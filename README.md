@@ -1,6 +1,12 @@
 Spring Cloud Zuul RateLimit
 ---
-Module to enable rate limit per service in Netflix Zuul
+Module to enable rate limit per service in Netflix Zuul.  
+There are four built-in rate limit approachs:
+ - Authenticated User: *Use the authenticated username or 'anonymous'*
+ - Origin: *Use the user origin request*
+ - Authenticated User and Origin IP: *Combine the authenticated user and de Origin*
+ - Global configuration per service: *This one doesn't validate the request Origin or the Authenticated User*
+   - To use this approach just don't set param 'type'
 
 Usage
 ---
@@ -12,9 +18,9 @@ zuul:
       the-service-id:
         limit: 10
         refresh-interval: 60 #default value (in seconds)
-        types: # if none is set the policy will be applied at service level
-          - user #use the authenticated username or 'anonymous'
-          - origin #use the user origin request
+        type: #optional
+          - user 
+          - origin 
 ```
 
 Any doubt open an [issue](https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit/issues).  
