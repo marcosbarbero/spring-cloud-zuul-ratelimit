@@ -17,4 +17,5 @@ zuul:
           - origin #use the user origin request
 ```
 
-Any question drop me a mail marcos.hgb@gmail.com
+Any doubt open an [issue](https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit/issues).  
+Any fix send me a [Pull Request](https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit/pulls).
