@@ -10,12 +10,24 @@ There are four built-in rate limit approachs:
 
 Usage
 ---
+
+Add the dependency on pom.xml
+```
+<dependency>
+    <groupId>com.marcosbarbero.cloud</groupId>
+    <artifactId>spring-cloud-zuul-ratelimit</artifactId>
+    <version>${zuul-ratelimit.version}</version>
+</dependency>
+```
+
+Sample configuration
+
 ```
 zuul:
   ratelimit:
     enabled: true #default false
     policies:
-      the-service-id:
+      myServiceId:
         limit: 10
         refresh-interval: 60 #default value (in seconds)
         type: #optional
