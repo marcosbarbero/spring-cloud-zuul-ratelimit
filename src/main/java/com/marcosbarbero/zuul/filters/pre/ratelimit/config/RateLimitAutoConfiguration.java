@@ -1,7 +1,7 @@
-package com.barbero.zuul.filters.pre.ratelimit.config;
+package com.marcosbarbero.zuul.filters.pre.ratelimit.config;
 
-import com.barbero.zuul.filters.pre.ratelimit.RateLimitFilter;
-import com.barbero.zuul.filters.pre.ratelimit.config.redis.RedisRateLimiter;
+import com.marcosbarbero.zuul.filters.pre.ratelimit.RateLimitFilter;
+import com.marcosbarbero.zuul.filters.pre.ratelimit.config.redis.RedisRateLimiter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

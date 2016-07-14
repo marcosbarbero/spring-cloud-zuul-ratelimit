@@ -1,8 +1,8 @@
-package com.barbero.zuul.filters.pre.ratelimit.config.redis;
+package com.marcosbarbero.zuul.filters.pre.ratelimit.config.redis;
 
-import com.barbero.zuul.filters.pre.ratelimit.config.Policy;
-import com.barbero.zuul.filters.pre.ratelimit.config.RateLimiter;
-import com.barbero.zuul.filters.pre.ratelimit.config.Rate;
+import com.marcosbarbero.zuul.filters.pre.ratelimit.config.Policy;
+import com.marcosbarbero.zuul.filters.pre.ratelimit.config.RateLimiter;
+import com.marcosbarbero.zuul.filters.pre.ratelimit.config.Rate;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;

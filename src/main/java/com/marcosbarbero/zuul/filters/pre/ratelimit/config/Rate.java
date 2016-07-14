@@ -1,4 +1,4 @@
-package com.barbero.zuul.filters.pre.ratelimit.config;
+package com.marcosbarbero.zuul.filters.pre.ratelimit.config;
 
 /**
  * Represents a view of rate limit in a giving time for a user.

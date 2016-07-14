@@ -1,4 +1,4 @@
-package com.barbero.zuul.filters.pre.ratelimit.config;
+package com.marcosbarbero.zuul.filters.pre.ratelimit.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

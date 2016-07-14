@@ -1,9 +1,9 @@
-package com.barbero.zuul.filters.pre.ratelimit;
+package com.marcosbarbero.zuul.filters.pre.ratelimit;
 
-import com.barbero.zuul.filters.pre.ratelimit.config.Policy;
-import com.barbero.zuul.filters.pre.ratelimit.config.RateLimitProperties;
-import com.barbero.zuul.filters.pre.ratelimit.config.RateLimiter;
-import com.barbero.zuul.filters.pre.ratelimit.config.Rate;
+import com.marcosbarbero.zuul.filters.pre.ratelimit.config.Policy;
+import com.marcosbarbero.zuul.filters.pre.ratelimit.config.RateLimitProperties;
+import com.marcosbarbero.zuul.filters.pre.ratelimit.config.RateLimiter;
+import com.marcosbarbero.zuul.filters.pre.ratelimit.config.Rate;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import org.springframework.cloud.netflix.zuul.filters.Route;
