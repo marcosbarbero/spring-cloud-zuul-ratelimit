@@ -16,7 +16,7 @@ Add the dependency on pom.xml
 <dependency>
     <groupId>com.marcosbarbero.cloud</groupId>
     <artifactId>spring-cloud-zuul-ratelimit</artifactId>
-    <version>${zuul-ratelimit.version}</version>
+    <version>1.0.1.RELEASE</version>
 </dependency>
 ```
 
