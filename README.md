@@ -11,6 +11,7 @@ There are four built-in rate limit approachs:
 Usage
 ---
 >This project is available on maven central
+
 Add the dependency on pom.xml
 ```
 <dependency>
