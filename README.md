@@ -27,6 +27,7 @@ Sample configuration
 zuul:
   ratelimit:
     enabled: true #default false
+    behind-proxy: true #default false
     policies:
       myServiceId:
         limit: 10

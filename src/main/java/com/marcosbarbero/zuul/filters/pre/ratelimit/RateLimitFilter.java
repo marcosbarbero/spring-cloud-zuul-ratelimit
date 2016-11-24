@@ -90,12 +90,22 @@ public class RateLimitFilter extends ZuulFilter {
         final Route route = route();
         StringBuilder builder = new StringBuilder(route.getId());
         if (policy.getType().contains(Policy.Type.ORIGIN)) {
-            builder.append(":").append(request.getRemoteAddr());
+            builder.append(":").append(getRemoteAddr(request));
         }
         if (policy.getType().contains(Policy.Type.USER)) {
             builder.append(":").append((request.getUserPrincipal() != null) ? request.getUserPrincipal().getName() : "anonymous");
         }
         return builder.toString();
+    }
+
+    private String getRemoteAddr(final HttpServletRequest request) {
+        final String remoteAddr;
+        if (this.properties.isBehindProxy() && request.getHeader("X-FORWARDED-FOR") != null) {
+            remoteAddr = request.getHeader("X-FORWARDED-FOR");
+        } else {
+            remoteAddr = request.getRemoteAddr();
+        }
+        return remoteAddr;
     }
 
     interface Headers {
