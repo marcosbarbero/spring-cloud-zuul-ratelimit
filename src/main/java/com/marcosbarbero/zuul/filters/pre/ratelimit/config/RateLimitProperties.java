@@ -15,5 +15,5 @@ public class RateLimitProperties {
 
     private Map<String, Policy> policies = new LinkedHashMap<>();
     private boolean enabled;
-
+    private boolean behindProxy;
 }
