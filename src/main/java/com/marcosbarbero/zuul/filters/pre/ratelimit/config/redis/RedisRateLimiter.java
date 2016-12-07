@@ -1,8 +1,8 @@
 package com.marcosbarbero.zuul.filters.pre.ratelimit.config.redis;
 
 import com.marcosbarbero.zuul.filters.pre.ratelimit.config.Policy;
-import com.marcosbarbero.zuul.filters.pre.ratelimit.config.RateLimiter;
 import com.marcosbarbero.zuul.filters.pre.ratelimit.config.Rate;
+import com.marcosbarbero.zuul.filters.pre.ratelimit.config.RateLimiter;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -32,9 +32,7 @@ public class RedisRateLimiter implements RateLimiter {
             public List<Object> execute(RedisOperations ops) throws DataAccessException {
                 ops.multi();
                 ops.boundValueOps(tempKey).increment(1L);
-                if (ops.getExpire(tempKey) == null) {
-                    ops.expire(tempKey, policy.getRefreshInterval(), TimeUnit.SECONDS);
-                }
+                ops.expire(tempKey, policy.getRefreshInterval(), TimeUnit.SECONDS);
                 return ops.exec();
             }
         });

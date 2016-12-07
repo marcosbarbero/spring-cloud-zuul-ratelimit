@@ -17,7 +17,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
  */
 @Configuration
 @EnableConfigurationProperties(RateLimitProperties.class)
-@ConditionalOnProperty(name = "zuul.ratelimit.enabled", matchIfMissing = false)
+@ConditionalOnProperty(name = "zuul.ratelimit.enabled")
 public class RateLimitAutoConfiguration {
 
     @Bean

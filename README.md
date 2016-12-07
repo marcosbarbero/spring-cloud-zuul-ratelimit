@@ -7,7 +7,17 @@ There are four built-in rate limit approachs:
  - Authenticated User and Request Origin: *Combine the authenticated user and the Request Origin*
  - Global configuration per service: *This one doesn't validate the request Origin or the Authenticated User*
    - To use this approach just don't set param 'type'
+      
+Adding Project Lombok Agent
+---
 
+This project uses [Project Lombok](http://projectlombok.org/features/index.html)
+to generate getters and setters etc. Compiling from the command line this
+shouldn't cause any problems, but in an IDE you need to add an agent
+to the JVM. Full instructions can be found in the Lombok website. The
+sign that you need to do this is a lot of compiler errors to do with
+missing methods and fields.     
+   
 Usage
 ---
 >This project is available on maven central
@@ -17,7 +27,7 @@ Add the dependency on pom.xml
 <dependency>
     <groupId>com.marcosbarbero.cloud</groupId>
     <artifactId>spring-cloud-zuul-ratelimit</artifactId>
-    <version>1.0.1.RELEASE</version>
+    <version>1.0.2.RELEASE</version>
 </dependency>
 ```
 
