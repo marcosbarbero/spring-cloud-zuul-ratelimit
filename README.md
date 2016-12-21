@@ -47,5 +47,9 @@ zuul:
           - origin 
 ```
 
+Footnote
+---
+This project currently works only with redis so in order to make this strategy work you'll need to have a redis up and running and configure it's connection.
+
 Any doubt open an [issue](https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit/issues).  
 Any fix send me a [Pull Request](https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit/pulls).
