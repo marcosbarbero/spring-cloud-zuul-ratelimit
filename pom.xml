@@ -13,7 +13,7 @@
         ]]>
     </description>
     <url>https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit</url>
-    <version>1.0.2.RELEASE</version>
+    <version>1.0.4.RELEASE</version>
 
     <licenses>
         <license>
@@ -41,7 +41,8 @@
 
     <scm>
         <connection>scm:git:https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit.git</connection>
-        <developerConnection>scm:git:git@github.com:marcosbarbero/spring-cloud-starter-zuul-ratelimit.git
+        <developerConnection>
+            scm:git:git@github.com:marcosbarbero/spring-cloud-starter-zuul-ratelimit.git
         </developerConnection>
         <url>https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit</url>
         <tag>HEAD</tag>
@@ -153,6 +154,7 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
 </project>
