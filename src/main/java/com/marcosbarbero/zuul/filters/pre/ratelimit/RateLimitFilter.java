@@ -24,6 +24,7 @@ import static com.marcosbarbero.zuul.filters.pre.ratelimit.config.Policy.Type.US
 
 /**
  * @author Marcos Barbero
+ * @author Michal Šváb
  */
 @AllArgsConstructor
 public class RateLimitFilter extends ZuulFilter {

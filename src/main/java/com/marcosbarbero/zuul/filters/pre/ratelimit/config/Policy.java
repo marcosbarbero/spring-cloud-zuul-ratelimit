@@ -11,6 +11,7 @@ import java.util.List;
  * A policy is used to define rate limit constraints within RateLimiter implementations
  *
  * @author Marcos Barbero
+ * @author Michal Šváb
  */
 @Data
 @NoArgsConstructor
