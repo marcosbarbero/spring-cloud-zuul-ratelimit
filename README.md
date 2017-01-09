@@ -45,8 +45,9 @@ zuul:
         limit: 10
         refresh-interval: 60 #default value (in seconds)
         type: #optional
-          - user 
-          - origin 
+          - user
+          - origin
+          - url
 ```
 
 Footnote
