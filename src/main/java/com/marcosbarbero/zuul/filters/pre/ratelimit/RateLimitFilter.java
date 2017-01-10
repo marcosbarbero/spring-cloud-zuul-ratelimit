@@ -1,31 +1,30 @@
 package com.marcosbarbero.zuul.filters.pre.ratelimit;
 
-import static com.marcosbarbero.zuul.filters.pre.ratelimit.config.Policy.Type;
-import static com.marcosbarbero.zuul.filters.pre.ratelimit.config.Policy.Type.ORIGIN;
-import static com.marcosbarbero.zuul.filters.pre.ratelimit.config.Policy.Type.USER;
-
-import java.util.List;
-import java.util.Optional;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.cloud.netflix.zuul.filters.Route;
-import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.util.UrlPathHelper;
-
 import com.marcosbarbero.zuul.filters.pre.ratelimit.config.Policy;
 import com.marcosbarbero.zuul.filters.pre.ratelimit.config.Rate;
 import com.marcosbarbero.zuul.filters.pre.ratelimit.config.RateLimitProperties;
 import com.marcosbarbero.zuul.filters.pre.ratelimit.config.RateLimiter;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
-
 import lombok.AllArgsConstructor;
+import org.springframework.cloud.netflix.zuul.filters.Route;
+import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.util.UrlPathHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Optional;
+
+import static com.marcosbarbero.zuul.filters.pre.ratelimit.config.Policy.Type;
+import static com.marcosbarbero.zuul.filters.pre.ratelimit.config.Policy.Type.ORIGIN;
+import static com.marcosbarbero.zuul.filters.pre.ratelimit.config.Policy.Type.URL;
+import static com.marcosbarbero.zuul.filters.pre.ratelimit.config.Policy.Type.USER;
 
 /**
  * @author Marcos Barbero
+ * @author Michal Šváb
  */
 @AllArgsConstructor
 public class RateLimitFilter extends ZuulFilter {
@@ -94,6 +93,9 @@ public class RateLimitFilter extends ZuulFilter {
     private String key(final HttpServletRequest request, final List<Type> types) {
         final Route route = route();
         final StringBuilder builder = new StringBuilder(route.getId());
+        if (types.contains(URL)) {
+            builder.append(":").append(route.getPath());
+        }
         if (types.contains(ORIGIN)) {
             builder.append(":").append(getRemoteAddr(request));
         }

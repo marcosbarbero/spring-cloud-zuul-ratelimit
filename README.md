@@ -1,13 +1,15 @@
 Spring Cloud Zuul RateLimit
 ---
 Module to enable rate limit per service in Netflix Zuul.  
-There are four built-in rate limit approachs:
- - Authenticated User: *Use the authenticated username or 'anonymous'*
- - Request Origin: *Use the user origin request*
- - Authenticated User and Request Origin: *Combine the authenticated user and the Request Origin*
+There are four built-in rate limit approaches:
+ - Authenticated User: *Uses the authenticated username or 'anonymous'*
+ - Request Origin: *Uses the user origin request*
+ - URL: *Uses the request path of the upstream service*
+   - Can be combined with Authenticated User, Request Origin or both
+ - Authenticated User and Request Origin: *Combines the authenticated user and the Request Origin*
  - Global configuration per service: *This one doesn't validate the request Origin or the Authenticated User*
    - To use this approach just don't set param 'type'
-      
+
 Adding Project Lombok Agent
 ---
 
@@ -43,8 +45,9 @@ zuul:
         limit: 10
         refresh-interval: 60 #default value (in seconds)
         type: #optional
-          - user 
-          - origin 
+          - user
+          - origin
+          - url
 ```
 
 Footnote

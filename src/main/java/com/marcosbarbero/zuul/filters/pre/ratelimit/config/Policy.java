@@ -5,14 +5,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * A policy is used to define rate limit constraints within RateLimiter implementations
  *
  * @author Marcos Barbero
+ * @author Michal Šváb
  */
 @Data
 @NoArgsConstructor
@@ -23,7 +22,7 @@ public class Policy {
     private List<Type> type = new ArrayList<>();
 
     public enum Type {
-        ORIGIN, USER
+        ORIGIN, USER, URL
     }
 
 }
