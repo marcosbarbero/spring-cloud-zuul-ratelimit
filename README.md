@@ -1,7 +1,7 @@
 Spring Cloud Zuul RateLimit
 ---
 Module to enable rate limit per service in Netflix Zuul.  
-There are four built-in rate limit approaches:
+There are five built-in rate limit approaches:
  - Authenticated User: *Uses the authenticated username or 'anonymous'*
  - Request Origin: *Uses the user origin request*
  - URL: *Uses the request path of the upstream service*
