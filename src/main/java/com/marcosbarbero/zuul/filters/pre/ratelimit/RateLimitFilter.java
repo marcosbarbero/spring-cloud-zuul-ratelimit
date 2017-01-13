@@ -6,16 +6,19 @@ import com.marcosbarbero.zuul.filters.pre.ratelimit.config.RateLimitProperties;
 import com.marcosbarbero.zuul.filters.pre.ratelimit.config.RateLimiter;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
-import lombok.AllArgsConstructor;
+
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.util.UrlPathHelper;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import lombok.AllArgsConstructor;
 
 import static com.marcosbarbero.zuul.filters.pre.ratelimit.config.Policy.Type;
 import static com.marcosbarbero.zuul.filters.pre.ratelimit.config.Policy.Type.ORIGIN;
@@ -29,10 +32,13 @@ import static com.marcosbarbero.zuul.filters.pre.ratelimit.config.Policy.Type.US
 @AllArgsConstructor
 public class RateLimitFilter extends ZuulFilter {
 
+    private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
+    private static final String X_FORWARDED_FOR = "X-FORWARDED-FOR";
+    private static final String ANONYMOUS = "anonymous";
+
     private final RateLimiter limiter;
     private final RateLimitProperties properties;
     private final RouteLocator routeLocator;
-    private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
 
     @Override
     public String filterType() {
@@ -100,15 +106,16 @@ public class RateLimitFilter extends ZuulFilter {
             builder.append(":").append(getRemoteAddr(request));
         }
         if (types.contains(USER)) {
-            builder.append(":").append((request.getUserPrincipal() != null) ? request.getUserPrincipal().getName() : "anonymous");
+            builder.append(":").append((request.getUserPrincipal() != null) ? request.getUserPrincipal().getName() :
+                    ANONYMOUS);
         }
         return builder.toString();
     }
 
     private String getRemoteAddr(final HttpServletRequest request) {
         final String remoteAddr;
-        if (this.properties.isBehindProxy() && request.getHeader("X-FORWARDED-FOR") != null) {
-            remoteAddr = request.getHeader("X-FORWARDED-FOR");
+        if (this.properties.isBehindProxy() && request.getHeader(X_FORWARDED_FOR) != null) {
+            remoteAddr = request.getHeader(X_FORWARDED_FOR);
         } else {
             remoteAddr = request.getRemoteAddr();
         }
