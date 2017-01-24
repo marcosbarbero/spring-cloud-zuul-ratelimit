@@ -1,5 +1,9 @@
 package com.marcosbarbero.zuul.filters.pre.ratelimit.config;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * Represents a view of rate limit in a giving time for a user.
  * <p>
@@ -9,40 +13,13 @@ package com.marcosbarbero.zuul.filters.pre.ratelimit.config;
  *
  * @author Marcos Barbero
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Rate {
+
     private Long limit;
-
     private Long remaining;
-
     private Long reset;
 
-    public Rate(Long limit, Long remaining, Long reset) {
-        this.limit = limit;
-        this.remaining = remaining;
-        this.reset = reset;
-    }
-
-    public Long getLimit() {
-        return limit;
-    }
-
-    public void setLimit(Long limit) {
-        this.limit = limit;
-    }
-
-    public Long getRemaining() {
-        return remaining;
-    }
-
-    public void setRemaining(Long remaining) {
-        this.remaining = remaining;
-    }
-
-    public Long getReset() {
-        return reset;
-    }
-
-    public void setReset(Long reset) {
-        this.reset = reset;
-    }
 }
