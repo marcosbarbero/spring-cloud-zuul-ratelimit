@@ -5,6 +5,7 @@ import com.marcosbarbero.zuul.filters.pre.ratelimit.config.Rate;
 import com.marcosbarbero.zuul.filters.pre.ratelimit.config.RateLimiter;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.util.Assert;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -12,9 +13,10 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  * @author Marcos Barbero
  */
 public class RedisRateLimiter implements RateLimiter {
-    private RedisTemplate template;
+    private final RedisTemplate template;
 
-    public RedisRateLimiter(RedisTemplate template) {
+    public RedisRateLimiter(final RedisTemplate template) {
+        Assert.notNull(template, "RedisTemplate cannot be null");
         this.template = template;
     }
 
