@@ -2,6 +2,7 @@ package com.marcosbarbero.zuul.filters.pre.ratelimit.config;
 
 import com.marcosbarbero.zuul.filters.pre.ratelimit.RateLimitFilter;
 import com.marcosbarbero.zuul.filters.pre.ratelimit.config.redis.RedisRateLimiter;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -17,11 +18,12 @@ import org.springframework.data.redis.core.StringRedisTemplate;
  */
 @Configuration
 @EnableConfigurationProperties(RateLimitProperties.class)
-@ConditionalOnProperty(name = "zuul.ratelimit.enabled")
+@ConditionalOnProperty(name = RateLimitProperties.PREFIX + ".enabled", havingValue = "true")
 public class RateLimitAutoConfiguration {
 
     @Bean
-    public RateLimitFilter rateLimiterFilter(RateLimiter rateLimiter, RateLimitProperties rateLimitProperties, RouteLocator routeLocator) {
+    public RateLimitFilter rateLimiterFilter(RateLimiter rateLimiter, RateLimitProperties rateLimitProperties,
+                                             RouteLocator routeLocator) {
         return new RateLimitFilter(rateLimiter, rateLimitProperties, routeLocator);
     }
 
