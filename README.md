@@ -53,15 +53,20 @@ zuul:
 Contributing
 ---
 
-Spring Cloud Zuul Rate Limit is released under the non-restrictive Apache 2.0 license, and follows a very standard Github development process, using Github tracker for issues and merging pull requests into master. If you want to contribute even something trivial please do not hesitate, but follow the guidelines below.
+Spring Cloud Zuul Rate Limit is released under the non-restrictive Apache 2.0 license, and follows a very 
+standard Github development process, using Github tracker for issues and merging pull requests into master. 
+If you want to contribute even something trivial please do not hesitate, but follow the guidelines below.
 
 ###Code of Conduct
 
-This project adheres to the Contributor Covenant [code of conduct](https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit/blob/master/docs/code-of-conduct.adoc). By participating, you are expected to uphold this code. Please report unacceptable behavior to marcos.hgb@gmail.com.
+This project adheres to the Contributor Covenant 
+[code of conduct](https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit/blob/master/docs/code-of-conduct.adoc). 
+By participating, you are expected to uphold this code. Please report unacceptable behavior to marcos.hgb@gmail.com.
 
 Footnote
 ---
-This project currently works only with redis so in order to make this strategy work you'll need to have a redis up and running and configure it's connection.
+This project currently works only with redis so in order to make this strategy work you'll need to have a 
+redis up and running and configure it's connection.
 
 Any doubt open an [issue](https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit/issues).  
 Any fix send me a [Pull Request](https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit/pulls).
