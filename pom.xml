@@ -13,7 +13,7 @@
         ]]>
     </description>
     <url>https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit</url>
-    <version>1.0.6.RELEASE</version>
+    <version>1.0.7.RELEASE</version>
 
     <licenses>
         <license>
