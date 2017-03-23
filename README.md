@@ -57,7 +57,7 @@ Spring Cloud Zuul Rate Limit is released under the non-restrictive Apache 2.0 li
 standard Github development process, using Github tracker for issues and merging pull requests into master. 
 If you want to contribute even something trivial please do not hesitate, but follow the guidelines below.
 
-###Code of Conduct
+### Code of Conduct
 
 This project adheres to the Contributor Covenant 
 [code of conduct](https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit/blob/master/docs/code-of-conduct.adoc). 
