@@ -13,12 +13,14 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
+import static com.marcosbarbero.zuul.filters.pre.ratelimit.config.RateLimitProperties.PREFIX;
+
 /**
  * @author Marcos Barbero
  */
 @Configuration
 @EnableConfigurationProperties(RateLimitProperties.class)
-@ConditionalOnProperty(name = RateLimitProperties.PREFIX + ".enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = PREFIX, name = "enabled", havingValue = "true")
 public class RateLimitAutoConfiguration {
 
     @Bean
