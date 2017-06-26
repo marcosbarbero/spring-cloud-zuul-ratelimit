@@ -1,0 +1,9 @@
+zuul:
+  ratelimit:
+    enabled: true
+    policies:
+      serviceA:
+        limit: 10
+        refresh-interval: 60
+        type:
+          - origin
