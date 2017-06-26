@@ -39,7 +39,6 @@ In case you are using Redis there will be needed to add the following dependency
 ```
 
 Sample configuration
-
 ```
 zuul:
   ratelimit:
