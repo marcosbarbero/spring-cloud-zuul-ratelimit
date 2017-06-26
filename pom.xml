@@ -79,6 +79,7 @@
     <modules>
         <module>ratelimit-core</module>
         <module>ratelimit-tests/inmemory</module>
+        <module>ratelimit-tests/redis</module>
     </modules>
 
 </project>
