@@ -1,5 +1,7 @@
 package com.marcosbarbero.zuul.filters.pre.ratelimit.config;
 
+import java.util.Date;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,5 +23,6 @@ public class Rate {
     private Long limit;
     private Long remaining;
     private Long reset;
+    private Date expiration;
 
 }

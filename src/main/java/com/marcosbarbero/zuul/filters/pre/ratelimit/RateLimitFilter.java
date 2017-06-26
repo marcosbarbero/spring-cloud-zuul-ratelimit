@@ -16,11 +16,12 @@ import org.springframework.web.util.UrlPathHelper;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.StringJoiner;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import static com.marcosbarbero.zuul.filters.pre.ratelimit.config.Policy.Type;
 import static com.marcosbarbero.zuul.filters.pre.ratelimit.config.Policy.Type.ORIGIN;
@@ -31,14 +32,14 @@ import static com.marcosbarbero.zuul.filters.pre.ratelimit.config.Policy.Type.US
  * @author Marcos Barbero
  * @author Michal Šváb
  */
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class RateLimitFilter extends ZuulFilter {
 
     private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
     private static final String X_FORWARDED_FOR = "X-FORWARDED-FOR";
     private static final String ANONYMOUS = "anonymous";
 
-    private final RateLimiter limiter;
+    private final RateLimiter rateLimiter;
     private final RateLimitProperties properties;
     private final RouteLocator routeLocator;
 
@@ -54,64 +55,53 @@ public class RateLimitFilter extends ZuulFilter {
 
     @Override
     public boolean shouldFilter() {
-        return this.properties.isEnabled() && policy() != null;
+        return this.properties.isEnabled() && policy().isPresent();
     }
 
     public Object run() {
         final RequestContext ctx = RequestContext.getCurrentContext();
         final HttpServletResponse response = ctx.getResponse();
         final HttpServletRequest request = ctx.getRequest();
-        Optional.ofNullable(policy()).ifPresent(policy -> {
 
-            final Rate rate = this.limiter.consume(policy, key(request, policy.getType()));
+        policy().ifPresent(policy -> {
+            final Rate rate = this.rateLimiter.consume(policy, key(request, policy.getType()));
             response.setHeader(Headers.LIMIT, rate.getLimit().toString());
             response.setHeader(Headers.REMAINING, String.valueOf(Math.max(rate.getRemaining(), 0)));
             response.setHeader(Headers.RESET, rate.getReset().toString());
             if (rate.getRemaining() < 0) {
                 ctx.setResponseStatusCode(HttpStatus.TOO_MANY_REQUESTS.value());
                 ctx.put("rateLimitExceeded", "true");
-                throw new ZuulRuntimeException(new ZuulException(HttpStatus.TOO_MANY_REQUESTS.toString(), HttpStatus.TOO_MANY_REQUESTS.value(), null));
+                throw new ZuulRuntimeException(new ZuulException(HttpStatus.TOO_MANY_REQUESTS.toString(), HttpStatus
+                        .TOO_MANY_REQUESTS.value(), null));
             }
         });
         return null;
     }
 
-    /**
-     * Get the requestURI from request.
-     *
-     * @return The request URI
-     */
-    private String requestURI() {
-        return URL_PATH_HELPER.getPathWithinApplication(RequestContext.getCurrentContext().getRequest());
-    }
-
-    /**
-     * Return the requestedContext from request.
-     *
-     * @return The requestedContext
-     */
     private Route route() {
-        return this.routeLocator.getMatchingRoute(this.requestURI());
+        String requestURI = URL_PATH_HELPER.getPathWithinApplication(RequestContext.getCurrentContext().getRequest());
+        return this.routeLocator.getMatchingRoute(requestURI);
     }
 
-    private Policy policy() {
-        return (route() != null) ? this.properties.getPolicies().get(route().getId()) : null;
+    private Optional<Policy> policy() {
+        return (route() != null) ? Optional.ofNullable(this.properties.getPolicies().get(route().getId())) :
+                Optional.empty();
     }
 
     private String key(final HttpServletRequest request, final List<Type> types) {
         final Route route = route();
-        final StringBuilder builder = new StringBuilder(route.getId());
+        final StringJoiner joiner = new StringJoiner(":");
+        joiner.add(route.getId());
         if (types.contains(URL)) {
-            builder.append(":").append(route.getPath());
+            joiner.add(route.getPath());
         }
         if (types.contains(ORIGIN)) {
-            builder.append(":").append(getRemoteAddr(request));
+            joiner.add(getRemoteAddr(request));
         }
         if (types.contains(USER)) {
-            builder.append(":").append((request.getUserPrincipal() != null) ? request.getUserPrincipal().getName() :
-                    ANONYMOUS);
+            joiner.add((request.getUserPrincipal() != null) ? request.getUserPrincipal().getName() : ANONYMOUS);
         }
-        return builder.toString();
+        return joiner.toString();
     }
 
     private String getRemoteAddr(final HttpServletRequest request) {

@@ -1,4 +1,4 @@
-package com.marcosbarbero.zuul.filters.pre.ratelimit.config.redis;
+package com.marcosbarbero.zuul.filters.pre.ratelimit.config.repository;
 
 import com.marcosbarbero.zuul.filters.pre.ratelimit.config.Policy;
 import com.marcosbarbero.zuul.filters.pre.ratelimit.config.Rate;
@@ -31,6 +31,6 @@ public class RedisRateLimiter implements RateLimiter {
             this.template.expire(key, refreshInterval, SECONDS);
             expire = refreshInterval;
         }
-        return new Rate(limit, Math.max(-1, limit - current), SECONDS.toMillis(expire));
+        return new Rate(limit, Math.max(-1, limit - current), SECONDS.toMillis(expire), null);
     }
 }

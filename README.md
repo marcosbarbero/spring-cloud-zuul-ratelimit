@@ -10,16 +10,13 @@ There are five built-in rate limit approaches:
  - Global configuration per service: *This one doesn't validate the request Origin or the Authenticated User*
    - To use this approach just don't set param 'type'
 
-Adding Project Lombok Agent
+Default implementations
 ---
+There are two implementations provided:  
+ * `RedisRateLimiter` for production
+ * `InMemoryRateLimiter` only for dev environment 
 
-This project uses [Project Lombok](http://projectlombok.org/features/index.html)
-to generate getters and setters etc. Compiling from the command line this
-shouldn't cause any problems, but in an IDE you need to add an agent
-to the JVM. Full instructions can be found in the Lombok website. The
-sign that you need to do this is a lot of compiler errors to do with
-missing methods and fields.     
-   
+
 Usage
 ---
 >This project is available on maven central
@@ -29,8 +26,16 @@ Add the dependency on pom.xml
 <dependency>
     <groupId>com.marcosbarbero.cloud</groupId>
     <artifactId>spring-cloud-zuul-ratelimit</artifactId>
-    <version>1.0.8.RELEASE</version>
+    <version>1.0.9.RELEASE</version>
 </dependency>
+```
+
+In case you are using Redis there will be needed to add the following dependency as well to pom.xml
+```
+ <dependency>
+     <groupId>org.springframework.boot</groupId>
+     <artifactId>spring-boot-starter-data-redis</artifactId>
+ </dependency>
 ```
 
 Sample configuration
@@ -57,6 +62,14 @@ Spring Cloud Zuul Rate Limit is released under the non-restrictive Apache 2.0 li
 standard Github development process, using Github tracker for issues and merging pull requests into master. 
 If you want to contribute even something trivial please do not hesitate, but follow the guidelines below.
 
+### Adding Project Lombok Agent
+This project uses [Project Lombok](http://projectlombok.org/features/index.html)
+to generate getters and setters etc. Compiling from the command line this
+shouldn't cause any problems, but in an IDE you need to add an agent
+to the JVM. Full instructions can be found in the Lombok website. The
+sign that you need to do this is a lot of compiler errors to do with
+missing methods and fields.
+
 ### Code of Conduct
 
 This project adheres to the Contributor Covenant 
@@ -65,8 +78,5 @@ By participating, you are expected to uphold this code. Please report unacceptab
 
 Footnote
 ---
-This project currently works only with redis so in order to make this strategy work you'll need to have a 
-redis up and running and configure it's connection.
-
 Any doubt open an [issue](https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit/issues).  
 Any fix send me a [Pull Request](https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit/pulls).
