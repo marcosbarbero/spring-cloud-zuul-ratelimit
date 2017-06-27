@@ -1,7 +1,7 @@
 package com.marcosbarbero.tests;
 
-import com.marcosbarbero.zuul.filters.pre.ratelimit.config.RateLimiter;
-import com.marcosbarbero.zuul.filters.pre.ratelimit.config.repository.InMemoryRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

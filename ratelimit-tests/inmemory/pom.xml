@@ -4,14 +4,23 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
-        <groupId>com.marcosbarbero.tests</groupId>
-        <artifactId>tests</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <artifactId>spring-cloud-zuul-ratelimit-parent</artifactId>
+        <groupId>com.marcosbarbero.cloud</groupId>
+        <version>1.1.0.RELEASE</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>inmemory</artifactId>
+    <name>InMemory RateLimit Tests</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.marcosbarbero.cloud</groupId>
+            <artifactId>spring-cloud-zuul-ratelimit</artifactId>
+            <version>1.1.0.RELEASE</version>
+        </dependency>
+    </dependencies>
 
 </project>
