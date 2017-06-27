@@ -37,12 +37,12 @@ public class InMemoryRateLimiter implements RateLimiter {
     @Override
     public synchronized Rate consume(final Policy policy, final String key) {
         Rate rate = this.create(policy, key);
-        this.replenish(rate);
+        this.update(rate);
         this.repository.put(key, rate);
         return rate;
     }
 
-    private void replenish(Rate rate) {
+    private void update(Rate rate) {
         if (rate.getReset() > 0) {
             Long reset = rate.getExpiration().getTime() - System.currentTimeMillis();
             rate.setReset(reset);
