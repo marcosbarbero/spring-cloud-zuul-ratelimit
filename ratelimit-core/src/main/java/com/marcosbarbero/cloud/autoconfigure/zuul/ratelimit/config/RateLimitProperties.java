@@ -1,4 +1,4 @@
-package com.marcosbarbero.zuul.filters.pre.ratelimit.config;
+package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -7,7 +7,7 @@ import java.util.Map;
 
 import lombok.Data;
 
-import static com.marcosbarbero.zuul.filters.pre.ratelimit.config.RateLimitProperties.PREFIX;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitProperties.PREFIX;
 
 /**
  * @author Marcos Barbero

@@ -1,8 +1,10 @@
-package com.marcosbarbero.zuul.filters.pre.ratelimit.config;
+package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit;
 
-import com.marcosbarbero.zuul.filters.pre.ratelimit.RateLimitFilter;
-import com.marcosbarbero.zuul.filters.pre.ratelimit.config.repository.InMemoryRateLimiter;
-import com.marcosbarbero.zuul.filters.pre.ratelimit.config.repository.RedisRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitFilter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitProperties;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RedisRateLimiter;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -17,7 +19,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
-import static com.marcosbarbero.zuul.filters.pre.ratelimit.config.RateLimitProperties.PREFIX;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitProperties.PREFIX;
 
 /**
  * @author Marcos Barbero

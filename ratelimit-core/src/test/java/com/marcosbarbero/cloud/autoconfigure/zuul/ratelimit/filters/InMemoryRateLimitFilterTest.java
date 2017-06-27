@@ -1,10 +1,10 @@
-package com.marcosbarbero.zuul.filters.pre.ratelimit;
+package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
-import com.marcosbarbero.zuul.filters.pre.ratelimit.commons.TestRouteLocator;
-import com.marcosbarbero.zuul.filters.pre.ratelimit.config.Policy;
-import com.marcosbarbero.zuul.filters.pre.ratelimit.config.RateLimitProperties;
-import com.marcosbarbero.zuul.filters.pre.ratelimit.config.RateLimiter;
-import com.marcosbarbero.zuul.filters.pre.ratelimit.config.repository.InMemoryRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.commons.TestRouteLocator;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Policy;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitProperties;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
 import com.netflix.zuul.context.RequestContext;
 
 import org.junit.Before;

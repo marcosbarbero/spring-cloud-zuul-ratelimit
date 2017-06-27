@@ -1,4 +1,4 @@
-package com.marcosbarbero.zuul.filters.pre.ratelimit.config;
+package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config;
 
 import java.util.Date;
 

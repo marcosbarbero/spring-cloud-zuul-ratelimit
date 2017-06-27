@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.marcosbarbero.zuul.filters.pre.ratelimit.config.RateLimitAutoConfiguration
+com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.RateLimitAutoConfiguration

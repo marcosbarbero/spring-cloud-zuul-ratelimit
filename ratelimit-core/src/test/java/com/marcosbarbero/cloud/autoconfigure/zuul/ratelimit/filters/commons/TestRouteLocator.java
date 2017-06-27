@@ -1,4 +1,4 @@
-package com.marcosbarbero.zuul.filters.pre.ratelimit.commons;
+package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.commons;
 
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
