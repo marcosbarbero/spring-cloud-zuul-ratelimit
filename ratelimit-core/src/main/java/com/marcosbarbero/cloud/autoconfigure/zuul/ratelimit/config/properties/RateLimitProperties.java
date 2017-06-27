@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config;
+package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -23,7 +23,7 @@ import java.util.Map;
 
 import lombok.Data;
 
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitProperties.PREFIX;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.PREFIX;
 
 /**
  * @author Marcos Barbero

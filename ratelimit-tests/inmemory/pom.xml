@@ -13,7 +13,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>inmemory</artifactId>
-    <name>InMemory RateLimit Tests</name>
+    <name>Tests - InMemory RateLimit</name>
 
     <dependencies>
         <dependency>

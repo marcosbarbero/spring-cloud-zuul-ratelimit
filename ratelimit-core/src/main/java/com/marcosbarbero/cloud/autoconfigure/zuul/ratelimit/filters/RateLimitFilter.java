@@ -16,10 +16,10 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
@@ -38,10 +38,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import lombok.RequiredArgsConstructor;
 
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Policy.Type;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Policy.Type.ORIGIN;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Policy.Type.URL;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Policy.Type.USER;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy.Type;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy.Type.ORIGIN;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy.Type.URL;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy.Type.USER;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
 /**
@@ -108,14 +108,16 @@ public class RateLimitFilter extends ZuulFilter {
         final Route route = route();
         final StringJoiner joiner = new StringJoiner(":");
         joiner.add(route.getId());
-        if (types.contains(URL)) {
-            joiner.add(route.getPath());
-        }
-        if (types.contains(ORIGIN)) {
-            joiner.add(getRemoteAddr(request));
-        }
-        if (types.contains(USER)) {
-            joiner.add(request.getUserPrincipal() != null ? request.getUserPrincipal().getName() : ANONYMOUS);
+        if (!types.isEmpty()) {
+            if (types.contains(URL)) {
+                joiner.add(route.getPath());
+            }
+            if (types.contains(ORIGIN)) {
+                joiner.add(getRemoteAddr(request));
+            }
+            if (types.contains(USER)) {
+                joiner.add(request.getUserPrincipal() != null ? request.getUserPrincipal().getName() : ANONYMOUS);
+            }
         }
         return joiner.toString();
     }

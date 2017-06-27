@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config;
+package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
+
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
+import static java.util.concurrent.TimeUnit.MINUTES;
 
 /**
  * A policy is used to define rate limit constraints within RateLimiter implementations
@@ -32,10 +37,15 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Policy {
-    private Long refreshInterval = 60L;
+public class Policy implements InitializingBean {
+    private Long refreshInterval = MINUTES.toSeconds(1L);
     private Long limit;
     private List<Type> type = new ArrayList<>();
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        Assert.notNull(this.limit, "Policy's limit cannot be null");
+    }
 
     public enum Type {
         ORIGIN, USER, URL

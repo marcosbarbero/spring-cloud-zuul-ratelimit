@@ -16,7 +16,7 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit;
 
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitProperties;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RedisRateLimiter;
@@ -34,7 +34,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitProperties.PREFIX;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.PREFIX;
 
 /**
  * @author Marcos Barbero

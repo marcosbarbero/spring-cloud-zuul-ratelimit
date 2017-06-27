@@ -1,7 +1,7 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Policy;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitProperties;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.commons.TestRouteLocator;

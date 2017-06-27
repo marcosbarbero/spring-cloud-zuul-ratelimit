@@ -16,6 +16,8 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config;
 
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy;
+
 /**
  * @author Marcos Barbero
  */
