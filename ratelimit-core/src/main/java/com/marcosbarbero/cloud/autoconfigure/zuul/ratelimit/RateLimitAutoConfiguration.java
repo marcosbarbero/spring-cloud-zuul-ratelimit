@@ -66,7 +66,7 @@ public class RateLimitAutoConfiguration {
 
     @ConditionalOnMissingBean(RateLimiter.class)
     @ConditionalOnMissingClass("org.springframework.data.redis.core.RedisTemplate")
-    public static class InMemoryConfigurationˆ {
+    public static class InMemoryConfiguration {
 
         @Bean
         public RateLimiter inMemoryRateLimiter() {
