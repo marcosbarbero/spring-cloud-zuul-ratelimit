@@ -16,11 +16,11 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit;
 
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitFilter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RedisRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitFilter;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -30,7 +30,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -60,7 +59,6 @@ public class RateLimitAutoConfiguration {
         }
 
         @Bean
-        @Primary
         public RateLimiter redisRateLimiter(RedisTemplate redisTemplate) {
             return new RedisRateLimiter(redisTemplate);
         }
@@ -68,7 +66,7 @@ public class RateLimitAutoConfiguration {
 
     @ConditionalOnMissingBean(RateLimiter.class)
     @ConditionalOnMissingClass("org.springframework.data.redis.core.RedisTemplate")
-    public static class InMemoryConfiguration {
+    public static class InMemoryConfigurationˆ {
 
         @Bean
         public RateLimiter inMemoryRateLimiter() {
