@@ -24,6 +24,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 /**
  * In memory rate limiter configuration for dev environment.
  *
@@ -47,7 +49,7 @@ public class InMemoryRateLimiter implements RateLimiter {
             Long reset = rate.getExpiration().getTime() - System.currentTimeMillis();
             rate.setReset(reset);
         }
-        rate.setRemaining(rate.getRemaining() - 1);
+        rate.setRemaining(Math.max(-1, rate.getRemaining() - 1));
     }
 
     private Rate create(Policy policy, String key) {
@@ -56,8 +58,8 @@ public class InMemoryRateLimiter implements RateLimiter {
             rate = new Rate();
 
             final Long limit = policy.getLimit();
-            final Long refreshInterval = policy.getRefreshInterval();
-            final Date expiration = new Date(System.currentTimeMillis() + (refreshInterval * 1000L));
+            final Long refreshInterval = SECONDS.toMillis(policy.getRefreshInterval());
+            final Date expiration = new Date(System.currentTimeMillis() + refreshInterval);
 
             rate.setExpiration(expiration);
             rate.setLimit(limit);
