@@ -1,4 +1,14 @@
 zuul:
+  routes:
+    serviceA:
+      path: /serviceA
+      url: forward:/services
+    serviceB:
+      path: /serviceB
+      url: forward:/services
+    serviceC:
+      path: /serviceC
+      url: forward:/services
   ratelimit:
     enabled: true
     policies:
@@ -7,3 +17,9 @@ zuul:
         refresh-interval: 60
         type:
           - origin
+      serviceB:
+        limit: 2
+        refresh-interval: 5
+        type:
+          - origin
+  strip-prefix: true

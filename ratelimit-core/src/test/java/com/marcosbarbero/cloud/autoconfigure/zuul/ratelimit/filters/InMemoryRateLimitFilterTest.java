@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
@@ -32,14 +33,11 @@ public class InMemoryRateLimitFilterTest {
 
     private RateLimitFilter filter;
 
-    private RouteLocator routeLocator;
+    private MockHttpServletRequest request;
+    private MockHttpServletResponse response;
 
     private RequestContext context = RequestContext.getCurrentContext();
-
     private RateLimiter rateLimiter = new InMemoryRateLimiter();
-    private MockHttpServletRequest request = new MockHttpServletRequest();
-
-    private MockHttpServletResponse response = new MockHttpServletResponse();
 
     private Route createRoute(String id, String path) {
         return new Route(id, path, null, null, false, Collections.emptySet());
@@ -65,8 +63,12 @@ public class InMemoryRateLimitFilterTest {
 
     @Before
     public void setUp() {
-        this.routeLocator = new TestRouteLocator(asList("ignored"), asList(createRoute("serviceA", "/serviceA")));
-        this.filter = new RateLimitFilter(this.rateLimiter, this.properties(), this.routeLocator);
+        RouteLocator routeLocator = new TestRouteLocator(asList("ignored"),
+                asList(createRoute("serviceA", "/serviceA"), createRoute("serviceB", "/serviceB")));
+
+        this.request = new MockHttpServletRequest();
+        this.response = new MockHttpServletResponse();
+        this.filter = new RateLimitFilter(this.rateLimiter, this.properties(), routeLocator);
         this.context.clear();
         this.context.setRequest(this.request);
         this.context.setResponse(this.response);
@@ -76,6 +78,9 @@ public class InMemoryRateLimitFilterTest {
     public void testRateLimit() throws Exception {
         this.request.setRequestURI("/serviceA");
         this.request.setRemoteAddr("10.0.0.100");
+
+        assertTrue(this.filter.shouldFilter());
+
         this.filter.run();
 
         TimeUnit.SECONDS.sleep(5);
@@ -97,6 +102,8 @@ public class InMemoryRateLimitFilterTest {
         this.request.setRequestURI("/serviceA");
         this.request.setRemoteAddr("10.0.0.100");
 
+        assertTrue(this.filter.shouldFilter());
+
         try {
             for (int i = 0; i <= 3; i++) {
                 this.filter.run();
@@ -107,7 +114,14 @@ public class InMemoryRateLimitFilterTest {
 
         String exceeded = (String) this.context.get("rateLimitExceeded");
         assertTrue("RateLimit Exceeded", Boolean.valueOf(exceeded));
-        assertEquals("Too many requests", context.getResponseStatusCode(), TOO_MANY_REQUESTS.value());
+        assertEquals("Too many requests", this.context.getResponseStatusCode(), TOO_MANY_REQUESTS.value());
+    }
+
+    @Test
+    public void testNoRateLimit() throws Exception {
+        this.request.setRequestURI("/serviceB");
+        this.request.setRemoteAddr("127.0.0.1");
+        assertFalse(this.filter.shouldFilter());
     }
 
 
