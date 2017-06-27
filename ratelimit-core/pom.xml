@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>spring-cloud-zuul-ratelimit</artifactId>
-    <name>Rate limit configuration for Spring Cloud Netflix Zuul</name>
+    <name>Rate limit configuration for Spring Cloud Netflix Zuul - Core</name>
     <description>
         <![CDATA[
             This project is a Spring Cloud Netflix Zuul Rate Limit strategy.

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2012-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Policy;
@@ -11,7 +27,6 @@ import com.netflix.zuul.exception.ZuulException;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.cloud.netflix.zuul.util.ZuulRuntimeException;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.util.UrlPathHelper;
 
 import java.util.List;
@@ -27,6 +42,7 @@ import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Policy
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Policy.Type.ORIGIN;
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Policy.Type.URL;
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Policy.Type.USER;
+import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
 /**
  * @author Marcos Barbero
@@ -69,10 +85,10 @@ public class RateLimitFilter extends ZuulFilter {
             response.setHeader(Headers.REMAINING, String.valueOf(Math.max(rate.getRemaining(), 0)));
             response.setHeader(Headers.RESET, rate.getReset().toString());
             if (rate.getRemaining() < 0) {
-                ctx.setResponseStatusCode(HttpStatus.TOO_MANY_REQUESTS.value());
+                ctx.setResponseStatusCode(TOO_MANY_REQUESTS.value());
                 ctx.put("rateLimitExceeded", "true");
-                throw new ZuulRuntimeException(new ZuulException(HttpStatus.TOO_MANY_REQUESTS.toString(), HttpStatus
-                        .TOO_MANY_REQUESTS.value(), null));
+                throw new ZuulRuntimeException(new ZuulException(TOO_MANY_REQUESTS.toString(),
+                        TOO_MANY_REQUESTS.value(), null));
             }
         });
         return null;
@@ -105,13 +121,10 @@ public class RateLimitFilter extends ZuulFilter {
     }
 
     private String getRemoteAddr(final HttpServletRequest request) {
-        final String remoteAddr;
         if (this.properties.isBehindProxy() && request.getHeader(X_FORWARDED_FOR) != null) {
-            remoteAddr = request.getHeader(X_FORWARDED_FOR);
-        } else {
-            remoteAddr = request.getRemoteAddr();
+            return request.getHeader(X_FORWARDED_FOR);
         }
-        return remoteAddr;
+        return request.getRemoteAddr();
     }
 
     interface Headers {

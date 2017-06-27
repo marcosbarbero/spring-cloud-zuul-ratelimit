@@ -1,10 +1,10 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.commons.TestRouteLocator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.commons.TestRouteLocator;
 import com.netflix.zuul.context.RequestContext;
 
 import org.junit.Before;
@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
 /**
  * @author Marcos Barbero
@@ -106,6 +107,7 @@ public class InMemoryRateLimitFilterTest {
 
         String exceeded = (String) this.context.get("rateLimitExceeded");
         assertTrue("RateLimit Exceeded", Boolean.valueOf(exceeded));
+        assertEquals("Too many requests", context.getResponseStatusCode(), TOO_MANY_REQUESTS.value());
     }
 
 
