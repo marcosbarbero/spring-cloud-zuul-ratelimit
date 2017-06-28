@@ -191,7 +191,8 @@
 
                 <configuration>
                     <excludes>
-                        <exclude>com/marcosbarbero/tests/**/*</exclude>
+                        <exclude>com/marcosbarbero/tests/config/**</exclude>
+                        <exclude>com/marcosbarbero/tests/**Application</exclude>
                     </excludes>
                 </configuration>
             </plugin>
