@@ -9,6 +9,10 @@ zuul:
     serviceC:
       path: /serviceC
       url: forward:/services
+    serviceD:
+      strip-prefix: false
+      path: /serviceD/**
+      url: forward:/services
   ratelimit:
     enabled: true
     policies:
@@ -22,4 +26,9 @@ zuul:
         refresh-interval: 5
         type:
           - origin
+      serviceD:
+        limit: 2
+        refresh-interval: 60
+        type:
+          - url
   strip-prefix: true

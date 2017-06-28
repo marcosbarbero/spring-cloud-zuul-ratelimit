@@ -5,6 +5,7 @@ import org.springframework.cloud.client.SpringCloudApplication;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,6 +40,11 @@ public class RedisApplication {
         @GetMapping("/serviceC")
         public ResponseEntity<String> serviceC() {
             return ResponseEntity.ok(RESPONSE_BODY);
+        }
+
+        @GetMapping("/serviceD/{paramName}")
+        public ResponseEntity<String> serviceD(@PathVariable String paramName) {
+            return ResponseEntity.ok(RESPONSE_BODY + " " + paramName);
         }
     }
 }

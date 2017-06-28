@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
@@ -72,6 +73,24 @@ public class InMemoryApplicationTestIT {
         HttpHeaders headers = response.getHeaders();
         assertHeaders(headers, true);
         assertEquals(OK, response.getStatusCode());
+    }
+
+    @Test
+    public void testMultipleUrls() {
+        String randomPath = UUID.randomUUID().toString();
+
+        for (int i = 0; i < 12; i++) {
+
+            if (i % 2 == 0) {
+                randomPath = UUID.randomUUID().toString();
+            }
+
+            ResponseEntity<String> response = this.restTemplate.exchange("/serviceD/" + randomPath, GET, null, String
+                    .class);
+            HttpHeaders headers = response.getHeaders();
+            assertHeaders(headers, false);
+            assertEquals(OK, response.getStatusCode());
+        }
     }
 
     private void assertHeaders(HttpHeaders headers, boolean nullable) {

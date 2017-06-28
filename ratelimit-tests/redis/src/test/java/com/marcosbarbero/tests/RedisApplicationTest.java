@@ -26,6 +26,6 @@ public class RedisApplicationTest {
     @Test
     public void testRedisRateLimiter() {
         RateLimiter rateLimiter = context.getBean(RateLimiter.class);
-        assertTrue("InMemoryRateLimiter", rateLimiter instanceof RedisRateLimiter);
+        assertTrue("RedisRateLimiter", rateLimiter instanceof RedisRateLimiter);
     }
 }

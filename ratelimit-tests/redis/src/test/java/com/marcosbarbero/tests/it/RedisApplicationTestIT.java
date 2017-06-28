@@ -1,6 +1,7 @@
 package com.marcosbarbero.tests.it;
 
 import com.marcosbarbero.tests.RedisApplication;
+import com.netflix.zuul.context.RequestContext;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
@@ -32,6 +34,8 @@ public class RedisApplicationTestIT {
     private static final String LIMIT = "X-RateLimit-Limit";
     private static final String REMAINING = "X-RateLimit-Remaining";
     private static final String RESET = "X-RateLimit-Reset";
+
+    private RequestContext context = RequestContext.getCurrentContext();
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -72,6 +76,22 @@ public class RedisApplicationTestIT {
         HttpHeaders headers = response.getHeaders();
         assertHeaders(headers, true);
         assertEquals(OK, response.getStatusCode());
+    }
+
+    @Test
+    public void testMultipleUrls() {
+        String randomPath = UUID.randomUUID().toString();
+
+        for (int i = 0; i < 10; i++) {
+            if (i % 2 == 0) {
+                randomPath = UUID.randomUUID().toString();
+            }
+
+            ResponseEntity<String> response = this.restTemplate.exchange("/serviceD/" + randomPath, GET, null, String.class);
+            HttpHeaders headers = response.getHeaders();
+            assertHeaders(headers, false);
+            assertEquals(OK, response.getStatusCode());
+        }
     }
 
     private void assertHeaders(HttpHeaders headers, boolean nullable) {
