@@ -6,7 +6,7 @@ jdk:
 install: mvn install
 
 script:
-  mvn verify
+  mvn verify integration-test
 
 notifications:
   email:
