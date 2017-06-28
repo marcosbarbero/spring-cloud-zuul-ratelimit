@@ -7,7 +7,7 @@ install:
  - mvn install
 
 script:
-  - mvn verify integration-test
+  - mvn clean verify -P all-tests
   - mvn test jacoco:report
 
 after_success:

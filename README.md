@@ -69,7 +69,6 @@ sign that you need to do this is a lot of compiler errors to do with
 missing methods and fields.
 
 ### Code of Conduct
-
 This project adheres to the Contributor Covenant 
 [code of conduct](https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit/blob/master/docs/code-of-conduct.adoc). 
 By participating, you are expected to uphold this code. Please report unacceptable behavior to marcos.hgb@gmail.com.
