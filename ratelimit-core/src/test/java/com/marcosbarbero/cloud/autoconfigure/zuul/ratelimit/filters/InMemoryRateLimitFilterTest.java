@@ -1,8 +1,8 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.commons.TestRouteLocator;
 import com.netflix.zuul.context.RequestContext;
@@ -46,14 +46,14 @@ public class InMemoryRateLimitFilterTest {
     private RateLimitProperties properties() {
         RateLimitProperties properties = new RateLimitProperties();
         properties.setEnabled(true);
-        properties.setBehindProxy(false);
+        properties.setBehindProxy(true);
 
         Map<String, Policy> policies = new HashMap<>();
 
         Policy policy = new Policy();
         policy.setLimit(2L);
         policy.setRefreshInterval(15L);
-        policy.setType(asList(Policy.Type.ORIGIN));
+        policy.setType(asList(Policy.Type.ORIGIN, Policy.Type.URL, Policy.Type.USER));
 
         policies.put("serviceA", policy);
         properties.setPolicies(policies);
@@ -61,14 +61,16 @@ public class InMemoryRateLimitFilterTest {
         return properties;
     }
 
+    private RouteLocator routeLocator() {
+        return new TestRouteLocator(asList("ignored"),
+                asList(createRoute("serviceA", "/serviceA"), createRoute("serviceB", "/serviceB")));
+    }
+
     @Before
     public void setUp() {
-        RouteLocator routeLocator = new TestRouteLocator(asList("ignored"),
-                asList(createRoute("serviceA", "/serviceA"), createRoute("serviceB", "/serviceB")));
-
         this.request = new MockHttpServletRequest();
         this.response = new MockHttpServletResponse();
-        this.filter = new RateLimitFilter(this.rateLimiter, this.properties(), routeLocator);
+        this.filter = new RateLimitFilter(this.rateLimiter, this.properties(), this.routeLocator());
         this.context.clear();
         this.context.setRequest(this.request);
         this.context.setResponse(this.response);
@@ -101,6 +103,7 @@ public class InMemoryRateLimitFilterTest {
     public void testRateLimitExceedCapacity() throws Exception {
         this.request.setRequestURI("/serviceA");
         this.request.setRemoteAddr("10.0.0.100");
+        this.request.addHeader("X-FORWARDED-FOR", "10.0.0.1");
 
         assertTrue(this.filter.shouldFilter());
 
@@ -118,11 +121,29 @@ public class InMemoryRateLimitFilterTest {
     }
 
     @Test
+    public void testNoRateLimitService() throws Exception {
+        this.request.setRequestURI("/serviceZ");
+        this.request.setRemoteAddr("10.0.0.100");
+
+        assertFalse(this.filter.shouldFilter());
+
+        try {
+            for (int i = 0; i <= 3; i++) {
+                this.filter.run();
+            }
+        } catch (Exception e) {
+            // do nothing
+        }
+
+        String exceeded = (String) this.context.get("rateLimitExceeded");
+        assertFalse("RateLimit not exceeded", Boolean.valueOf(exceeded));
+    }
+
+    @Test
     public void testNoRateLimit() throws Exception {
         this.request.setRequestURI("/serviceB");
         this.request.setRemoteAddr("127.0.0.1");
         assertFalse(this.filter.shouldFilter());
     }
-
 
 }
