@@ -1,7 +1,6 @@
 package com.marcosbarbero.tests.it;
 
 import com.marcosbarbero.tests.RedisApplication;
-import com.netflix.zuul.context.RequestContext;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,8 +33,6 @@ public class RedisApplicationTestIT {
     private static final String LIMIT = "X-RateLimit-Limit";
     private static final String REMAINING = "X-RateLimit-Remaining";
     private static final String RESET = "X-RateLimit-Reset";
-
-    private RequestContext context = RequestContext.getCurrentContext();
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -87,7 +84,8 @@ public class RedisApplicationTestIT {
                 randomPath = UUID.randomUUID().toString();
             }
 
-            ResponseEntity<String> response = this.restTemplate.exchange("/serviceD/" + randomPath, GET, null, String.class);
+            ResponseEntity<String> response = this.restTemplate.exchange("/serviceD/" + randomPath, GET, null, String
+                    .class);
             HttpHeaders headers = response.getHeaders();
             assertHeaders(headers, false);
             assertEquals(OK, response.getStatusCode());
