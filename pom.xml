@@ -119,6 +119,15 @@
                         </goals>
                     </execution>
                 </executions>
+
+                <configuration>
+                    <excludes>
+                        <exclude>com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/**/*</exclude>
+                        <exclude>**/**Configuration</exclude>
+                        <exclude>**/**Application</exclude>
+                    </excludes>
+
+                </configuration>
             </plugin>
         </plugins>
     </build>

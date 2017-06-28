@@ -20,7 +20,7 @@ import static redis.clients.jedis.Protocol.DEFAULT_PORT;
  * @since 2017-06-27
  */
 @Configuration
-public class RedisConfig {
+public class RedisConfiguration {
 
     private RedisServer redisServer;
 
