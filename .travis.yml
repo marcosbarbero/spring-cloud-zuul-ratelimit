@@ -3,10 +3,15 @@ language: java
 jdk:
  - oraclejdk8
 
-install: mvn install
+install:
+ - mvn install
 
 script:
-  mvn verify integration-test
+  - mvn verify integration-test
+  - mvn test jacoco:report
+
+after_success:
+  - mvn coveralls:report
 
 notifications:
   email:
