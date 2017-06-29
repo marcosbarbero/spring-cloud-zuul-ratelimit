@@ -116,7 +116,9 @@
                 <artifactId>coveralls-maven-plugin</artifactId>
                 <version>4.3.0</version>
                 <configuration>
-                    <jacocoReports>ratelimit-coverage/target/site/jacoco-ut/jacoco.xml</jacocoReports>
+                    <jacocoReports>
+                        <jacocoReport>ratelimit-coverage/target/site/jacoco-ut/jacoco.xml</jacocoReport>
+                    </jacocoReports>
                 </configuration>
             </plugin>
 
