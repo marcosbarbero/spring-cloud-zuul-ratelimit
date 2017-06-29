@@ -4,10 +4,10 @@ jdk:
  - oraclejdk8
 
 install:
- - mvn clean install
+ - mvn install
 
-script:
-  - mvn clean verify
+#script:
+#  - mvn clean verify
 
 after_success:
   - mvn clean verify jacoco:report coveralls:report
