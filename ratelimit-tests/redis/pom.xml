@@ -29,7 +29,7 @@
         <dependency>
             <groupId>com.marcosbarbero.cloud</groupId>
             <artifactId>spring-cloud-zuul-ratelimit</artifactId>
-            <version>1.1.0.RELEASE</version>
+            <version>${global.version}</version>
         </dependency>
     </dependencies>
 

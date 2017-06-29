@@ -35,6 +35,10 @@
         <java.version>1.8</java.version>
         <nexus-staging-maven-plugin.version>1.6.3</nexus-staging-maven-plugin.version>
         <global.version>1.1.0.RELEASE</global.version>
+        <build.profile.id>dev</build.profile.id>
+        <!-- Only unit tests are run by default. -->
+        <skip.integration.tests>true</skip.integration.tests>
+        <skip.unit.tests>false</skip.unit.tests>
     </properties>
 
     <developers>
@@ -189,12 +193,12 @@
                     </execution>
                 </executions>
 
-                <configuration>
-                    <excludes>
-                        <exclude>com/marcosbarbero/tests/config/**</exclude>
-                        <exclude>com/marcosbarbero/tests/**Application</exclude>
-                    </excludes>
-                </configuration>
+                <!--<configuration>-->
+                    <!--<excludes>-->
+                        <!--<exclude>com/marcosbarbero/tests/config/**</exclude>-->
+                        <!--<exclude>com/marcosbarbero/tests/**Application</exclude>-->
+                    <!--</excludes>-->
+                <!--</configuration>-->
             </plugin>
 
             <plugin>
@@ -240,6 +244,33 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- Used to add source directories to our build. -->
+            <!--<plugin>-->
+                <!--<groupId>org.codehaus.mojo</groupId>-->
+                <!--<artifactId>build-helper-maven-plugin</artifactId>-->
+                <!--<version>1.7</version>-->
+                <!--<executions>-->
+                    <!--&lt;!&ndash;-->
+                        <!--States that the plugin's add-test-source goal is executed at-->
+                        <!--generate-test-sources phase.-->
+                    <!--&ndash;&gt;-->
+                    <!--<execution>-->
+                        <!--<id>add-integration-test-sources</id>-->
+                        <!--<phase>generate-test-sources</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>add-test-source</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--&lt;!&ndash; Configures the source directory of integration tests. &ndash;&gt;-->
+                            <!--<sources>-->
+                                <!--<source>ratelimit-tests/inmemory/src/test/java</source>-->
+                                <!--<source>ratelimit-tests/redis/src/test/java</source>-->
+                            <!--</sources>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
         </plugins>
     </build>
 

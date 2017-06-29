@@ -23,7 +23,7 @@ zuul:
           - origin
       serviceB:
         limit: 2
-        refresh-interval: 5
+        refresh-interval: 2
         type:
           - origin
       serviceD:

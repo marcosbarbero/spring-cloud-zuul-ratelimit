@@ -1,5 +1,7 @@
 package com.marcosbarbero.tests.it;
 
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RedisRateLimiter;
 import com.marcosbarbero.tests.RedisApplication;
 
 import org.junit.Test;
@@ -7,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -18,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
@@ -36,6 +40,15 @@ public class RedisApplicationTestIT {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @Autowired
+    private ApplicationContext context;
+
+    @Test
+    public void testRedisRateLimiter() {
+        RateLimiter rateLimiter = context.getBean(RateLimiter.class);
+        assertTrue("RedisRateLimiter", rateLimiter instanceof RedisRateLimiter);
+    }
 
     @Test
     public void testNotExceedingCapacityRequest() {
@@ -59,7 +72,7 @@ public class RedisApplicationTestIT {
         assertEquals(TOO_MANY_REQUESTS, response.getStatusCode());
         assertNotEquals(RedisApplication.ServiceController.RESPONSE_BODY, response.getBody());
 
-        TimeUnit.SECONDS.sleep(5);
+        TimeUnit.SECONDS.sleep(2);
 
         response = this.restTemplate.exchange("/serviceB", GET, null, String.class);
         headers = response.getHeaders();

@@ -52,7 +52,7 @@ public class InMemoryRateLimitFilterTest {
 
         Policy policy = new Policy();
         policy.setLimit(2L);
-        policy.setRefreshInterval(15L);
+        policy.setRefreshInterval(2L);
         policy.setType(asList(Policy.Type.ORIGIN, Policy.Type.URL, Policy.Type.USER));
 
         policies.put("serviceA", policy);
@@ -83,16 +83,14 @@ public class InMemoryRateLimitFilterTest {
 
         assertTrue(this.filter.shouldFilter());
 
-        this.filter.run();
-
-        TimeUnit.SECONDS.sleep(5);
-
-        this.filter.run();
+        for (int i = 0; i < 2; i++) {
+            this.filter.run();
+        }
 
         String remaining = this.response.getHeader(RateLimitFilter.Headers.REMAINING);
-        assertEquals(remaining, "0");
+        assertEquals("0", remaining);
 
-        TimeUnit.SECONDS.sleep(10);
+        TimeUnit.SECONDS.sleep(2);
 
         this.filter.run();
         remaining = this.response.getHeader(RateLimitFilter.Headers.REMAINING);
