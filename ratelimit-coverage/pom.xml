@@ -82,17 +82,17 @@
                                 </taskdef>
                                 <mkdir dir="${basedir}/target/coverage-report"/>
                                 <report>
-                                    <executiondata>
-                                        <fileset dir="${build.directory.core}">
-                                            <include name="jacoco.exec"/>
-                                        </fileset>
-                                        <fileset dir="${build.directory.it.inmemory}">
-                                            <include name="jacoco.exec"/>
-                                        </fileset>
-                                        <fileset dir="${build.directory.it.redis}">
-                                            <include name="jacoco.exec"/>
-                                        </fileset>
-                                    </executiondata>
+                                    <!--<executiondata>-->
+                                        <!--<fileset dir="${build.directory.core}">-->
+                                            <!--<include name="jacoco.exec"/>-->
+                                        <!--</fileset>-->
+                                        <!--<fileset dir="${build.directory.it.inmemory}">-->
+                                            <!--<include name="jacoco.exec"/>-->
+                                        <!--</fileset>-->
+                                        <!--<fileset dir="${build.directory.it.redis}">-->
+                                            <!--<include name="jacoco.exec"/>-->
+                                        <!--</fileset>-->
+                                    <!--</executiondata>-->
                                     <structure name="jacoco-multi Coverage Project">
                                         <group name="jacoco-multi">
                                             <classfiles>

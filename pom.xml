@@ -35,7 +35,15 @@
         <java.version>1.8</java.version>
         <nexus-staging-maven-plugin.version>1.6.3</nexus-staging-maven-plugin.version>
         <global.version>1.1.0.RELEASE</global.version>
-        <jacoco.version>0.5.7.201204190339</jacoco.version>
+        <jacoco.version>0.7.9</jacoco.version>
+
+        <jacoco.itReportPath>${project.basedir}/../target/jacoco-it.exec</jacoco.itReportPath>
+        <jacoco.reportPath>${project.basedir}/../target/jacoco.exec</jacoco.reportPath>
+
+        <jacoco.it.execution.data.file>${project.build.directory}/coverage-reports/jacoco-it.exec</jacoco.it.execution.data.file>
+        <jacoco.ut.execution.data.file>${project.build.directory}/coverage-reports/jacoco-ut.exec</jacoco.ut.execution.data.file>
+
+        <jacoco.reportPath>${project.basedir}/../target/jacoco.exec</jacoco.reportPath>
     </properties>
 
     <developers>
@@ -118,16 +126,24 @@
                 <version>${jacoco.version}</version>
                 <executions>
                     <execution>
+                        <id>agent-for-ut</id>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
+                        <configuration>
+                            <append>true</append>
+                            <destFile>${jacoco.reportPath}</destFile>
+                        </configuration>
                     </execution>
                     <execution>
-                        <id>report</id>
-                        <phase>prepare-package</phase>
+                        <id>agent-for-it</id>
                         <goals>
-                            <goal>report</goal>
+                            <goal>prepare-agent-integration</goal>
                         </goals>
+                        <configuration>
+                            <append>true</append>
+                            <destFile>${jacoco.itReportPath}</destFile>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

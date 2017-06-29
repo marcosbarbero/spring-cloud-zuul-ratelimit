@@ -1,4 +1,4 @@
-Spring Cloud Zuul RateLimit [![Build Status](https://travis-ci.org/marcosbarbero/spring-cloud-starter-zuul-ratelimit.svg?branch=master)](https://travis-ci.org/marcosbarbero/spring-cloud-starter-zuul-ratelimit) [![Coverage Status](https://coveralls.io/repos/github/marcosbarbero/spring-cloud-starter-zuul-ratelimit/badge.svg)](https://coveralls.io/github/marcosbarbero/spring-cloud-starter-zuul-ratelimit)
+Spring Cloud Zuul RateLimit [![Build Status](https://travis-ci.org/marcosbarbero/spring-cloud-starter-zuul-ratelimit.svg?branch=master)](https://travis-ci.org/marcosbarbero/spring-cloud-starter-zuul-ratelimit) 
 ---
 Module to enable rate limit per service in Netflix Zuul.  
 There are five built-in rate limit approaches:
