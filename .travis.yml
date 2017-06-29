@@ -8,10 +8,9 @@ install:
 
 script:
   - mvn clean verify
-  - mvn test jacoco:report
 
 after_success:
-  - mvn coveralls:report
+  - mvn clean verify jacoco:report coveralls:report
 
 notifications:
   email:
