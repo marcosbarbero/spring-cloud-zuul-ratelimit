@@ -18,8 +18,8 @@
             This project is a Spring Cloud Netflix Zuul Rate Limit strategy.
         ]]>
     </description>
-    <url>https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit</url>
-    <version>${global.version}</version>
+    <url>https://github.com/marcosbarbero/spring-cloud-zuul-ratelimit</url>
+    <version>1.1.0.RELEASE</version>
 
     <licenses>
         <license>
@@ -40,8 +40,10 @@
         <jacoco.itReportPath>${project.basedir}/target/jacoco-it.exec</jacoco.itReportPath>
         <jacoco.reportPath>${project.basedir}/target/jacoco.exec</jacoco.reportPath>
 
-        <jacoco.it.execution.data.file>${project.build.directory}/coverage-reports/jacoco-it.exec</jacoco.it.execution.data.file>
-        <jacoco.ut.execution.data.file>${project.build.directory}/coverage-reports/jacoco-ut.exec</jacoco.ut.execution.data.file>
+        <jacoco.it.execution.data.file>${project.build.directory}/coverage-reports/jacoco-it.exec
+        </jacoco.it.execution.data.file>
+        <jacoco.ut.execution.data.file>${project.build.directory}/coverage-reports/jacoco-ut.exec
+        </jacoco.ut.execution.data.file>
 
         <jacoco.reportPath>${project.basedir}/target/jacoco.exec</jacoco.reportPath>
     </properties>
@@ -56,11 +58,11 @@
     </developers>
 
     <scm>
-        <connection>scm:git:https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit.git</connection>
+        <connection>scm:git:https://github.com/marcosbarbero/spring-cloud-zuul-ratelimit.git</connection>
         <developerConnection>
-            scm:git:git@github.com:marcosbarbero/spring-cloud-starter-zuul-ratelimit.git
+            scm:git:git@github.com:marcosbarbero/spring-cloud-starter-ratelimit.git
         </developerConnection>
-        <url>https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit</url>
+        <url>https://github.com/marcosbarbero/spring-cloud-zuul-ratelimit</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -80,22 +82,27 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
+            <dependency>
+                <groupId>com.marcosbarbero.cloud</groupId>
+                <artifactId>spring-cloud-zuul-ratelimit-dependencies</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <modules>
-        <module>ratelimit-core</module>
-        <module>ratelimit-tests/inmemory</module>
-        <module>ratelimit-tests/redis</module>
-        <module>ratelimit-coverage</module>
+        <module>spring-cloud-zuul-ratelimit-core</module>
+        <module>spring-cloud-zuul-ratelimit-tests/inmemory</module>
+        <module>spring-cloud-zuul-ratelimit-tests/redis</module>
+        <module>spring-cloud-zuul-ratelimit-coverage</module>
+        <module>spring-cloud-zuul-ratelimit-dependencies</module>
+        <module>spring-cloud-starter-zuul-ratelimit</module>
     </modules>
 
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-zuul</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -117,7 +124,8 @@
                 <version>4.3.0</version>
                 <configuration>
                     <jacocoReports>
-                        <jacocoReport>ratelimit-coverage/target/site/jacoco-ut/jacoco.xml</jacocoReport>
+                        <jacocoReport>spring-cloud-zuul-ratelimit-coverage/target/site/jacoco-ut/jacoco.xml
+                        </jacocoReport>
                     </jacocoReports>
                 </configuration>
             </plugin>

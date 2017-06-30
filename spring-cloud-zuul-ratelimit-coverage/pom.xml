@@ -5,32 +5,35 @@
     <parent>
         <artifactId>spring-cloud-zuul-ratelimit-parent</artifactId>
         <groupId>com.marcosbarbero.cloud</groupId>
-        <version>${global.version}</version>
+        <version>1.1.0.RELEASE</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>ratelimit-coverage</artifactId>
+    <artifactId>spring-cloud-zuul-ratelimit-coverage</artifactId>
 
     <properties>
-        <build.directory.core>../ratelimit-core/target</build.directory.core>
-        <build.directory.it.inmemory>../ratelimit-tests/inmemory/target</build.directory.it.inmemory>
-        <build.directory.it.redis>../ratelimit-tests/redis/target</build.directory.it.redis>
+        <build.directory.core>../spring-cloud-zuul-ratelimit-core/target</build.directory.core>
+        <build.directory.it.inmemory>../spring-cloud-zuul-ratelimit-tests/inmemory/target</build.directory.it.inmemory>
+        <build.directory.it.redis>../spring-cloud-zuul-ratelimit-tests/redis/target</build.directory.it.redis>
 
         <classes.directory.core>${build.directory.core}/classes</classes.directory.core>
         <classes.directory.it.inmemory>${build.directory.it.inmemory}/classes</classes.directory.it.inmemory>
         <classes.directory.it.redis>${build.directory.it.redis}/classes</classes.directory.it.redis>
 
-        <sources.directory.core>../ratelimit-core/src/main/java</sources.directory.core>
-        <sources.directory.it.inmemory>../ratelimit-tests/inmemory/src/main/java</sources.directory.it.inmemory>
-        <sources.directory.it.redis>../ratelimit-tests/redis/src/main/java</sources.directory.it.redis>
+        <sources.directory.core>../spring-cloud-zuul-ratelimit-core/src/main/java</sources.directory.core>
+        <sources.directory.it.inmemory>../spring-cloud-zuul-ratelimit-tests/inmemory/src/main/java</sources.directory.it.inmemory>
+        <sources.directory.it.redis>../spring-cloud-zuul-ratelimit-tests/redis/src/main/java</sources.directory.it.redis>
 
-        <generated-sources.directory.core>${build.directory.core}/generated-sources/annotations
+        <generated-sources.directory.core>
+            ${build.directory.core}/generated-sources/annotations
         </generated-sources.directory.core>
-        <generated-sources.directory.it.inmemory>${build.directory.it.inmemory}/target/generated-sources/annotations
+        <generated-sources.directory.it.inmemory>
+            ${build.directory.it.inmemory}/target/generated-sources/annotations
         </generated-sources.directory.it.inmemory>
-        <generated-sources.directory.it.redis>${build.directory.it.redis}/target/generated-sources/annotations
+        <generated-sources.directory.it.redis>
+            ${build.directory.it.redis}/target/generated-sources/annotations
         </generated-sources.directory.it.redis>
     </properties>
 
@@ -82,17 +85,6 @@
                                 </taskdef>
                                 <mkdir dir="${basedir}/target/coverage-report"/>
                                 <report>
-                                    <!--<executiondata>-->
-                                        <!--<fileset dir="${build.directory.core}">-->
-                                            <!--<include name="jacoco.exec"/>-->
-                                        <!--</fileset>-->
-                                        <!--<fileset dir="${build.directory.it.inmemory}">-->
-                                            <!--<include name="jacoco.exec"/>-->
-                                        <!--</fileset>-->
-                                        <!--<fileset dir="${build.directory.it.redis}">-->
-                                            <!--<include name="jacoco.exec"/>-->
-                                        <!--</fileset>-->
-                                    <!--</executiondata>-->
                                     <structure name="jacoco-multi Coverage Project">
                                         <group name="jacoco-multi">
                                             <classfiles>

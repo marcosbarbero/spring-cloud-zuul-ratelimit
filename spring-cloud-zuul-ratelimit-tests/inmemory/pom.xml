@@ -2,34 +2,33 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <parent>
         <artifactId>spring-cloud-zuul-ratelimit-parent</artifactId>
         <groupId>com.marcosbarbero.cloud</groupId>
-        <version>${global.version}</version>
+        <version>1.1.0.RELEASE</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>redis</artifactId>
-    <name>Tests - Redis RateLimit</name>
+    <artifactId>inmemory</artifactId>
+    <name>Tests - InMemory RateLimit</name>
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.kstyrc</groupId>
-            <artifactId>embedded-redis</artifactId>
-            <version>0.6</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.marcosbarbero.cloud</groupId>
             <artifactId>spring-cloud-zuul-ratelimit</artifactId>
-            <version>${global.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-zuul</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
     </dependencies>
 

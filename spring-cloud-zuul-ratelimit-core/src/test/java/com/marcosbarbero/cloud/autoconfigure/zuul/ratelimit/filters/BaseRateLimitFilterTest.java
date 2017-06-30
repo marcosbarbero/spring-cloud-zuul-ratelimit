@@ -27,17 +27,17 @@ import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
 /**
  * @author Marcos Barbero
- * @since 2017-06-23
+ * @since 2017-06-30
  */
-public class InMemoryRateLimitFilterTest {
+public class BaseRateLimitFilterTest {
 
-    private RateLimitFilter filter;
+    protected RateLimitFilter filter;
 
-    private MockHttpServletRequest request;
-    private MockHttpServletResponse response;
+    protected MockHttpServletRequest request;
+    protected MockHttpServletResponse response;
 
-    private RequestContext context = RequestContext.getCurrentContext();
-    private RateLimiter rateLimiter = new InMemoryRateLimiter();
+    protected RequestContext context = RequestContext.getCurrentContext();
+    protected RateLimiter rateLimiter = new InMemoryRateLimiter();
 
     private Route createRoute(String id, String path) {
         return new Route(id, path, null, null, false, Collections.emptySet());
@@ -64,6 +64,10 @@ public class InMemoryRateLimitFilterTest {
     private RouteLocator routeLocator() {
         return new TestRouteLocator(asList("ignored"),
                 asList(createRoute("serviceA", "/serviceA"), createRoute("serviceB", "/serviceB")));
+    }
+
+    protected void setRateLimiter(RateLimiter rateLimiter) {
+        this.rateLimiter = rateLimiter;
     }
 
     @Before
@@ -143,5 +147,4 @@ public class InMemoryRateLimitFilterTest {
         this.request.setRemoteAddr("127.0.0.1");
         assertFalse(this.filter.shouldFilter());
     }
-
 }
