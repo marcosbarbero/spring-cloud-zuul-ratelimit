@@ -124,7 +124,8 @@
                 <version>4.3.0</version>
                 <configuration>
                     <jacocoReports>
-                        <jacocoReport>spring-cloud-zuul-ratelimit-coverage/target/site/jacoco-ut/jacoco.xml
+                        <jacocoReport>
+                            spring-cloud-zuul-ratelimit-coverage/target/coverage-report/coverage-report.xml
                         </jacocoReport>
                     </jacocoReports>
                 </configuration>
