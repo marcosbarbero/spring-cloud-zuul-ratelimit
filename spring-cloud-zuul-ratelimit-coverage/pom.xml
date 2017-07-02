@@ -14,6 +14,7 @@
     <artifactId>spring-cloud-zuul-ratelimit-coverage</artifactId>
 
     <properties>
+        <main.basedir>${basedir}/..</main.basedir>
         <build.directory.core>../spring-cloud-zuul-ratelimit-core/target</build.directory.core>
         <build.directory.it.inmemory>../spring-cloud-zuul-ratelimit-tests/inmemory/target</build.directory.it.inmemory>
         <build.directory.it.redis>../spring-cloud-zuul-ratelimit-tests/redis/target</build.directory.it.redis>
@@ -57,6 +58,7 @@
                                     <groupId>org.jacoco</groupId>
                                     <artifactId>org.jacoco.ant</artifactId>
                                     <version>${jacoco.version}</version>
+
                                 </artifactItem>
                             </artifactItems>
                             <stripVersion>true</stripVersion>

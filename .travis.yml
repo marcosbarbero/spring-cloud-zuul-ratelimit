@@ -7,7 +7,7 @@ install:
  - mvn install
 
 after_success:
-  - mvn clean verify jacoco:report coveralls:report
+  - mvn -pl '!spring-cloud-zuul-ratelimit-dependencies' clean jacoco:prepare-agent verify jacoco:report coveralls:report
 
 notifications:
   email:

@@ -37,15 +37,15 @@
         <global.version>1.1.0.RELEASE</global.version>
         <jacoco.version>0.7.9</jacoco.version>
 
-        <jacoco.itReportPath>${project.basedir}/target/jacoco-it.exec</jacoco.itReportPath>
-        <jacoco.reportPath>${project.basedir}/target/jacoco.exec</jacoco.reportPath>
+        <jacoco.itReportPath>${project.basedir}/spring-cloud-zuul-ratelimit-coverage/target/jacoco-it.exec</jacoco.itReportPath>
+        <jacoco.reportPath>${project.basedir}/spring-cloud-zuul-ratelimit-coverage/target/jacoco.exec</jacoco.reportPath>
 
-        <jacoco.it.execution.data.file>${project.build.directory}/coverage-reports/jacoco-it.exec
+        <jacoco.it.execution.data.file>
+            ${project.build.directory}/coverage-reports/jacoco-it.exec
         </jacoco.it.execution.data.file>
-        <jacoco.ut.execution.data.file>${project.build.directory}/coverage-reports/jacoco-ut.exec
+        <jacoco.ut.execution.data.file>
+            ${project.build.directory}/coverage-reports/jacoco-ut.exec
         </jacoco.ut.execution.data.file>
-
-        <jacoco.reportPath>${project.basedir}/target/jacoco.exec</jacoco.reportPath>
     </properties>
 
     <developers>
