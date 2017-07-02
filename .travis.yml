@@ -4,7 +4,7 @@ jdk:
  - oraclejdk8
 
 install:
- - mvn install
+ - mvn install -DskipTests
 
 after_success:
   - mvn -pl '!spring-cloud-zuul-ratelimit-dependencies' clean jacoco:prepare-agent verify jacoco:report coveralls:report
