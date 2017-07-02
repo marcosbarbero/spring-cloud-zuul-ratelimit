@@ -36,16 +36,13 @@
         <nexus-staging-maven-plugin.version>1.6.3</nexus-staging-maven-plugin.version>
         <global.version>1.1.0.RELEASE</global.version>
         <jacoco.version>0.7.9</jacoco.version>
-
-        <jacoco.itReportPath>${project.basedir}/spring-cloud-zuul-ratelimit-coverage/target/jacoco-it.exec</jacoco.itReportPath>
-        <jacoco.reportPath>${project.basedir}/spring-cloud-zuul-ratelimit-coverage/target/jacoco.exec</jacoco.reportPath>
-
         <jacoco.it.execution.data.file>
-            ${project.build.directory}/coverage-reports/jacoco-it.exec
+            ${project.build.directory}/coverage-reports/jacoco.exec
         </jacoco.it.execution.data.file>
         <jacoco.ut.execution.data.file>
-            ${project.build.directory}/coverage-reports/jacoco-ut.exec
+            ${project.build.directory}/coverage-reports/jacoco.exec
         </jacoco.ut.execution.data.file>
+        <package.root.path>com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit</package.root.path>
     </properties>
 
     <developers>
@@ -125,36 +122,67 @@
                 <configuration>
                     <jacocoReports>
                         <jacocoReport>
-                            spring-cloud-zuul-ratelimit-coverage/target/coverage-report/coverage-report.xml
+                            spring-cloud-zuul-ratelimit-core/target/site/jacoco/jacoco.xml
                         </jacocoReport>
                     </jacocoReports>
                 </configuration>
             </plugin>
 
+            <!--<plugin>-->
+                <!--<groupId>org.jacoco</groupId>-->
+                <!--<artifactId>jacoco-maven-plugin</artifactId>-->
+                <!--<version>${jacoco.version}</version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>agent-for-ut</id>-->
+                        <!--<goals>-->
+                            <!--<goal>prepare-agent</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<append>true</append>-->
+                            <!--<destFile>${jacoco.ut.execution.data.file}</destFile>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                    <!--<execution>-->
+                        <!--<id>agent-for-it</id>-->
+                        <!--<goals>-->
+                            <!--<goal>prepare-agent-integration</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<append>true</append>-->
+                            <!--<destFile>${jacoco.it.execution.data.file}</destFile>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
+
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
+                <configuration>
+                    <destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
+                    <dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
+                    <excludes>
+                        <exclude>**/properties/**</exclude>
+                        <exclude>**/*Configuration.*</exclude>
+                        <exclude>**/*Application.*</exclude>
+                        <exclude>**/*Rate.*</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
-                        <id>agent-for-ut</id>
+                        <id>jacoco-initialize</id>
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
-                        <configuration>
-                            <append>true</append>
-                            <destFile>${jacoco.reportPath}</destFile>
-                        </configuration>
                     </execution>
                     <execution>
-                        <id>agent-for-it</id>
+                        <id>jacoco-site</id>
+                        <phase>package</phase>
                         <goals>
-                            <goal>prepare-agent-integration</goal>
+                            <goal>report</goal>
                         </goals>
-                        <configuration>
-                            <append>true</append>
-                            <destFile>${jacoco.itReportPath}</destFile>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
