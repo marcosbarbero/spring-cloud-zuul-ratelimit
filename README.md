@@ -13,7 +13,7 @@ There are five built-in rate limit approaches:
    - To use this approach just don't set param 'type'
    
 >Note: It is possible to combine Authenticated User, Request Origin and URL just adding 
-to the list multiple values to the list
+multiple values to the list
 
 Default implementations
 ---
