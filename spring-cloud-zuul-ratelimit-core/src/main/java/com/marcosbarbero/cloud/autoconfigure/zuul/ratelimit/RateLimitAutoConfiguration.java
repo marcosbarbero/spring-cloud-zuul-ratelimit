@@ -74,7 +74,7 @@ public class RateLimitAutoConfiguration {
 
     @ConditionalOnConsulEnabled
     @ConditionalOnMissingBean(RateLimiter.class)
-    @ConditionalOnMissingClass("org.springframework.data.redis.core.RedisTemplate")
+    @ConditionalOnMissingClass(ClassFullName.RedisTemplate)
     @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "CONSUL")
     public static class ConsulConfiguration {
 
@@ -86,14 +86,18 @@ public class RateLimitAutoConfiguration {
     }
 
     @ConditionalOnMissingBean(RateLimiter.class)
-    @ConditionalOnMissingClass({"org.springframework.data.redis.core.RedisTemplate",
-            "com.ecwid.consul.v1.ConsulClient"})
+    @ConditionalOnMissingClass({ClassFullName.RedisTemplate, ClassFullName.ConsulClient})
     public static class InMemoryConfiguration {
 
         @Bean
         public RateLimiter inMemoryRateLimiter() {
             return new InMemoryRateLimiter();
         }
+    }
+
+    interface ClassFullName {
+        String RedisTemplate = "org.springframework.data.redis.core.RedisTemplate";
+        String ConsulClient = "com.ecwid.consul.v1.ConsulClient";
     }
 
 }
