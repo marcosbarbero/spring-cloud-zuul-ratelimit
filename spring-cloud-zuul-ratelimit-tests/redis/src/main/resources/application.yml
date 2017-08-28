@@ -15,7 +15,7 @@ zuul:
       url: forward:/services
   ratelimit:
     enabled: true
-    strategy: REDIS
+    repository: REDIS
     policies:
       serviceA:
         limit: 10

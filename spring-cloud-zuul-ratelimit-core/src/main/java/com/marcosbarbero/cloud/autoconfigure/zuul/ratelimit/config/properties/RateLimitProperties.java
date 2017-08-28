@@ -39,9 +39,9 @@ public class RateLimitProperties {
     private boolean behindProxy;
     private boolean enabled;
 
-    private Strategy strategy;
+    private Repository repository;
 
-    public enum Strategy {
+    public enum Repository {
         REDIS, CONSUL
     }
 

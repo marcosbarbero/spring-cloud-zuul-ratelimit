@@ -15,13 +15,6 @@ There are five built-in rate limit approaches:
 >Note: It is possible to combine Authenticated User, Request Origin and URL just adding 
 multiple values to the list
 
-Default implementations
----
-There are two implementations provided:  
- * `RedisRateLimiter` for production
- * `InMemoryRateLimiter` only for dev environment 
-
-
 Usage
 ---
 >This project is available on maven central
@@ -31,11 +24,11 @@ Add the dependency on pom.xml
 <dependency>
     <groupId>com.marcosbarbero.cloud</groupId>
     <artifactId>spring-cloud-zuul-ratelimit</artifactId>
-    <version>1.1.0.RELEASE</version>
+    <version>1.2.0.RELEASE</version>
 </dependency>
 ```
 
-In case you are using Redis there will be needed to add the following dependency as well to pom.xml
+In case you are using Redis there will be needed to add the following dependency
 ```
  <dependency>
      <groupId>org.springframework.boot</groupId>
@@ -43,11 +36,20 @@ In case you are using Redis there will be needed to add the following dependency
  </dependency>
 ```
 
+In case you are using Consul there will be needed to add the following dependency
+```
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-consul</artifactId>
+</dependency>
+```
+
 Sample configuration
 ```
 zuul:
   ratelimit:
     enabled: true #default false
+    repository: REDIS
     behind-proxy: true #default false
     policies:
       myServiceId:
@@ -58,6 +60,22 @@ zuul:
           - origin
           - url
 ```
+
+Available implementations
+---
+There are three implementations provided:  
+ * `InMemoryRateLimiter` - uses ConcurrentHashMap as data storage
+ * `ConsulRateLimiter` - uses [Consul](https://www.consul.io/) as data storage
+ * `RedisRateLimiter` - uses [Redis](https://redis.io/) as data storage
+ 
+### Using
+|Property name| Value |Implementation|
+|-------------|:-------:|--------------|
+|zuul.ratelimit.repository|CONSUL|ConsulRateLimiter|
+|zuul.ratelimit.repository|REDIS|RedisRateLimiter|
+|zuul.ratelimit.repository| - |InMemoryRateLimiter|
+
+>Note: InMemoryRateLimiter is the default implementation if no repository is set it will be used by default.
 
 Contributing
 ---

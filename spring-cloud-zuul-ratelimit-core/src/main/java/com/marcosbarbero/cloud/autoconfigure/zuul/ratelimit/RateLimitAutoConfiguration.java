@@ -58,7 +58,7 @@ public class RateLimitAutoConfiguration {
 
     @ConditionalOnClass(RedisTemplate.class)
     @ConditionalOnMissingBean(RateLimiter.class)
-    @ConditionalOnProperty(prefix = PREFIX, name = "strategy", havingValue = "REDIS")
+    @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "REDIS")
     public static class RedisConfiguration {
 
         @Bean("rateLimiterRedisTemplate")
@@ -75,7 +75,7 @@ public class RateLimitAutoConfiguration {
     @ConditionalOnConsulEnabled
     @ConditionalOnMissingBean(RateLimiter.class)
     @ConditionalOnMissingClass("org.springframework.data.redis.core.RedisTemplate")
-    @ConditionalOnProperty(prefix = PREFIX , name = "strategy", havingValue = "CONSUL")
+    @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "CONSUL")
     public static class ConsulConfiguration {
 
         @Bean
