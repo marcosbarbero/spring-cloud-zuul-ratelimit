@@ -100,7 +100,8 @@ public class RateLimitFilter extends ZuulFilter {
     }
 
     private Optional<Policy> policy() {
-        return (route() != null) ? Optional.ofNullable(this.properties.getPolicies().get(route().getId())) :
+        Route route = route();
+        return (route != null) ? Optional.ofNullable(this.properties.getPolicies().get(route.getId())) :
                 Optional.empty();
     }
 

@@ -16,25 +16,22 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy;
 
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.util.Assert;
+
+import lombok.RequiredArgsConstructor;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * @author Marcos Barbero
  */
+@RequiredArgsConstructor
 public class RedisRateLimiter implements RateLimiter {
     private final RedisTemplate template;
-
-    public RedisRateLimiter(final RedisTemplate template) {
-        Assert.notNull(template, "RedisTemplate cannot be null");
-        this.template = template;
-    }
 
     @Override
     @SuppressWarnings("unchecked")

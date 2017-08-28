@@ -33,6 +33,7 @@ public class RedisRateLimitFilterTest extends BaseRateLimitFilterTest {
 
     @Test
     @Override
+    @SuppressWarnings("unchecked")
     public void testRateLimitExceedCapacity() throws Exception {
         BoundValueOperations ops = mock(BoundValueOperations.class);
         when(this.redisTemplate.boundValueOps(anyString())).thenReturn(ops);
@@ -42,6 +43,7 @@ public class RedisRateLimitFilterTest extends BaseRateLimitFilterTest {
 
     @Test
     @Override
+    @SuppressWarnings("unchecked")
     public void testRateLimit() throws Exception {
         BoundValueOperations ops = mock(BoundValueOperations.class);
         when(this.redisTemplate.boundValueOps(anyString())).thenReturn(ops);

@@ -16,17 +16,22 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit;
 
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
+import com.ecwid.consul.v1.ConsulClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.ConsulRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RedisRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitFilter;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,27 +50,44 @@ import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.proper
 public class RateLimitAutoConfiguration {
 
     @Bean
-    public RateLimitFilter rateLimiterFilter(RateLimiter rateLimiter, RateLimitProperties rateLimitProperties,
-                                             RouteLocator routeLocator) {
+    public RateLimitFilter rateLimiterFilter(final RateLimiter rateLimiter,
+                                             final RateLimitProperties rateLimitProperties,
+                                             final RouteLocator routeLocator) {
         return new RateLimitFilter(rateLimiter, rateLimitProperties, routeLocator);
     }
 
     @ConditionalOnClass(RedisTemplate.class)
     @ConditionalOnMissingBean(RateLimiter.class)
+    @ConditionalOnProperty(prefix = PREFIX, name = "strategy", havingValue = "REDIS")
     public static class RedisConfiguration {
-        @Bean
-        public StringRedisTemplate redisTemplate(RedisConnectionFactory connectionFactory) {
+
+        @Bean("rateLimiterRedisTemplate")
+        public StringRedisTemplate redisTemplate(final RedisConnectionFactory connectionFactory) {
             return new StringRedisTemplate(connectionFactory);
         }
 
         @Bean
-        public RateLimiter redisRateLimiter(RedisTemplate redisTemplate) {
+        public RateLimiter redisRateLimiter(@Qualifier("rateLimiterRedisTemplate") final RedisTemplate redisTemplate) {
             return new RedisRateLimiter(redisTemplate);
         }
     }
 
+    @ConditionalOnConsulEnabled
     @ConditionalOnMissingBean(RateLimiter.class)
     @ConditionalOnMissingClass("org.springframework.data.redis.core.RedisTemplate")
+    @ConditionalOnProperty(prefix = PREFIX , name = "strategy", havingValue = "CONSUL")
+    public static class ConsulConfiguration {
+
+        @Bean
+        public RateLimiter consultRateLimiter(final ConsulClient consulClient, final ObjectMapper objectMapper) {
+            return new ConsulRateLimiter(consulClient, objectMapper);
+        }
+
+    }
+
+    @ConditionalOnMissingBean(RateLimiter.class)
+    @ConditionalOnMissingClass({"org.springframework.data.redis.core.RedisTemplate",
+            "com.ecwid.consul.v1.ConsulClient"})
     public static class InMemoryConfiguration {
 
         @Bean

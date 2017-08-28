@@ -6,11 +6,13 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.commons.TestRouteLocator;
 import com.netflix.zuul.context.RequestContext;
+import com.netflix.zuul.monitoring.CounterFactory;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
+import org.springframework.cloud.netflix.zuul.metrics.EmptyCounterFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -31,13 +33,13 @@ import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
  */
 public class BaseRateLimitFilterTest {
 
-    protected RateLimitFilter filter;
+    RateLimitFilter filter;
 
-    protected MockHttpServletRequest request;
-    protected MockHttpServletResponse response;
+    MockHttpServletRequest request;
+    MockHttpServletResponse response;
 
-    protected RequestContext context = RequestContext.getCurrentContext();
-    protected RateLimiter rateLimiter = new InMemoryRateLimiter();
+    private RequestContext context = RequestContext.getCurrentContext();
+    private RateLimiter rateLimiter = new InMemoryRateLimiter();
 
     private Route createRoute(String id, String path) {
         return new Route(id, path, null, null, false, Collections.emptySet());
@@ -66,12 +68,13 @@ public class BaseRateLimitFilterTest {
                 asList(createRoute("serviceA", "/serviceA"), createRoute("serviceB", "/serviceB")));
     }
 
-    protected void setRateLimiter(RateLimiter rateLimiter) {
+    void setRateLimiter(RateLimiter rateLimiter) {
         this.rateLimiter = rateLimiter;
     }
 
     @Before
     public void setUp() {
+        CounterFactory.initialize(new EmptyCounterFactory());
         this.request = new MockHttpServletRequest();
         this.response = new MockHttpServletResponse();
         this.filter = new RateLimitFilter(this.rateLimiter, this.properties(), this.routeLocator());
