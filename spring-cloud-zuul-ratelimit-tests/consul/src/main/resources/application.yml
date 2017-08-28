@@ -1,0 +1,35 @@
+zuul:
+  routes:
+    serviceA:
+      path: /serviceA
+      url: forward:/services
+    serviceB:
+      path: /serviceB
+      url: forward:/services
+    serviceC:
+      path: /serviceC
+      url: forward:/services
+    serviceD:
+      strip-prefix: false
+      path: /serviceD/**
+      url: forward:/services
+  ratelimit:
+    enabled: true
+    repository: CONSUL
+    policies:
+      serviceA:
+        limit: 10
+        refresh-interval: 60
+        type:
+          - origin
+      serviceB:
+        limit: 2
+        refresh-interval: 2
+        type:
+          - origin
+      serviceD:
+        limit: 2
+        refresh-interval: 60
+        type:
+          - url
+  strip-prefix: true

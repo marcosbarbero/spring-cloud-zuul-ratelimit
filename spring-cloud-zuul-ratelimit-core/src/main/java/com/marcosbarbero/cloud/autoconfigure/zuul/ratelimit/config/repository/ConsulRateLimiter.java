@@ -17,6 +17,7 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
 import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.kv.model.GetValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
@@ -46,10 +47,10 @@ public class ConsulRateLimiter extends AbstractRateLimiter implements RateLimite
     @Override
     Rate getRate(String key) {
         Rate rate = null;
-        String value = this.consulClient.getKVValue(key).getValue().getValue();
-        if (StringUtils.hasText(value)) {
+        GetValue value = this.consulClient.getKVValue(key).getValue();
+        if (value != null) {
             try {
-                rate = this.objectMapper.readValue(value, Rate.class);
+                rate = this.objectMapper.readValue(value.getDecodedValue(), Rate.class);
             } catch (IOException e) {
                 log.error("Failed to deserialize Rate", e);
             }

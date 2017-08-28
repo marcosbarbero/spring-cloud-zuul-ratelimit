@@ -48,7 +48,7 @@ public class ConsulRateLimitFilterTest extends BaseRateLimitFilterTest {
         GetValue getValue = mock(GetValue.class);
         when(this.consulClient.getKVValue(anyString())).thenReturn(response);
         when(response.getValue()).thenReturn(getValue);
-        when(getValue.getValue()).thenReturn(this.objectMapper.writeValueAsString(this.rate(-1)));
+        when(getValue.getDecodedValue()).thenReturn(this.objectMapper.writeValueAsString(this.rate(-1)));
         super.testRateLimitExceedCapacity();
     }
 
@@ -60,7 +60,7 @@ public class ConsulRateLimitFilterTest extends BaseRateLimitFilterTest {
         GetValue getValue = mock(GetValue.class);
         when(this.consulClient.getKVValue(anyString())).thenReturn(response);
         when(response.getValue()).thenReturn(getValue);
-        when(getValue.getValue()).thenReturn(this.objectMapper.writeValueAsString(this.rate(1)));
+        when(getValue.getDecodedValue()).thenReturn(this.objectMapper.writeValueAsString(this.rate(1)));
 
         this.request.setRequestURI("/serviceA");
         this.request.setRemoteAddr("10.0.0.100");
@@ -76,7 +76,7 @@ public class ConsulRateLimitFilterTest extends BaseRateLimitFilterTest {
 
         TimeUnit.SECONDS.sleep(2);
 
-        when(getValue.getValue()).thenReturn(this.objectMapper.writeValueAsString(this.rate(2)));
+        when(getValue.getDecodedValue()).thenReturn(this.objectMapper.writeValueAsString(this.rate(2)));
         this.filter.run();
         remaining = this.response.getHeader(RateLimitFilter.Headers.REMAINING);
         assertEquals("1", remaining);
