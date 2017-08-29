@@ -48,6 +48,7 @@ Sample configuration
 ```
 zuul:
   ratelimit:
+    key-prefix: your-prefix #default value ${spring.application.name:rate-limit-application}
     enabled: true #default false
     repository: REDIS
     behind-proxy: true #default false
@@ -73,7 +74,7 @@ There are three implementations provided:
 |-------------|:-------:|--------------|
 |zuul.ratelimit.repository|CONSUL|ConsulRateLimiter|
 |zuul.ratelimit.repository|REDIS|RedisRateLimiter|
-|zuul.ratelimit.repository| - |InMemoryRateLimiter|
+|zuul.ratelimit.repository|IN_MEMORY|InMemoryRateLimiter|
 
 >Note: InMemoryRateLimiter is the default implementation if no repository is set it will be used by default.
 
