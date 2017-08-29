@@ -48,14 +48,14 @@ Sample configuration
 ```
 zuul:
   ratelimit:
-    key-prefix: your-prefix # default value ${spring.application.name:rate-limit-application}
-    enabled: true # default false
-    repository: REDIS # default IN_MEMORY
-    behind-proxy: true # default false
+    key-prefix: your-prefix #default value ${spring.application.name:rate-limit-application}
+    enabled: true #default false
+    repository: REDIS #default IN_MEMORY
+    behind-proxy: true #default false
     policies:
       myServiceId:
         limit: 10
-        refresh-interval: 60 # default value (in seconds)
+        refresh-interval: 60 #default value (in seconds)
         type: #optional
           - user
           - origin
