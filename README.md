@@ -48,10 +48,10 @@ Sample configuration
 ```
 zuul:
   ratelimit:
-    key-prefix: your-prefix #default value ${spring.application.name:rate-limit-application}
-    enabled: true #default false
-    repository: REDIS #default IN_MEMORY
-    behind-proxy: true #default false
+    key-prefix: your-prefix 
+    enabled: true 
+    repository: REDIS 
+    behind-proxy: true 
     policies:
       myServiceId:
         limit: 10
@@ -69,12 +69,18 @@ There are three implementations provided:
  * `ConsulRateLimiter` - uses [Consul](https://www.consul.io/) as data storage
  * `RedisRateLimiter` - uses [Redis](https://redis.io/) as data storage
  
-### Using
-|Property name| Value |Implementation|
-|-------------|:-------:|--------------|
-|zuul.ratelimit.repository|CONSUL|ConsulRateLimiter|
-|zuul.ratelimit.repository|REDIS|RedisRateLimiter|
-|zuul.ratelimit.repository|IN_MEMORY|InMemoryRateLimiter|
+Common application properties
+---
+Property namespace: __zuul.ratelimit__
+
+|Property name| Values |Default Value|
+|-------------|:-------|:-------------:|
+|enabled|true/false|false|
+|behind-proxy|true/false|false|
+|key-prefix|String|${spring.application.name:rate-limit-application}|
+|repository|CONSUL, REDIS, IN_MEMORY|IN_MEMORY|
+|policies|List of [Policy](spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/Policy.java)| - |
+
 
 >Note: InMemoryRateLimiter is the default implementation if no repository is set it will be used by default.
 
