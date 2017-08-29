@@ -1,6 +1,7 @@
 package com.marcosbarbero.tests.it;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
 import com.marcosbarbero.tests.InMemoryApplication;
 
@@ -48,6 +49,12 @@ public class InMemoryApplicationTestIT {
     public void testInMemoryRateLimiter() {
         RateLimiter rateLimiter = context.getBean(RateLimiter.class);
         assertTrue("InMemoryRateLimiter", rateLimiter instanceof InMemoryRateLimiter);
+    }
+
+    @Test
+    public void testKeyPrefixDefaultValue() {
+        RateLimitProperties properties = context.getBean(RateLimitProperties.class);
+        assertEquals("rate-limit-application", properties.getKeyPrefix());
     }
 
     @Test

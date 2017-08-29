@@ -108,6 +108,7 @@ public class RateLimitFilter extends ZuulFilter {
     private String key(final HttpServletRequest request, final List<Type> types) {
         final Route route = route();
         final StringJoiner joiner = new StringJoiner(":");
+        joiner.add(this.properties.getKeyPrefix());
         joiner.add(route.getId());
         if (!types.isEmpty()) {
             if (types.contains(URL)) {

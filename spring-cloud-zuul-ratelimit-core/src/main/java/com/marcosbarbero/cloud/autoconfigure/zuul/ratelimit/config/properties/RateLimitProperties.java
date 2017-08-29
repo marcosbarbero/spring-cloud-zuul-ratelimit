@@ -16,6 +16,7 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.LinkedHashMap;
@@ -38,6 +39,9 @@ public class RateLimitProperties {
 
     private boolean behindProxy;
     private boolean enabled;
+
+    @Value("${spring.application.name:rate-limit-application}")
+    private String keyPrefix;
 
     private Repository repository;
 
