@@ -81,9 +81,6 @@ Property namespace: __zuul.ratelimit__
 |repository|CONSUL, REDIS, IN_MEMORY|IN_MEMORY|
 |policies|List of [Policy](spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/Policy.java)| - |
 
-
->Note: InMemoryRateLimiter is the default implementation if no repository is set it will be used by default.
-
 Contributing
 ---
 Spring Cloud Zuul Rate Limit is released under the non-restrictive Apache 2.0 license, and follows a very 
