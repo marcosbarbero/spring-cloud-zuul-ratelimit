@@ -28,7 +28,6 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitFil
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
@@ -58,7 +57,7 @@ public class RateLimitAutoConfiguration {
 
     @ConditionalOnClass(RedisTemplate.class)
     @ConditionalOnMissingBean(RateLimiter.class)
-    @ConditionalOnProperty(prefix = PREFIX, name = "strategy", havingValue = "REDIS")
+    @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "REDIS")
     public static class RedisConfiguration {
 
         @Bean("rateLimiterRedisTemplate")
@@ -74,8 +73,7 @@ public class RateLimitAutoConfiguration {
 
     @ConditionalOnConsulEnabled
     @ConditionalOnMissingBean(RateLimiter.class)
-    @ConditionalOnMissingClass("org.springframework.data.redis.core.RedisTemplate")
-    @ConditionalOnProperty(prefix = PREFIX , name = "strategy", havingValue = "CONSUL")
+    @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "CONSUL")
     public static class ConsulConfiguration {
 
         @Bean
@@ -86,8 +84,7 @@ public class RateLimitAutoConfiguration {
     }
 
     @ConditionalOnMissingBean(RateLimiter.class)
-    @ConditionalOnMissingClass({"org.springframework.data.redis.core.RedisTemplate",
-            "com.ecwid.consul.v1.ConsulClient"})
+    @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "IN_MEMORY", matchIfMissing = true)
     public static class InMemoryConfiguration {
 
         @Bean

@@ -1,9 +1,8 @@
 package com.marcosbarbero.tests.it;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
-import com.marcosbarbero.tests.InMemoryApplication;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.ConsulRateLimiter;
+import com.marcosbarbero.tests.ConsulApplication;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,7 +32,7 @@ import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class InMemoryApplicationTestIT {
+public class ConsulApplicationTestIT {
 
     private static final String LIMIT = "X-RateLimit-Limit";
     private static final String REMAINING = "X-RateLimit-Remaining";
@@ -46,15 +45,9 @@ public class InMemoryApplicationTestIT {
     private ApplicationContext context;
 
     @Test
-    public void testInMemoryRateLimiter() {
+    public void testConsulRateLimiter() {
         RateLimiter rateLimiter = context.getBean(RateLimiter.class);
-        assertTrue("InMemoryRateLimiter", rateLimiter instanceof InMemoryRateLimiter);
-    }
-
-    @Test
-    public void testKeyPrefixDefaultValue() {
-        RateLimitProperties properties = context.getBean(RateLimitProperties.class);
-        assertEquals("rate-limit-application", properties.getKeyPrefix());
+        assertTrue("ConsulRateLimiter", rateLimiter instanceof ConsulRateLimiter);
     }
 
     @Test
@@ -77,7 +70,7 @@ public class InMemoryApplicationTestIT {
         }
 
         assertEquals(TOO_MANY_REQUESTS, response.getStatusCode());
-        assertNotEquals(InMemoryApplication.ServiceController.RESPONSE_BODY, response.getBody());
+        assertNotEquals(ConsulApplication.ServiceController.RESPONSE_BODY, response.getBody());
 
         TimeUnit.SECONDS.sleep(2);
 
@@ -99,8 +92,7 @@ public class InMemoryApplicationTestIT {
     public void testMultipleUrls() {
         String randomPath = UUID.randomUUID().toString();
 
-        for (int i = 0; i < 12; i++) {
-
+        for (int i = 0; i < 10; i++) {
             if (i % 2 == 0) {
                 randomPath = UUID.randomUUID().toString();
             }
@@ -118,14 +110,14 @@ public class InMemoryApplicationTestIT {
         String remaining = headers.getFirst(REMAINING);
         String reset = headers.getFirst(RESET);
 
-        if (!nullable) {
-            assertNotNull(limit);
-            assertNotNull(remaining);
-            assertNotNull(reset);
-        } else {
+        if (nullable) {
             assertNull(limit);
             assertNull(remaining);
             assertNull(reset);
+        } else {
+            assertNotNull(limit);
+            assertNotNull(remaining);
+            assertNotNull(reset);
         }
     }
 

@@ -11,8 +11,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -26,8 +29,8 @@ public class ConsulRateLimitFilterTest extends BaseRateLimitFilterTest {
     private ConsulClient consulClient = mock(ConsulClient.class);
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    private Rate rate() {
-        return new Rate(30L, -1L, 100L, new Date(System.currentTimeMillis() + SECONDS.toMillis(10)));
+    private Rate rate(long remaining) {
+        return new Rate(30L, remaining, 100L, new Date(System.currentTimeMillis() + SECONDS.toMillis(2)));
     }
 
     @Before
@@ -45,7 +48,7 @@ public class ConsulRateLimitFilterTest extends BaseRateLimitFilterTest {
         GetValue getValue = mock(GetValue.class);
         when(this.consulClient.getKVValue(anyString())).thenReturn(response);
         when(response.getValue()).thenReturn(getValue);
-        when(getValue.getValue()).thenReturn(this.objectMapper.writeValueAsString(this.rate()));
+        when(getValue.getDecodedValue()).thenReturn(this.objectMapper.writeValueAsString(this.rate(-1)));
         super.testRateLimitExceedCapacity();
     }
 
@@ -53,28 +56,29 @@ public class ConsulRateLimitFilterTest extends BaseRateLimitFilterTest {
     @Override
     @SuppressWarnings("unchecked")
     public void testRateLimit() throws Exception {
-//        BoundValueOperations ops = mock(BoundValueOperations.class);
-//        when(this.redisTemplate.boundValueOps(anyString())).thenReturn(ops);
-//        when(ops.increment(anyLong())).thenReturn(2L);
-//
-//
-//        this.request.setRequestURI("/serviceA");
-//        this.request.setRemoteAddr("10.0.0.100");
-//
-//        assertTrue(this.filter.shouldFilter());
-//
-//        for (int i = 0; i < 2; i++) {
-//            this.filter.run();
-//        }
-//
-//        String remaining = this.response.getHeader(RateLimitFilter.Headers.REMAINING);
-//        assertEquals("0", remaining);
-//
-//        TimeUnit.SECONDS.sleep(2);
-//
-//        when(ops.increment(anyLong())).thenReturn(1L);
-//        this.filter.run();
-//        remaining = this.response.getHeader(RateLimitFilter.Headers.REMAINING);
-//        assertEquals(remaining, "1");
+        Response<GetValue> response = mock(Response.class);
+        GetValue getValue = mock(GetValue.class);
+        when(this.consulClient.getKVValue(anyString())).thenReturn(response);
+        when(response.getValue()).thenReturn(getValue);
+        when(getValue.getDecodedValue()).thenReturn(this.objectMapper.writeValueAsString(this.rate(1)));
+
+        this.request.setRequestURI("/serviceA");
+        this.request.setRemoteAddr("10.0.0.100");
+
+        assertTrue(this.filter.shouldFilter());
+
+        for (int i = 0; i < 2; i++) {
+            this.filter.run();
+        }
+
+        String remaining = this.response.getHeader(RateLimitFilter.Headers.REMAINING);
+        assertEquals("0", remaining);
+
+        TimeUnit.SECONDS.sleep(2);
+
+        when(getValue.getDecodedValue()).thenReturn(this.objectMapper.writeValueAsString(this.rate(2)));
+        this.filter.run();
+        remaining = this.response.getHeader(RateLimitFilter.Headers.REMAINING);
+        assertEquals("1", remaining);
     }
 }
