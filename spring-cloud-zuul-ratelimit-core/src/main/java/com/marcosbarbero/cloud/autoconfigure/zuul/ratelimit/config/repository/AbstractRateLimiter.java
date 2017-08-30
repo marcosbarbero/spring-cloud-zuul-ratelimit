@@ -1,12 +1,11 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy;
-
 import java.util.Date;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * Abstract implementation for {@link RateLimiter}.
@@ -15,33 +14,28 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  * @author Marcos Barbero
  * @since 2017-08-28
  */
-abstract class AbstractRateLimiter implements RateLimiter {
+public abstract class AbstractRateLimiter implements RateLimiter {
 
-    abstract Rate getRate(String key);
-
-    abstract void saveRate(String key, Rate rate);
+    protected abstract Rate getRate(String key);
+    protected abstract void saveRate(Rate rate);
 
     @Override
     public synchronized Rate consume(final Policy policy, final String key) {
         Rate rate = this.create(policy, key);
         this.updateRate(rate);
-        this.saveRate(key, rate);
+        this.saveRate(rate);
         return rate;
     }
 
     private Rate create(final Policy policy, final String key) {
         Rate rate = this.getRate(key);
         if (isExpired(rate)) {
-            rate = new Rate();
 
             final Long limit = policy.getLimit();
             final Long refreshInterval = SECONDS.toMillis(policy.getRefreshInterval());
             final Date expiration = new Date(System.currentTimeMillis() + refreshInterval);
 
-            rate.setExpiration(expiration);
-            rate.setLimit(limit);
-            rate.setRemaining(limit);
-            rate.setReset(refreshInterval);
+            rate = new Rate(key, limit, limit, refreshInterval, expiration);
         }
         return rate;
     }

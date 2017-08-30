@@ -1,0 +1,59 @@
+spring:
+    datasource:
+        url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+        name:
+        username: FaaS
+        password:
+        type: org.h2.jdbcx.JdbcDataSource
+    h2:
+        console:
+            enabled: true
+            settings:
+                web-allow-others: true
+    jpa:
+        hibernate:
+            ddl-auto: create-drop
+        generate-ddl: false
+        database-platform: org.hibernate.dialect.H2Dialect
+        database: H2
+        show_sql: true
+        properties:
+            hibernate.cache.use_second_level_cache: false
+            hibernate.cache.use_query_cache: false
+            hibernate.generate_statistics: true
+
+zuul:
+  routes:
+    serviceA:
+      path: /serviceA
+      url: forward:/services
+    serviceB:
+      path: /serviceB
+      url: forward:/services
+    serviceC:
+      path: /serviceC
+      url: forward:/services
+    serviceD:
+      strip-prefix: false
+      path: /serviceD/**
+      url: forward:/services
+  ratelimit:
+    enabled: true
+    repository: SPRING_DATA
+    policies:
+      serviceA:
+        limit: 10
+        refresh-interval: 60
+        type:
+          - origin
+      serviceB:
+        limit: 2
+        refresh-interval: 2
+        type:
+          - origin
+      serviceD:
+        limit: 2
+        refresh-interval: 60
+        type:
+          - url
+  strip-prefix: true

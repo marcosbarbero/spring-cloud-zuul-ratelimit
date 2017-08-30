@@ -16,15 +16,13 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.PREFIX;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import lombok.Data;
-
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.PREFIX;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * @author Marcos Barbero
@@ -46,7 +44,7 @@ public class RateLimitProperties {
     private Repository repository;
 
     public enum Repository {
-        REDIS, CONSUL
+        REDIS, CONSUL, SPRING_DATA
     }
 
 }

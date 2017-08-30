@@ -1,24 +1,22 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.kv.model.GetValue;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.ConsulRateLimiter;
-
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
-
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.kv.model.GetValue;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.ConsulRateLimiter;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Marcos Barbero
@@ -30,7 +28,7 @@ public class ConsulRateLimitFilterTest extends BaseRateLimitFilterTest {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     private Rate rate(long remaining) {
-        return new Rate(30L, remaining, 100L, new Date(System.currentTimeMillis() + SECONDS.toMillis(2)));
+        return new Rate("key", 30L, remaining, 100L, new Date(System.currentTimeMillis() + SECONDS.toMillis(2)));
     }
 
     @Before
