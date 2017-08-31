@@ -1,13 +1,21 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
+
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.commons.TestRouteLocator;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.monitoring.CounterFactory;
-
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.cloud.netflix.zuul.filters.Route;
@@ -16,30 +24,19 @@ import org.springframework.cloud.netflix.zuul.metrics.EmptyCounterFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
-
 /**
  * @author Marcos Barbero
  * @since 2017-06-30
  */
-public class BaseRateLimitFilterTest {
+public abstract class BaseRateLimitFilterTest {
 
     RateLimitFilter filter;
 
     MockHttpServletRequest request;
     MockHttpServletResponse response;
 
-    private RequestContext context = RequestContext.getCurrentContext();
-    private RateLimiter rateLimiter = new InMemoryRateLimiter();
+    private RequestContext context;
+    private RateLimiter rateLimiter;
 
     private Route createRoute(String id, String path) {
         return new Route(id, path, null, null, false, Collections.emptySet());
@@ -78,6 +75,8 @@ public class BaseRateLimitFilterTest {
         this.request = new MockHttpServletRequest();
         this.response = new MockHttpServletResponse();
         this.filter = new RateLimitFilter(this.rateLimiter, this.properties(), this.routeLocator());
+        this.context = new RequestContext();
+        RequestContext.testSetCurrentContext(this.context);
         this.context.clear();
         this.context.setRequest(this.request);
         this.context.setResponse(this.response);
@@ -97,7 +96,7 @@ public class BaseRateLimitFilterTest {
         String remaining = this.response.getHeader(RateLimitFilter.Headers.REMAINING);
         assertEquals("0", remaining);
 
-        TimeUnit.SECONDS.sleep(2);
+        TimeUnit.SECONDS.sleep(3);
 
         this.filter.run();
         remaining = this.response.getHeader(RateLimitFilter.Headers.REMAINING);

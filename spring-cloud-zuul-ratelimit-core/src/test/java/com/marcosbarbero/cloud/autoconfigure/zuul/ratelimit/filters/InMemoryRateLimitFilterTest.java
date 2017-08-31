@@ -13,8 +13,8 @@ public class InMemoryRateLimitFilterTest extends BaseRateLimitFilterTest {
     @Before
     @Override
     public void setUp() {
-        this.setRateLimiter(new InMemoryRateLimiter());
+        InMemoryRateLimiter rateLimiter = new InMemoryRateLimiter();
+        this.setRateLimiter(rateLimiter);
         super.setUp();
     }
-
 }

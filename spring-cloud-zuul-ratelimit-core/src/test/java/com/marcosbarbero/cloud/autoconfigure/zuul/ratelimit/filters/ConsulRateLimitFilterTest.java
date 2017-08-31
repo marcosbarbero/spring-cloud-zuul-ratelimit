@@ -24,7 +24,7 @@ import org.junit.Test;
  */
 public class ConsulRateLimitFilterTest extends BaseRateLimitFilterTest {
 
-    private ConsulClient consulClient = mock(ConsulClient.class);
+    private ConsulClient consulClient;
     private ObjectMapper objectMapper = new ObjectMapper();
 
     private Rate rate(long remaining) {
@@ -34,6 +34,7 @@ public class ConsulRateLimitFilterTest extends BaseRateLimitFilterTest {
     @Before
     @Override
     public void setUp() {
+        consulClient = mock(ConsulClient.class);
         this.setRateLimiter(new ConsulRateLimiter(this.consulClient, this.objectMapper));
         super.setUp();
     }
