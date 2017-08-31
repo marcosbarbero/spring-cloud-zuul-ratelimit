@@ -16,12 +16,9 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Date;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -39,24 +36,12 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "rate_table")
 public class Rate {
 
     @Id
-    @JsonProperty
-    @Column(name = "key_column")
     private String key;
-    @JsonProperty
-    @Column(name = "limit_column")
-    private Long limit;
-    @JsonProperty
-    @Column(name = "remaining_column")
     private Long remaining;
-    @JsonProperty
-    @Column(name = "reset_column")
     private Long reset;
-    @JsonProperty
-    @Column(name = "expiration_column")
     private Date expiration;
 
 }

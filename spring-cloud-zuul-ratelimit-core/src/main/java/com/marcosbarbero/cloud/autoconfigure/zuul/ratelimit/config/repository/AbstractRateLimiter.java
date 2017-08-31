@@ -35,7 +35,7 @@ public abstract class AbstractRateLimiter implements RateLimiter {
             final Long refreshInterval = SECONDS.toMillis(policy.getRefreshInterval());
             final Date expiration = new Date(System.currentTimeMillis() + refreshInterval);
 
-            rate = new Rate(key, limit, limit, refreshInterval, expiration);
+            rate = new Rate(key, limit, refreshInterval, expiration);
         }
         return rate;
     }

@@ -42,6 +42,6 @@ public class RedisRateLimiter implements RateLimiter {
             this.template.expire(key, refreshInterval, SECONDS);
             expire = refreshInterval;
         }
-        return new Rate(key, limit, Math.max(-1, limit - current), SECONDS.toMillis(expire), null);
+        return new Rate(key, Math.max(-1, limit - current), SECONDS.toMillis(expire), null);
     }
 }

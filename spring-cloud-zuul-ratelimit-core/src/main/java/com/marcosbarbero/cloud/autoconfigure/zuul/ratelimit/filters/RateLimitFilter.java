@@ -16,6 +16,12 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy.Type;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy.Type.ORIGIN;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy.Type.URL;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy.Type.USER;
+import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
+
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy;
@@ -23,26 +29,16 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
-
+import java.util.List;
+import java.util.Optional;
+import java.util.StringJoiner;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.cloud.netflix.zuul.util.ZuulRuntimeException;
 import org.springframework.web.util.UrlPathHelper;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.StringJoiner;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import lombok.RequiredArgsConstructor;
-
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy.Type;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy.Type.ORIGIN;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy.Type.URL;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy.Type.USER;
-import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
 /**
  * @author Marcos Barbero
@@ -81,7 +77,7 @@ public class RateLimitFilter extends ZuulFilter {
 
         policy().ifPresent(policy -> {
             final Rate rate = this.rateLimiter.consume(policy, key(request, policy.getType()));
-            response.setHeader(Headers.LIMIT, rate.getLimit().toString());
+            response.setHeader(Headers.LIMIT, policy.getLimit().toString());
             response.setHeader(Headers.REMAINING, String.valueOf(Math.max(rate.getRemaining(), 0)));
             response.setHeader(Headers.RESET, rate.getReset().toString());
             if (rate.getRemaining() < 0) {
