@@ -39,7 +39,7 @@ zuul:
       url: forward:/services
   ratelimit:
     enabled: true
-    repository: SPRING_DATA
+    repository: JPA
     policies:
       serviceA:
         limit: 10

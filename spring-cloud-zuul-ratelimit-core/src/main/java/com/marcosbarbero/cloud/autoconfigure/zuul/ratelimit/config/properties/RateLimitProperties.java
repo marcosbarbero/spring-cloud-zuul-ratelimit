@@ -44,7 +44,7 @@ public class RateLimitProperties {
     private Repository repository;
 
     public enum Repository {
-        REDIS, CONSUL, SPRING_DATA
+        REDIS, CONSUL, JPA
     }
 
 }

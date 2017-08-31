@@ -89,7 +89,7 @@ public class RateLimitAutoConfiguration {
     @EntityScan
     @EnableJpaRepositories
     @ConditionalOnMissingBean(RateLimiter.class)
-    @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "SPRING_DATA")
+    @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "JPA")
     public static class SpringDataConfiguration {
 
         @Bean

@@ -87,7 +87,7 @@ Property namespace: __zuul.ratelimit__
 |enabled|true/false|false|
 |behind-proxy|true/false|false|
 |key-prefix|String|${spring.application.name:rate-limit-application}|
-|repository|CONSUL, REDIS, SPRING_DATA, IN_MEMORY|IN_MEMORY|
+|repository|CONSUL, REDIS, JPA, IN_MEMORY|IN_MEMORY|
 |policies|List of [Policy](spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/Policy.java)| - |
 
 Contributing
