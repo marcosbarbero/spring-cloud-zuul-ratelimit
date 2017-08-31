@@ -18,14 +18,20 @@
         <build.directory.core>../spring-cloud-zuul-ratelimit-core/target</build.directory.core>
         <build.directory.it.inmemory>../spring-cloud-zuul-ratelimit-tests/inmemory/target</build.directory.it.inmemory>
         <build.directory.it.redis>../spring-cloud-zuul-ratelimit-tests/redis/target</build.directory.it.redis>
+        <build.directory.it.consul>../spring-cloud-zuul-ratelimit-tests/consul/target</build.directory.it.consul>
+        <build.directory.it.springdata>../spring-cloud-zuul-ratelimit-tests/springdata/target</build.directory.it.springdata>
 
         <classes.directory.core>${build.directory.core}/classes</classes.directory.core>
         <classes.directory.it.inmemory>${build.directory.it.inmemory}/classes</classes.directory.it.inmemory>
         <classes.directory.it.redis>${build.directory.it.redis}/classes</classes.directory.it.redis>
+        <classes.directory.it.consul>${build.directory.it.consul}/classes</classes.directory.it.consul>
+        <classes.directory.it.springdata>${build.directory.it.springdata}/classes</classes.directory.it.springdata>
 
         <sources.directory.core>../spring-cloud-zuul-ratelimit-core/src/main/java</sources.directory.core>
         <sources.directory.it.inmemory>../spring-cloud-zuul-ratelimit-tests/inmemory/src/main/java</sources.directory.it.inmemory>
         <sources.directory.it.redis>../spring-cloud-zuul-ratelimit-tests/redis/src/main/java</sources.directory.it.redis>
+        <sources.directory.it.consul>../spring-cloud-zuul-ratelimit-tests/consul/src/main/java</sources.directory.it.consul>
+        <sources.directory.it.springdata>../spring-cloud-zuul-ratelimit-tests/springdata/src/main/java</sources.directory.it.springdata>
 
         <generated-sources.directory.core>
             ${build.directory.core}/generated-sources/annotations
@@ -36,6 +42,12 @@
         <generated-sources.directory.it.redis>
             ${build.directory.it.redis}/target/generated-sources/annotations
         </generated-sources.directory.it.redis>
+        <generated-sources.directory.it.consul>
+            ${build.directory.it.consul}/target/generated-sources/annotations
+        </generated-sources.directory.it.consul>
+        <generated-sources.directory.it.springdata>
+            ${build.directory.it.springdata}/target/generated-sources/annotations
+        </generated-sources.directory.it.springdata>
     </properties>
 
     <build>
@@ -93,11 +105,15 @@
                                                 <fileset dir="${classes.directory.core}"/>
                                                 <fileset dir="${classes.directory.it.inmemory}"/>
                                                 <fileset dir="${classes.directory.it.redis}"/>
+                                                <fileset dir="${classes.directory.it.consul}"/>
+                                                <fileset dir="${classes.directory.it.springdata}"/>
                                             </classfiles>
                                             <sourcefiles encoding="UTF-8">
                                                 <fileset dir="${sources.directory.core}"/>
                                                 <fileset dir="${sources.directory.it.inmemory}"/>
                                                 <fileset dir="${sources.directory.it.redis}"/>
+                                                <fileset dir="${classes.directory.it.consul}"/>
+                                                <fileset dir="${classes.directory.it.springdata}"/>
                                             </sourcefiles>
                                         </group>
                                     </structure>

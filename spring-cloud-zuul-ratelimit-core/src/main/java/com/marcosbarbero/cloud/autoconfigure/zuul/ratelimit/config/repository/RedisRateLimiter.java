@@ -16,15 +16,13 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy;
-
-import org.springframework.data.redis.core.RedisTemplate;
-
 import lombok.RequiredArgsConstructor;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
+import org.springframework.data.redis.core.RedisTemplate;
 
 /**
  * @author Marcos Barbero
@@ -44,6 +42,6 @@ public class RedisRateLimiter implements RateLimiter {
             this.template.expire(key, refreshInterval, SECONDS);
             expire = refreshInterval;
         }
-        return new Rate(limit, Math.max(-1, limit - current), SECONDS.toMillis(expire), null);
+        return new Rate(key, Math.max(-1, limit - current), SECONDS.toMillis(expire), null);
     }
 }

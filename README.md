@@ -44,6 +44,14 @@ In case you are using Consul there will be needed to add the following dependenc
 </dependency>
 ```
 
+In case you are using Spring Data there will be needed to add the following dependency
+```
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+```
+
 Sample configuration
 ```
 zuul:
@@ -68,6 +76,7 @@ There are three implementations provided:
  * `InMemoryRateLimiter` - uses ConcurrentHashMap as data storage
  * `ConsulRateLimiter` - uses [Consul](https://www.consul.io/) as data storage
  * `RedisRateLimiter` - uses [Redis](https://redis.io/) as data storage
+ * `SpringDataRateLimiter` - uses [Spring Data](https://projects.spring.io/spring-data-jpa/) as data storage
  
 Common application properties
 ---
@@ -78,7 +87,7 @@ Property namespace: __zuul.ratelimit__
 |enabled|true/false|false|
 |behind-proxy|true/false|false|
 |key-prefix|String|${spring.application.name:rate-limit-application}|
-|repository|CONSUL, REDIS, IN_MEMORY|IN_MEMORY|
+|repository|CONSUL, REDIS, JPA, IN_MEMORY|IN_MEMORY|
 |policies|List of [Policy](spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/Policy.java)| - |
 
 Contributing

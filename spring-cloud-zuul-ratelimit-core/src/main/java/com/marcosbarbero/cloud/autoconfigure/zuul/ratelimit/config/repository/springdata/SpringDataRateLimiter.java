@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
+package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.AbstractRateLimiter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * In memory rate limiter configuration for dev environment.
@@ -26,18 +26,19 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Marcos Barbero
  * @since 2017-06-23
  */
-public class InMemoryRateLimiter extends AbstractRateLimiter {
+@RequiredArgsConstructor
+public class SpringDataRateLimiter extends AbstractRateLimiter {
 
-    private Map<String, Rate> repository = new ConcurrentHashMap<>();
+    private final IRateLimiterRepository repository;
 
     @Override
     protected Rate getRate(String key) {
-        return this.repository.get(key);
+        return this.repository.findOne(key);
     }
 
     @Override
     protected void saveRate(Rate rate) {
-        this.repository.put(rate.getKey(), rate);
+        this.repository.save(rate);
     }
 
 }

@@ -17,7 +17,8 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config;
 
 import java.util.Date;
-
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,11 +33,13 @@ import lombok.NoArgsConstructor;
  * @author Marcos Barbero
  */
 @Data
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 public class Rate {
 
-    private Long limit;
+    @Id
+    private String key;
     private Long remaining;
     private Long reset;
     private Date expiration;

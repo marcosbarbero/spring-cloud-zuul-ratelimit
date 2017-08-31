@@ -21,14 +21,10 @@ import com.ecwid.consul.v1.kv.model.GetValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
-
-import org.springframework.util.StringUtils;
-
 import java.io.IOException;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 /**
  * Consul rate limiter configuration.
@@ -39,13 +35,13 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class ConsulRateLimiter extends AbstractRateLimiter implements RateLimiter {
+public class ConsulRateLimiter extends AbstractRateLimiter {
 
     private final ConsulClient consulClient;
     private final ObjectMapper objectMapper;
 
     @Override
-    Rate getRate(String key) {
+    protected Rate getRate(String key) {
         Rate rate = null;
         GetValue value = this.consulClient.getKVValue(key).getValue();
         if (value != null) {
@@ -59,7 +55,7 @@ public class ConsulRateLimiter extends AbstractRateLimiter implements RateLimite
     }
 
     @Override
-    void saveRate(String key, Rate rate) {
+    protected void saveRate(Rate rate) {
         String value = "";
         try {
             value = this.objectMapper.writeValueAsString(rate);
@@ -68,7 +64,7 @@ public class ConsulRateLimiter extends AbstractRateLimiter implements RateLimite
         }
 
         if (StringUtils.hasText(value)) {
-            this.consulClient.setKVValue(key, value);
+            this.consulClient.setKVValue(rate.getKey(), value);
         }
     }
 
