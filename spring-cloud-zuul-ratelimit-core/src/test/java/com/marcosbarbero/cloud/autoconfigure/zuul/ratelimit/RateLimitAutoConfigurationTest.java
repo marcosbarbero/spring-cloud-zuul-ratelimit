@@ -1,16 +1,25 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit;
 
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitFilter;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.PREFIX;
 
+import com.ecwid.consul.v1.ConsulClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.ConsulRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RedisRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitFilter;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.PREFIX;
 
 /**
  * @author Marcos Barbero
@@ -23,11 +32,15 @@ public class RateLimitAutoConfigurationTest {
     @Before
     public void setUp() {
         System.setProperty(PREFIX + ".enabled", "true");
-
         this.context = new AnnotationConfigWebApplicationContext();
         this.context.setServletContext(new MockServletContext());
+        this.context.register(Conf.class);
         this.context.register(RateLimitAutoConfiguration.class);
-        this.context.refresh();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        System.clearProperty(PREFIX + ".repository");
     }
 
     @After
@@ -38,9 +51,65 @@ public class RateLimitAutoConfigurationTest {
     }
 
     @Test
-    @Ignore
-    public void testDefaultConfiguration() {
+    public void testRateLimitFilter() {
+        this.context.refresh();
+
         Assert.assertNotNull(this.context.getBean(RateLimitFilter.class));
     }
 
+    @Test
+    public void testInMemoryRateLimiterByDefault() {
+        this.context.refresh();
+
+        Assert.assertTrue(this.context.getBean(RateLimiter.class) instanceof InMemoryRateLimiter);
+    }
+
+    @Test
+    public void testConsulRateLimiterByProperty() {
+        System.setProperty(PREFIX + ".repository", "CONSUL");
+        System.setProperty("spring.cloud.consul.enabled", "true");
+        this.context.refresh();
+
+        Assert.assertTrue(this.context.getBean(RateLimiter.class) instanceof ConsulRateLimiter);
+    }
+
+    @Test
+    public void testRedisRateLimiterByProperty() {
+        System.setProperty(PREFIX + ".repository", "REDIS");
+        this.context.refresh();
+
+        Assert.assertTrue(this.context.getBean(RateLimiter.class) instanceof RedisRateLimiter);
+    }
+
+    @Test
+    public void testInMemoryRateLimiterByProperty() {
+        System.setProperty(PREFIX + ".repository", "IN_MEMORY");
+        this.context.refresh();
+
+        Assert.assertTrue(this.context.getBean(RateLimiter.class) instanceof InMemoryRateLimiter);
+    }
+
+    @Configuration
+    public static class Conf {
+
+        @Bean
+        public RouteLocator routeLocator() {
+            return Mockito.mock(RouteLocator.class);
+        }
+
+        @Bean
+        public ConsulClient consulClient() {
+            return Mockito.mock(ConsulClient.class);
+        }
+
+        @Bean
+        public ObjectMapper objectMapper() {
+            return Mockito.mock(ObjectMapper.class);
+        }
+
+        @Bean
+        public RedisConnectionFactory redisConnectionFactory() {
+            return Mockito.mock(RedisConnectionFactory.class);
+        }
+    }
 }

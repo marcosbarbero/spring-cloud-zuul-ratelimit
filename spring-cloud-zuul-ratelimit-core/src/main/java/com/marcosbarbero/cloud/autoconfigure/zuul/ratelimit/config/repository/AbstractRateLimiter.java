@@ -4,7 +4,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import java.util.Date;
 
 /**

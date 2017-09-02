@@ -70,14 +70,14 @@ public class ConsulRateLimitFilterTest extends BaseRateLimitFilterTest {
             this.filter.run();
         }
 
-        String remaining = this.response.getHeader(RateLimitFilter.Headers.REMAINING);
+        String remaining = this.response.getHeader(RateLimitFilter.REMAINING_HEADER);
         assertEquals("0", remaining);
 
         TimeUnit.SECONDS.sleep(2);
 
         when(getValue.getDecodedValue()).thenReturn(this.objectMapper.writeValueAsString(this.rate(2)));
         this.filter.run();
-        remaining = this.response.getHeader(RateLimitFilter.Headers.REMAINING);
+        remaining = this.response.getHeader(RateLimitFilter.REMAINING_HEADER);
         assertEquals("1", remaining);
     }
 }
