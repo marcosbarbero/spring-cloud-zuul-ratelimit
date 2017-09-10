@@ -59,7 +59,14 @@ zuul:
     key-prefix: your-prefix 
     enabled: true 
     repository: REDIS 
-    behind-proxy: true 
+    behind-proxy: true
+    default-policy: #optional - will apply unless specific policy exists
+      limit: 10
+      refresh-interval: 60 #default value (in seconds)
+      type: #optional
+        - user
+        - origin
+        - url
     policies:
       myServiceId:
         limit: 10
