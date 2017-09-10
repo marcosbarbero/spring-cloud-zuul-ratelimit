@@ -16,16 +16,14 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy.Type;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy.Type.ORIGIN;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy.Type.URL;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy.Type.USER;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
+import com.google.common.net.HttpHeaders;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.Type;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
@@ -47,9 +45,12 @@ import org.springframework.web.util.UrlPathHelper;
 @RequiredArgsConstructor
 public class RateLimitFilter extends ZuulFilter {
 
+    public static final String LIMIT_HEADER = "X-RateLimit-Limit";
+    public static final String REMAINING_HEADER = "X-RateLimit-Remaining";
+    public static final String RESET_HEADER = "X-RateLimit-Reset";
+
+    private static final String ANONYMOUS_USER = "anonymous";
     private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
-    private static final String X_FORWARDED_FOR = "X-FORWARDED-FOR";
-    private static final String ANONYMOUS = "anonymous";
 
     private final RateLimiter rateLimiter;
     private final RateLimitProperties properties;
@@ -67,7 +68,7 @@ public class RateLimitFilter extends ZuulFilter {
 
     @Override
     public boolean shouldFilter() {
-        return this.properties.isEnabled() && policy().isPresent();
+        return properties.isEnabled() && policy().isPresent();
     }
 
     public Object run() {
@@ -76,10 +77,10 @@ public class RateLimitFilter extends ZuulFilter {
         final HttpServletRequest request = ctx.getRequest();
 
         policy().ifPresent(policy -> {
-            final Rate rate = this.rateLimiter.consume(policy, key(request, policy.getType()));
-            response.setHeader(Headers.LIMIT, policy.getLimit().toString());
-            response.setHeader(Headers.REMAINING, String.valueOf(Math.max(rate.getRemaining(), 0)));
-            response.setHeader(Headers.RESET, rate.getReset().toString());
+            final Rate rate = rateLimiter.consume(policy, key(request, policy.getType()));
+            response.setHeader(LIMIT_HEADER, policy.getLimit().toString());
+            response.setHeader(REMAINING_HEADER, String.valueOf(Math.max(rate.getRemaining(), 0)));
+            response.setHeader(RESET_HEADER, rate.getReset().toString());
             if (rate.getRemaining() < 0) {
                 ctx.setResponseStatusCode(TOO_MANY_REQUESTS.value());
                 ctx.put("rateLimitExceeded", "true");
@@ -92,44 +93,40 @@ public class RateLimitFilter extends ZuulFilter {
 
     private Route route() {
         String requestURI = URL_PATH_HELPER.getPathWithinApplication(RequestContext.getCurrentContext().getRequest());
-        return this.routeLocator.getMatchingRoute(requestURI);
+        return routeLocator.getMatchingRoute(requestURI);
     }
 
     private Optional<Policy> policy() {
         Route route = route();
-        return (route != null) ? Optional.ofNullable(this.properties.getPolicies().get(route.getId())) :
-                Optional.empty();
+        if (route != null) {
+            return properties.getPolicy(route.getId());
+        }
+        return Optional.ofNullable(properties.getDefaultPolicy());
     }
 
     private String key(final HttpServletRequest request, final List<Type> types) {
         final Route route = route();
         final StringJoiner joiner = new StringJoiner(":");
-        joiner.add(this.properties.getKeyPrefix());
+        joiner.add(properties.getKeyPrefix());
         joiner.add(route.getId());
         if (!types.isEmpty()) {
-            if (types.contains(URL)) {
+            if (types.contains(Type.URL)) {
                 joiner.add(route.getPath());
             }
-            if (types.contains(ORIGIN)) {
+            if (types.contains(Type.ORIGIN)) {
                 joiner.add(getRemoteAddr(request));
             }
-            if (types.contains(USER)) {
-                joiner.add(request.getUserPrincipal() != null ? request.getUserPrincipal().getName() : ANONYMOUS);
+            if (types.contains(Type.USER)) {
+                joiner.add(request.getUserPrincipal() != null ? request.getUserPrincipal().getName() : ANONYMOUS_USER);
             }
         }
         return joiner.toString();
     }
 
     private String getRemoteAddr(final HttpServletRequest request) {
-        if (this.properties.isBehindProxy() && request.getHeader(X_FORWARDED_FOR) != null) {
-            return request.getHeader(X_FORWARDED_FOR);
+        if (properties.isBehindProxy() && request.getHeader(HttpHeaders.X_FORWARDED_FOR) != null) {
+            return request.getHeader(HttpHeaders.X_FORWARDED_FOR);
         }
         return request.getRemoteAddr();
-    }
-
-    interface Headers {
-        String LIMIT = "X-RateLimit-Limit";
-        String REMAINING = "X-RateLimit-Remaining";
-        String RESET = "X-RateLimit-Reset";
     }
 }

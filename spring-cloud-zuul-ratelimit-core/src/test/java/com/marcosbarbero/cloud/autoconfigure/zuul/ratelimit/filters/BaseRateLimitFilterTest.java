@@ -7,8 +7,8 @@ import static org.junit.Assert.assertTrue;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.commons.TestRouteLocator;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.monitoring.CounterFactory;
@@ -93,13 +93,13 @@ public abstract class BaseRateLimitFilterTest {
             this.filter.run();
         }
 
-        String remaining = this.response.getHeader(RateLimitFilter.Headers.REMAINING);
+        String remaining = this.response.getHeader(RateLimitFilter.REMAINING_HEADER);
         assertEquals("0", remaining);
 
         TimeUnit.SECONDS.sleep(3);
 
         this.filter.run();
-        remaining = this.response.getHeader(RateLimitFilter.Headers.REMAINING);
+        remaining = this.response.getHeader(RateLimitFilter.REMAINING_HEADER);
         assertEquals(remaining, "1");
     }
 

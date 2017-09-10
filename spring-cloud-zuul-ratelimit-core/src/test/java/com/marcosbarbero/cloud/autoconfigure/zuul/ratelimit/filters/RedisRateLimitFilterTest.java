@@ -58,14 +58,14 @@ public class RedisRateLimitFilterTest extends BaseRateLimitFilterTest {
             this.filter.run();
         }
 
-        String remaining = this.response.getHeader(RateLimitFilter.Headers.REMAINING);
+        String remaining = this.response.getHeader(RateLimitFilter.REMAINING_HEADER);
         assertEquals("0", remaining);
 
         TimeUnit.SECONDS.sleep(2);
 
         when(ops.increment(anyLong())).thenReturn(1L);
         this.filter.run();
-        remaining = this.response.getHeader(RateLimitFilter.Headers.REMAINING);
+        remaining = this.response.getHeader(RateLimitFilter.REMAINING_HEADER);
         assertEquals(remaining, "1");
     }
 }
