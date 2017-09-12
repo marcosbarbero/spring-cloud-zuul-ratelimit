@@ -16,27 +16,25 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
-import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
-
-import com.google.common.net.HttpHeaders;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyer;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.Type;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
-import java.util.List;
-import java.util.Optional;
-import java.util.StringJoiner;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.cloud.netflix.zuul.util.ZuulRuntimeException;
 import org.springframework.web.util.UrlPathHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
+
+import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
 /**
  * @author Marcos Barbero
@@ -49,12 +47,12 @@ public class RateLimitFilter extends ZuulFilter {
     public static final String REMAINING_HEADER = "X-RateLimit-Remaining";
     public static final String RESET_HEADER = "X-RateLimit-Reset";
 
-    private static final String ANONYMOUS_USER = "anonymous";
     private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
 
     private final RateLimiter rateLimiter;
     private final RateLimitProperties properties;
     private final RouteLocator routeLocator;
+    private final RateLimitKeyer rateLimitKeyer;
 
     @Override
     public String filterType() {
@@ -68,16 +66,18 @@ public class RateLimitFilter extends ZuulFilter {
 
     @Override
     public boolean shouldFilter() {
-        return properties.isEnabled() && policy().isPresent();
+        return properties.isEnabled() && policy(route()).isPresent();
     }
 
     public Object run() {
         final RequestContext ctx = RequestContext.getCurrentContext();
         final HttpServletResponse response = ctx.getResponse();
         final HttpServletRequest request = ctx.getRequest();
+        final Route route = route();
 
-        policy().ifPresent(policy -> {
-            final Rate rate = rateLimiter.consume(policy, key(request, policy.getType()));
+        policy(route).ifPresent(policy -> {
+            final String key = rateLimitKeyer.key(request, route, policy);
+            final Rate rate = rateLimiter.consume(policy, key);
             response.setHeader(LIMIT_HEADER, policy.getLimit().toString());
             response.setHeader(REMAINING_HEADER, String.valueOf(Math.max(rate.getRemaining(), 0)));
             response.setHeader(RESET_HEADER, rate.getReset().toString());
@@ -96,37 +96,10 @@ public class RateLimitFilter extends ZuulFilter {
         return routeLocator.getMatchingRoute(requestURI);
     }
 
-    private Optional<Policy> policy() {
-        Route route = route();
+    private Optional<Policy> policy(final Route route) {
         if (route != null) {
             return properties.getPolicy(route.getId());
         }
         return Optional.ofNullable(properties.getDefaultPolicy());
-    }
-
-    private String key(final HttpServletRequest request, final List<Type> types) {
-        final Route route = route();
-        final StringJoiner joiner = new StringJoiner(":");
-        joiner.add(properties.getKeyPrefix());
-        joiner.add(route.getId());
-        if (!types.isEmpty()) {
-            if (types.contains(Type.URL)) {
-                joiner.add(route.getPath());
-            }
-            if (types.contains(Type.ORIGIN)) {
-                joiner.add(getRemoteAddr(request));
-            }
-            if (types.contains(Type.USER)) {
-                joiner.add(request.getUserPrincipal() != null ? request.getUserPrincipal().getName() : ANONYMOUS_USER);
-            }
-        }
-        return joiner.toString();
-    }
-
-    private String getRemoteAddr(final HttpServletRequest request) {
-        if (properties.isBehindProxy() && request.getHeader(HttpHeaders.X_FORWARDED_FOR) != null) {
-            return request.getHeader(HttpHeaders.X_FORWARDED_FOR);
-        }
-        return request.getRemoteAddr();
     }
 }
