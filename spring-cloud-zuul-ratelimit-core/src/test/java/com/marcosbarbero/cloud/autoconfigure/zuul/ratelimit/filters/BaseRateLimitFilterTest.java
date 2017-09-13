@@ -1,21 +1,13 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
-
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.DefaultRateLimitKeyGenerator;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.commons.TestRouteLocator;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.monitoring.CounterFactory;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.cloud.netflix.zuul.filters.Route;
@@ -23,6 +15,17 @@ import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.cloud.netflix.zuul.metrics.EmptyCounterFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
 /**
  * @author Marcos Barbero
@@ -37,6 +40,7 @@ public abstract class BaseRateLimitFilterTest {
 
     private RequestContext context;
     private RateLimiter rateLimiter;
+    private RateLimitKeyGenerator rateLimitKeyGenerator;
 
     private Route createRoute(String id, String path) {
         return new Route(id, path, null, null, false, Collections.emptySet());
@@ -74,7 +78,8 @@ public abstract class BaseRateLimitFilterTest {
         CounterFactory.initialize(new EmptyCounterFactory());
         this.request = new MockHttpServletRequest();
         this.response = new MockHttpServletResponse();
-        this.filter = new RateLimitFilter(this.rateLimiter, this.properties(), this.routeLocator());
+        this.rateLimitKeyGenerator = new DefaultRateLimitKeyGenerator(this.properties());
+        this.filter = new RateLimitFilter(this.rateLimiter, this.properties(), this.routeLocator(), this.rateLimitKeyGenerator);
         this.context = new RequestContext();
         RequestContext.testSetCurrentContext(this.context);
         this.context.clear();

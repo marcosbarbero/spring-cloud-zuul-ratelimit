@@ -16,10 +16,10 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit;
 
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.PREFIX;
-
 import com.ecwid.consul.v1.ConsulClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.DefaultRateLimitKeyGenerator;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.ConsulRateLimiter;
@@ -43,6 +43,8 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.PREFIX;
+
 /**
  * @author Marcos Barbero
  */
@@ -54,8 +56,15 @@ public class RateLimitAutoConfiguration {
     @Bean
     public RateLimitFilter rateLimiterFilter(final RateLimiter rateLimiter,
                                              final RateLimitProperties rateLimitProperties,
-                                             final RouteLocator routeLocator) {
-        return new RateLimitFilter(rateLimiter, rateLimitProperties, routeLocator);
+                                             final RouteLocator routeLocator,
+                                             final RateLimitKeyGenerator rateLimitKeyGenerator) {
+        return new RateLimitFilter(rateLimiter, rateLimitProperties, routeLocator, rateLimitKeyGenerator);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(RateLimitKeyGenerator.class)
+    public RateLimitKeyGenerator rateLimitIdentifier(final RateLimitProperties properties) {
+        return new DefaultRateLimitKeyGenerator(properties);
     }
 
     @ConditionalOnClass(RedisTemplate.class)
