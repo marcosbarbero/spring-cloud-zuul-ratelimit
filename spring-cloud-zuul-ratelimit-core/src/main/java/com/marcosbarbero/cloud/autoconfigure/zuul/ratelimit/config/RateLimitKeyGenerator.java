@@ -5,7 +5,7 @@ import org.springframework.cloud.netflix.zuul.filters.Route;
 
 import javax.servlet.http.HttpServletRequest;
 
-public interface RateLimitKeyer {
+public interface RateLimitKeyGenerator {
 
     String key(HttpServletRequest request, Route route, RateLimitProperties.Policy policy);
 }

@@ -1,7 +1,7 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.DefaultRateLimitKeyer;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyer;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.DefaultRateLimitKeyGenerator;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
@@ -40,7 +40,7 @@ public abstract class BaseRateLimitFilterTest {
 
     private RequestContext context;
     private RateLimiter rateLimiter;
-    private RateLimitKeyer rateLimitKeyer;
+    private RateLimitKeyGenerator rateLimitKeyGenerator;
 
     private Route createRoute(String id, String path) {
         return new Route(id, path, null, null, false, Collections.emptySet());
@@ -78,8 +78,8 @@ public abstract class BaseRateLimitFilterTest {
         CounterFactory.initialize(new EmptyCounterFactory());
         this.request = new MockHttpServletRequest();
         this.response = new MockHttpServletResponse();
-        this.rateLimitKeyer = new DefaultRateLimitKeyer(this.properties());
-        this.filter = new RateLimitFilter(this.rateLimiter, this.properties(), this.routeLocator(), this.rateLimitKeyer);
+        this.rateLimitKeyGenerator = new DefaultRateLimitKeyGenerator(this.properties());
+        this.filter = new RateLimitFilter(this.rateLimiter, this.properties(), this.routeLocator(), this.rateLimitKeyGenerator);
         this.context = new RequestContext();
         RequestContext.testSetCurrentContext(this.context);
         this.context.clear();

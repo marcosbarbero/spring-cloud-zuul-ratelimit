@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.StringJoiner;
 
 @RequiredArgsConstructor
-public class DefaultRateLimitKeyer implements RateLimitKeyer {
+public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
 
     private static final String ANONYMOUS_USER = "anonymous";
 

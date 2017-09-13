@@ -17,7 +17,7 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyer;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
@@ -52,7 +52,7 @@ public class RateLimitFilter extends ZuulFilter {
     private final RateLimiter rateLimiter;
     private final RateLimitProperties properties;
     private final RouteLocator routeLocator;
-    private final RateLimitKeyer rateLimitKeyer;
+    private final RateLimitKeyGenerator rateLimitKeyGenerator;
 
     @Override
     public String filterType() {
@@ -76,7 +76,7 @@ public class RateLimitFilter extends ZuulFilter {
         final Route route = route();
 
         policy(route).ifPresent(policy -> {
-            final String key = rateLimitKeyer.key(request, route, policy);
+            final String key = rateLimitKeyGenerator.key(request, route, policy);
             final Rate rate = rateLimiter.consume(policy, key);
             response.setHeader(LIMIT_HEADER, policy.getLimit().toString());
             response.setHeader(REMAINING_HEADER, String.valueOf(Math.max(rate.getRemaining(), 0)));
