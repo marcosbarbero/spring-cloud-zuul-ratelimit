@@ -1,14 +1,19 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config;
 
-import com.google.common.net.HttpHeaders;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.Type;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.cloud.netflix.zuul.filters.Route;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.StringJoiner;
+
+import javax.servlet.http.HttpServletRequest;
+
+import lombok.RequiredArgsConstructor;
+
+import static com.google.common.net.HttpHeaders.X_FORWARDED_FOR;
+
 
 @RequiredArgsConstructor
 public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
@@ -17,6 +22,7 @@ public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
 
     private final RateLimitProperties properties;
 
+    @Override
     public String key(final HttpServletRequest request, final Route route, final RateLimitProperties.Policy policy) {
         final List<Type> types = policy.getType();
         final StringJoiner joiner = new StringJoiner(":");
@@ -37,8 +43,8 @@ public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
     }
 
     private String getRemoteAddr(final HttpServletRequest request) {
-        if (properties.isBehindProxy() && request.getHeader(HttpHeaders.X_FORWARDED_FOR) != null) {
-            return request.getHeader(HttpHeaders.X_FORWARDED_FOR);
+        if (properties.isBehindProxy() && request.getHeader(X_FORWARDED_FOR) != null) {
+            return request.getHeader(X_FORWARDED_FOR);
         }
         return request.getRemoteAddr();
     }

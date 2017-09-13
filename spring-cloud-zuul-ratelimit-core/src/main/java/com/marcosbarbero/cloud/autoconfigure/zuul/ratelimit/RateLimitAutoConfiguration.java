@@ -25,8 +25,8 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.ConsulRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RedisRateLimiter;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata.IRateLimiterRepository;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata.SpringDataRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata.JpaRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata.RateLimiterRepository;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitFilter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -63,7 +63,7 @@ public class RateLimitAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(RateLimitKeyGenerator.class)
-    public RateLimitKeyGenerator rateLimitIdentifier(final RateLimitProperties properties) {
+    public RateLimitKeyGenerator ratelimitKeyGenerator(final RateLimitProperties properties) {
         return new DefaultRateLimitKeyGenerator(properties);
     }
 
@@ -102,8 +102,8 @@ public class RateLimitAutoConfiguration {
     public static class SpringDataConfiguration {
 
         @Bean
-        public RateLimiter springDataRateLimiter(IRateLimiterRepository rateLimiterRepository) {
-            return new SpringDataRateLimiter(rateLimiterRepository);
+        public RateLimiter springDataRateLimiter(RateLimiterRepository rateLimiterRepository) {
+            return new JpaRateLimiter(rateLimiterRepository);
         }
 
     }

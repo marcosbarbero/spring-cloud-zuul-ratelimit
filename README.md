@@ -24,7 +24,7 @@ Add the dependency on pom.xml
 <dependency>
     <groupId>com.marcosbarbero.cloud</groupId>
     <artifactId>spring-cloud-zuul-ratelimit</artifactId>
-    <version>1.3.1.RELEASE</version>
+    <version>1.3.2.RELEASE</version>
 </dependency>
 ```
 
@@ -110,11 +110,11 @@ Further Customization
 ---
 
 If your application needs to control the key strategy beyond the options offered by the type property then you can 
-supply a custom `RateLimitKeyer` implementation adding further qualifiers or something entirely different:
+supply a custom `RateLimitKeyGenerator` implementation adding further qualifiers or something entirely different:
 
     @Bean
-    public RateLimitKeyer customRateLimitKeyer(final RateLimitProperties properties) {
-        return new DefaultRateLimitKeyer(properties) {
+    public RateLimitKeyGenerator rateLimitKeyGenerator(final RateLimitProperties properties) {
+        return new DefaultRateLimitKeyGenerator(properties) {
             @Override
             public String key(HttpServletRequest request, Route route, RateLimitProperties.Policy policy) {
                 return super.key(request, route, policy) + ":" + request.getMethod();

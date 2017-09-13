@@ -5,8 +5,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata.IRateLimiterRepository;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata.SpringDataRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata.JpaRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata.RateLimiterRepository;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.junit.Before;
@@ -15,13 +16,13 @@ import org.junit.Before;
  * @author Marcos Barbero
  * @since 2017-06-30
  */
-public class SpringDataLimitFilterTest extends BaseRateLimitFilterTest {
+public class JpaLimitFilterTest extends BaseRateLimitFilterTest {
 
     @Before
     @Override
     public void setUp() {
         Map<String, Rate> repository = new ConcurrentHashMap<>();
-        IRateLimiterRepository rateLimiterRepository = mock(IRateLimiterRepository.class);
+        RateLimiterRepository rateLimiterRepository = mock(RateLimiterRepository.class);
         when(rateLimiterRepository.save(any(Rate.class))).thenAnswer(invocationOnMock -> {
             Rate rate = invocationOnMock.getArgument(0);
             repository.put(rate.getKey(), rate);
@@ -31,7 +32,7 @@ public class SpringDataLimitFilterTest extends BaseRateLimitFilterTest {
             String key = invocationOnMock.getArgument(0);
             return repository.get(key);
         });
-        this.setRateLimiter(new SpringDataRateLimiter(rateLimiterRepository));
+        this.setRateLimiter(new JpaRateLimiter(rateLimiterRepository));
         super.setUp();
     }
 }

@@ -27,9 +27,9 @@ import lombok.RequiredArgsConstructor;
  * @since 2017-06-23
  */
 @RequiredArgsConstructor
-public class SpringDataRateLimiter extends AbstractRateLimiter {
+public class JpaRateLimiter extends AbstractRateLimiter {
 
-    private final IRateLimiterRepository repository;
+    private final RateLimiterRepository repository;
 
     @Override
     protected Rate getRate(String key) {

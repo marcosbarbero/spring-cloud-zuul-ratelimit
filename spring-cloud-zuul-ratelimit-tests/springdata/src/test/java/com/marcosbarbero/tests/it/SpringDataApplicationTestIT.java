@@ -11,7 +11,7 @@ import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata.SpringDataRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata.JpaRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitFilter;
 import com.marcosbarbero.tests.SpringDataApplication;
 import java.util.UUID;
@@ -44,7 +44,7 @@ public class SpringDataApplicationTestIT {
     @Test
     public void testSpringDataRateLimiter() {
         RateLimiter rateLimiter = context.getBean(RateLimiter.class);
-        assertTrue("SpringDataRateLimiter", rateLimiter instanceof SpringDataRateLimiter);
+        assertTrue("JpaRateLimiter", rateLimiter instanceof JpaRateLimiter);
     }
 
     @Test
