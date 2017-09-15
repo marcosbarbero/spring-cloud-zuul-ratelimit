@@ -16,7 +16,7 @@ import org.junit.Before;
  * @author Marcos Barbero
  * @since 2017-06-30
  */
-public class JpaLimitFilterTest extends BaseRateLimitPreFilterTest {
+public class JpaLimitPreFilterTest extends BaseRateLimitPreFilterTest {
 
     @Before
     @Override
