@@ -38,7 +38,7 @@ import org.springframework.web.util.UrlPathHelper;
  * @author Marcos Barbero
  * @author Michal Šváb
  */
-public class RateLimitPreFilter extends RateLimitFilter {
+public class RateLimitPreFilter extends AbstractRateLimitFilter {
 
     private final RateLimiter rateLimiter;
     private final RateLimitKeyGenerator rateLimitKeyGenerator;

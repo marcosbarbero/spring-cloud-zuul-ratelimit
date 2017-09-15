@@ -31,7 +31,7 @@ import org.springframework.web.util.UrlPathHelper;
  * @author Liel Chayoun
  */
 @RequiredArgsConstructor
-public abstract class RateLimitFilter extends ZuulFilter {
+public abstract class AbstractRateLimitFilter extends ZuulFilter {
 
     public static final String QUOTA_HEADER = "X-RateLimit-Quota";
     public static final String REMAINING_QUOTA_HEADER = "X-RateLimit-Remaining-Quota";
