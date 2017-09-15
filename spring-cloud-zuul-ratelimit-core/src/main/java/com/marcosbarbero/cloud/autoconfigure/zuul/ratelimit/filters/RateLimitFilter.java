@@ -16,90 +16,60 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.cloud.netflix.zuul.util.ZuulRuntimeException;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.util.UrlPathHelper;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Optional;
-
-import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
 /**
  * @author Marcos Barbero
- * @author Michal Šváb
+ * @author Liel Chayoun
  */
 @RequiredArgsConstructor
-public class RateLimitFilter extends ZuulFilter {
+public abstract class RateLimitFilter extends ZuulFilter {
 
+    public static final String QUOTA_HEADER = "X-RateLimit-Quota";
+    public static final String REMAINING_QUOTA_HEADER = "X-RateLimit-Remaining-Quota";
     public static final String LIMIT_HEADER = "X-RateLimit-Limit";
     public static final String REMAINING_HEADER = "X-RateLimit-Remaining";
     public static final String RESET_HEADER = "X-RateLimit-Reset";
+    public static final String REQUEST_START_TIME = "rateLimitRequestStartTime";
 
-    private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
-
-    private final RateLimiter rateLimiter;
     private final RateLimitProperties properties;
     private final RouteLocator routeLocator;
-    private final RateLimitKeyGenerator rateLimitKeyGenerator;
-
-    @Override
-    public String filterType() {
-        return "pre";
-    }
-
-    @Override
-    public int filterOrder() {
-        return -1;
-    }
+    private final UrlPathHelper urlPathHelper;
 
     @Override
     public boolean shouldFilter() {
         return properties.isEnabled() && policy(route()).isPresent();
     }
 
-    public Object run() {
-        final RequestContext ctx = RequestContext.getCurrentContext();
-        final HttpServletResponse response = ctx.getResponse();
-        final HttpServletRequest request = ctx.getRequest();
-        final Route route = route();
-
-        policy(route).ifPresent(policy -> {
-            final String key = rateLimitKeyGenerator.key(request, route, policy);
-            final Rate rate = rateLimiter.consume(policy, key);
-            response.setHeader(LIMIT_HEADER, policy.getLimit().toString());
-            response.setHeader(REMAINING_HEADER, String.valueOf(Math.max(rate.getRemaining(), 0)));
-            response.setHeader(RESET_HEADER, rate.getReset().toString());
-            if (rate.getRemaining() < 0) {
-                ctx.setResponseStatusCode(TOO_MANY_REQUESTS.value());
-                ctx.put("rateLimitExceeded", "true");
-                throw new ZuulRuntimeException(new ZuulException(TOO_MANY_REQUESTS.toString(),
-                        TOO_MANY_REQUESTS.value(), null));
-            }
-        });
-        return null;
-    }
-
-    private Route route() {
-        String requestURI = URL_PATH_HELPER.getPathWithinApplication(RequestContext.getCurrentContext().getRequest());
+    protected Route route() {
+        String requestURI = urlPathHelper.getPathWithinApplication(RequestContext.getCurrentContext().getRequest());
         return routeLocator.getMatchingRoute(requestURI);
     }
 
-    private Optional<Policy> policy(final Route route) {
+    protected Optional<Policy> policy(final Route route) {
         if (route != null) {
             return properties.getPolicy(route.getId());
         }
         return Optional.ofNullable(properties.getDefaultPolicy());
+    }
+
+    protected void rejectExceededRequest(RequestContext ctx) {
+        HttpStatus tooManyRequests = HttpStatus.TOO_MANY_REQUESTS;
+        ctx.setResponseStatusCode(tooManyRequests.value());
+        ctx.put("rateLimitExceeded", "true");
+        ctx.setSendZuulResponse(false);
+        ZuulException zuulException = new ZuulException(tooManyRequests.toString(), tooManyRequests.value(), null);
+        throw new ZuulRuntimeException(zuulException);
     }
 }

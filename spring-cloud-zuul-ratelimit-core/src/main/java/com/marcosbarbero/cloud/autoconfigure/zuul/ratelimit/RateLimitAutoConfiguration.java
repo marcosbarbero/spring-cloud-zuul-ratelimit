@@ -16,6 +16,8 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit;
 
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.PREFIX;
+
 import com.ecwid.consul.v1.ConsulClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.DefaultRateLimitKeyGenerator;
@@ -27,7 +29,9 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.In
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RedisRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata.JpaRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata.RateLimiterRepository;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitFilter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPostFilter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
+import com.netflix.zuul.ZuulFilter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -42,8 +46,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
-
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.PREFIX;
+import org.springframework.web.util.UrlPathHelper;
 
 /**
  * @author Marcos Barbero
@@ -54,11 +57,21 @@ import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.proper
 public class RateLimitAutoConfiguration {
 
     @Bean
-    public RateLimitFilter rateLimiterFilter(final RateLimiter rateLimiter,
-                                             final RateLimitProperties rateLimitProperties,
-                                             final RouteLocator routeLocator,
-                                             final RateLimitKeyGenerator rateLimitKeyGenerator) {
-        return new RateLimitFilter(rateLimiter, rateLimitProperties, routeLocator, rateLimitKeyGenerator);
+    public ZuulFilter rateLimiterPreFilter(final RateLimiter rateLimiter,
+        final RateLimitProperties rateLimitProperties,
+        final RouteLocator routeLocator,
+        final RateLimitKeyGenerator rateLimitKeyGenerator) {
+        UrlPathHelper urlPathHelper = new UrlPathHelper();
+        return new RateLimitPreFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter, rateLimitKeyGenerator);
+    }
+
+    @Bean
+    public ZuulFilter rateLimiterPostFilter(final RateLimiter rateLimiter,
+        final RateLimitProperties rateLimitProperties,
+        final RouteLocator routeLocator,
+        final RateLimitKeyGenerator rateLimitKeyGenerator) {
+        UrlPathHelper urlPathHelper = new UrlPathHelper();
+        return new RateLimitPostFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter, rateLimitKeyGenerator);
     }
 
     @Bean

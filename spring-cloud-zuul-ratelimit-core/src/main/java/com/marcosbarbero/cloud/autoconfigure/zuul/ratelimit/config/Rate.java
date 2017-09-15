@@ -41,6 +41,7 @@ public class Rate {
     @Id
     private String key;
     private Long remaining;
+    private Long remainingQuota;
     private Long reset;
     private Date expiration;
 

@@ -1,4 +1,4 @@
-package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
+package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.pre;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertEquals;
@@ -13,6 +13,7 @@ import com.ecwid.consul.v1.kv.model.GetValue;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.ConsulRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import org.junit.Before;
@@ -22,13 +23,13 @@ import org.junit.Test;
  * @author Marcos Barbero
  * @since 2017-08-28
  */
-public class ConsulRateLimitFilterTest extends BaseRateLimitFilterTest {
+public class ConsulRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
 
     private ConsulClient consulClient;
     private ObjectMapper objectMapper = new ObjectMapper();
 
     private Rate rate(long remaining) {
-        return new Rate("key", remaining, 100L, new Date(System.currentTimeMillis() + SECONDS.toMillis(2)));
+        return new Rate("key", remaining, null, 100L, new Date(System.currentTimeMillis() + SECONDS.toMillis(2)));
     }
 
     @Before
@@ -70,14 +71,14 @@ public class ConsulRateLimitFilterTest extends BaseRateLimitFilterTest {
             this.filter.run();
         }
 
-        String remaining = this.response.getHeader(RateLimitFilter.REMAINING_HEADER);
+        String remaining = this.response.getHeader(RateLimitPreFilter.REMAINING_HEADER);
         assertEquals("0", remaining);
 
         TimeUnit.SECONDS.sleep(2);
 
         when(getValue.getDecodedValue()).thenReturn(this.objectMapper.writeValueAsString(this.rate(2)));
         this.filter.run();
-        remaining = this.response.getHeader(RateLimitFilter.REMAINING_HEADER);
+        remaining = this.response.getHeader(RateLimitPreFilter.REMAINING_HEADER);
         assertEquals("1", remaining);
     }
 }

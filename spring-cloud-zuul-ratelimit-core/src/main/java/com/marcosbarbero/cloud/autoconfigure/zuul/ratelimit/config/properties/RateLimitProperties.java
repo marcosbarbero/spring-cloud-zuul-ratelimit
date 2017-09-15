@@ -65,8 +65,8 @@ public class RateLimitProperties {
 
         @NotNull
         private Long refreshInterval = TimeUnit.MINUTES.toSeconds(1L);
-        @NotNull
         private Long limit;
+        private Long quota;
         @NotNull
         private List<Type> type = Lists.newArrayList();
 

@@ -28,20 +28,39 @@ import org.springframework.data.redis.core.RedisTemplate;
  * @author Marcos Barbero
  */
 @RequiredArgsConstructor
+@SuppressWarnings("unchecked")
 public class RedisRateLimiter implements RateLimiter {
     private final RedisTemplate template;
 
     @Override
-    @SuppressWarnings("unchecked")
-    public Rate consume(final Policy policy, final String key) {
-        final Long limit = policy.getLimit();
+    public Rate consume(final Policy policy, final String key, final Long requestTime) {
         final Long refreshInterval = policy.getRefreshInterval();
-        final Long current = this.template.boundValueOps(key).increment(1L);
+        Rate rate = new Rate(key, null, null, null, null);
+
+        final Long limit = policy.getLimit();
+        if (limit != null && requestTime == null) {
+            handleExpiration(key, refreshInterval, rate);
+            final Long current = this.template.boundValueOps(key).increment(1L);
+            rate.setRemaining(Math.max(-1, limit - current));
+        }
+
+        final Long quota = policy.getQuota();
+        if (quota != null && requestTime != null) {
+            String quotaKey = key + "-quota";
+            handleExpiration(quotaKey, refreshInterval, rate);
+            final Long current = this.template.boundValueOps(quotaKey).increment(requestTime);
+            rate.setRemainingQuota(Math.max(-1, SECONDS.toMillis(quota) - current));
+        }
+
+        return rate;
+    }
+
+    private void handleExpiration(String key, Long refreshInterval, Rate rate) {
         Long expire = this.template.getExpire(key);
         if (expire == null || expire == -1) {
             this.template.expire(key, refreshInterval, SECONDS);
             expire = refreshInterval;
         }
-        return new Rate(key, Math.max(-1, limit - current), SECONDS.toMillis(expire), null);
+        rate.setReset(SECONDS.toMillis(expire));
     }
 }

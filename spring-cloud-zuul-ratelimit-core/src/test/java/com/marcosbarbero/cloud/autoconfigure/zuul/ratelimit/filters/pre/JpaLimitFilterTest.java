@@ -1,4 +1,4 @@
-package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
+package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.pre;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -16,7 +16,7 @@ import org.junit.Before;
  * @author Marcos Barbero
  * @since 2017-06-30
  */
-public class JpaLimitFilterTest extends BaseRateLimitFilterTest {
+public class JpaLimitFilterTest extends BaseRateLimitPreFilterTest {
 
     @Before
     @Override
