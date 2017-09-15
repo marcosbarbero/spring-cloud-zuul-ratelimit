@@ -20,13 +20,10 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
-import com.netflix.zuul.exception.ZuulException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
-import org.springframework.cloud.netflix.zuul.util.ZuulRuntimeException;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.util.UrlPathHelper;
 
 /**
@@ -62,14 +59,5 @@ public abstract class RateLimitFilter extends ZuulFilter {
             return properties.getPolicy(route.getId());
         }
         return Optional.ofNullable(properties.getDefaultPolicy());
-    }
-
-    protected void rejectExceededRequest(RequestContext ctx) {
-        HttpStatus tooManyRequests = HttpStatus.TOO_MANY_REQUESTS;
-        ctx.setResponseStatusCode(tooManyRequests.value());
-        ctx.put("rateLimitExceeded", "true");
-        ctx.setSendZuulResponse(false);
-        ZuulException zuulException = new ZuulException(tooManyRequests.toString(), tooManyRequests.value(), null);
-        throw new ZuulRuntimeException(zuulException);
     }
 }
