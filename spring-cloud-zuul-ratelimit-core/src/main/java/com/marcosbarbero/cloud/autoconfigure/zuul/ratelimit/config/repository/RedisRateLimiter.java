@@ -30,26 +30,29 @@ import org.springframework.data.redis.core.RedisTemplate;
 @RequiredArgsConstructor
 @SuppressWarnings("unchecked")
 public class RedisRateLimiter implements RateLimiter {
+
     private final RedisTemplate template;
 
     @Override
     public Rate consume(final Policy policy, final String key, final Long requestTime) {
         final Long refreshInterval = policy.getRefreshInterval();
-        Rate rate = new Rate(key, null, null, null, null);
+        final Long quota = policy.getQuota() != null ? SECONDS.toMillis(policy.getQuota()) : null;
+        Rate rate = new Rate(key, policy.getLimit(), quota, null, null);
 
         final Long limit = policy.getLimit();
-        if (limit != null && requestTime == null) {
+        if (limit != null) {
             handleExpiration(key, refreshInterval, rate);
-            final Long current = this.template.boundValueOps(key).increment(1L);
+            long usage = requestTime == null ? 1L : 0L;
+            final Long current = this.template.boundValueOps(key).increment(usage);
             rate.setRemaining(Math.max(-1, limit - current));
         }
 
-        final Long quota = policy.getQuota();
-        if (quota != null && requestTime != null) {
+        if (quota != null) {
             String quotaKey = key + "-quota";
             handleExpiration(quotaKey, refreshInterval, rate);
-            final Long current = this.template.boundValueOps(quotaKey).increment(requestTime);
-            rate.setRemainingQuota(Math.max(-1, SECONDS.toMillis(quota) - current));
+            Long usage =  requestTime != null ? requestTime : 0L;
+            final Long current = this.template.boundValueOps(quotaKey).increment(usage);
+            rate.setRemainingQuota(Math.max(-1, quota - current));
         }
 
         return rate;

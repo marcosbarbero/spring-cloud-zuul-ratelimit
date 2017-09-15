@@ -44,9 +44,9 @@ public class ConsulRateLimiter extends AbstractRateLimiter {
     protected Rate getRate(String key) {
         Rate rate = null;
         GetValue value = this.consulClient.getKVValue(key).getValue();
-        if (value != null) {
+        if (value != null && value.getValue() != null) {
             try {
-                rate = this.objectMapper.readValue(value.getDecodedValue(), Rate.class);
+                rate = this.objectMapper.readValue(value.getValue(), Rate.class);
             } catch (IOException e) {
                 log.error("Failed to deserialize Rate", e);
             }
