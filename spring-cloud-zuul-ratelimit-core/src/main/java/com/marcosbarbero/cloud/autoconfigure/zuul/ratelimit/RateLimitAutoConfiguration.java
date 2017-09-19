@@ -56,12 +56,13 @@ import org.springframework.web.util.UrlPathHelper;
 @ConditionalOnProperty(prefix = PREFIX, name = "enabled", havingValue = "true")
 public class RateLimitAutoConfiguration {
 
+    private final UrlPathHelper urlPathHelper = new UrlPathHelper();
+
     @Bean
     public ZuulFilter rateLimiterPreFilter(final RateLimiter rateLimiter,
         final RateLimitProperties rateLimitProperties,
         final RouteLocator routeLocator,
         final RateLimitKeyGenerator rateLimitKeyGenerator) {
-        UrlPathHelper urlPathHelper = new UrlPathHelper();
         return new RateLimitPreFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter, rateLimitKeyGenerator);
     }
 
@@ -70,7 +71,6 @@ public class RateLimitAutoConfiguration {
         final RateLimitProperties rateLimitProperties,
         final RouteLocator routeLocator,
         final RateLimitKeyGenerator rateLimitKeyGenerator) {
-        UrlPathHelper urlPathHelper = new UrlPathHelper();
         return new RateLimitPostFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter, rateLimitKeyGenerator);
     }
 
