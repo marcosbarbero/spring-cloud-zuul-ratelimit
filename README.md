@@ -61,7 +61,8 @@ zuul:
     repository: REDIS 
     behind-proxy: true
     default-policy: #optional - will apply unless specific policy exists
-      limit: 10
+      limit: 10 #optional - request number limit per refresh interval window
+      quota: 1000 #optional - request time limit per refresh interval window (in seconds)
       refresh-interval: 60 #default value (in seconds)
       type: #optional
         - user
@@ -69,7 +70,8 @@ zuul:
         - url
     policies:
       myServiceId:
-        limit: 10
+        limit: 10 #optional - request number limit per refresh interval window
+        quota: 1000 #optional - request time limit per refresh interval window (in seconds)
         refresh-interval: 60 #default value (in seconds)
         type: #optional
           - user
@@ -103,6 +105,7 @@ Policy properties:
 |Property name| Values |Default Value|
 |-------------|:-------|:-------------:|
 |limit|number of calls| - |
+|quota|time of calls| - |
 |refresh-interval|seconds|60|
 |type| [ORIGIN, USER, URL] | [] |
 

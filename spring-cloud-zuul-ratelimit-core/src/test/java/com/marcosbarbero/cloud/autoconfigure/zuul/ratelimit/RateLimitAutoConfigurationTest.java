@@ -1,5 +1,8 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit;
 
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.PREFIX;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.ecwid.consul.v1.ConsulClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.DefaultRateLimitKeyGenerator;
@@ -8,8 +11,8 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.ConsulRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RedisRateLimiter;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitFilter;
-
+import com.netflix.zuul.ZuulFilter;
+import java.util.Map;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -21,8 +24,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.PREFIX;
 
 /**
  * @author Marcos Barbero
@@ -54,10 +55,12 @@ public class RateLimitAutoConfigurationTest {
     }
 
     @Test
-    public void testRateLimitFilter() {
+    public void testZuulFilters() {
         this.context.refresh();
 
-        Assert.assertNotNull(this.context.getBean(RateLimitFilter.class));
+        Map<String, ZuulFilter> zuulFilterMap = context.getBeansOfType(ZuulFilter.class);
+        assertThat(zuulFilterMap.size()).isEqualTo(2);
+        assertThat(zuulFilterMap.keySet()).containsExactly("rateLimiterPreFilter", "rateLimiterPostFilter");
     }
 
     @Test

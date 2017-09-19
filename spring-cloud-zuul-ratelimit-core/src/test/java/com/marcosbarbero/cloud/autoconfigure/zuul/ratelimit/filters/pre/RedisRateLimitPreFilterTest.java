@@ -1,4 +1,4 @@
-package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
+package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.pre;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RedisRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
 import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +19,7 @@ import org.springframework.data.redis.core.RedisTemplate;
  * @author Marcos Barbero
  * @since 2017-06-30
  */
-public class RedisRateLimitFilterTest extends BaseRateLimitFilterTest {
+public class RedisRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
 
     private RedisTemplate redisTemplate;
 
@@ -58,14 +59,14 @@ public class RedisRateLimitFilterTest extends BaseRateLimitFilterTest {
             this.filter.run();
         }
 
-        String remaining = this.response.getHeader(RateLimitFilter.REMAINING_HEADER);
+        String remaining = this.response.getHeader(RateLimitPreFilter.REMAINING_HEADER);
         assertEquals("0", remaining);
 
         TimeUnit.SECONDS.sleep(2);
 
         when(ops.increment(anyLong())).thenReturn(1L);
         this.filter.run();
-        remaining = this.response.getHeader(RateLimitFilter.REMAINING_HEADER);
+        remaining = this.response.getHeader(RateLimitPreFilter.REMAINING_HEADER);
         assertEquals(remaining, "1");
     }
 }

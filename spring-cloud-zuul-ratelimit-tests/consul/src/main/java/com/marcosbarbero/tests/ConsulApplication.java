@@ -1,8 +1,10 @@
 package com.marcosbarbero.tests;
 
+import static org.springframework.boot.SpringApplication.run;
+
 import com.pszymczyk.consul.ConsulProcess;
 import com.pszymczyk.consul.ConsulStarterBuilder;
-
+import javax.annotation.PreDestroy;
 import org.springframework.cloud.client.SpringCloudApplication;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.annotation.Bean;
@@ -12,10 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.annotation.PreDestroy;
-
-import static org.springframework.boot.SpringApplication.run;
 
 /**
  * @author Marcos Barbero
@@ -71,7 +69,7 @@ public class ConsulApplication {
         }
 
         @PreDestroy
-        public void cleanup() throws Exception {
+        public void cleanup() {
             consulProcess.close();
         }
 

@@ -28,20 +28,42 @@ import org.springframework.data.redis.core.RedisTemplate;
  * @author Marcos Barbero
  */
 @RequiredArgsConstructor
+@SuppressWarnings("unchecked")
 public class RedisRateLimiter implements RateLimiter {
+
     private final RedisTemplate template;
 
     @Override
-    @SuppressWarnings("unchecked")
-    public Rate consume(final Policy policy, final String key) {
-        final Long limit = policy.getLimit();
+    public Rate consume(final Policy policy, final String key, final Long requestTime) {
         final Long refreshInterval = policy.getRefreshInterval();
-        final Long current = this.template.boundValueOps(key).increment(1L);
+        final Long quota = policy.getQuota() != null ? SECONDS.toMillis(policy.getQuota()) : null;
+        Rate rate = new Rate(key, policy.getLimit(), quota, null, null);
+
+        final Long limit = policy.getLimit();
+        if (limit != null) {
+            handleExpiration(key, refreshInterval, rate);
+            long usage = requestTime == null ? 1L : 0L;
+            final Long current = this.template.boundValueOps(key).increment(usage);
+            rate.setRemaining(Math.max(-1, limit - current));
+        }
+
+        if (quota != null) {
+            String quotaKey = key + "-quota";
+            handleExpiration(quotaKey, refreshInterval, rate);
+            Long usage =  requestTime != null ? requestTime : 0L;
+            final Long current = this.template.boundValueOps(quotaKey).increment(usage);
+            rate.setRemainingQuota(Math.max(-1, quota - current));
+        }
+
+        return rate;
+    }
+
+    private void handleExpiration(String key, Long refreshInterval, Rate rate) {
         Long expire = this.template.getExpire(key);
         if (expire == null || expire == -1) {
             this.template.expire(key, refreshInterval, SECONDS);
             expire = refreshInterval;
         }
-        return new Rate(key, Math.max(-1, limit - current), SECONDS.toMillis(expire), null);
+        rate.setReset(SECONDS.toMillis(expire));
     }
 }

@@ -1,25 +1,4 @@
-package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
-
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.DefaultRateLimitKeyGenerator;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.commons.TestRouteLocator;
-import com.netflix.zuul.context.RequestContext;
-import com.netflix.zuul.monitoring.CounterFactory;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.cloud.netflix.zuul.filters.Route;
-import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
-import org.springframework.cloud.netflix.zuul.metrics.EmptyCounterFactory;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.pre;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
@@ -27,13 +6,35 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.DefaultRateLimitKeyGenerator;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.commons.TestRouteLocator;
+import com.netflix.zuul.context.RequestContext;
+import com.netflix.zuul.monitoring.CounterFactory;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.cloud.netflix.zuul.filters.Route;
+import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
+import org.springframework.cloud.netflix.zuul.metrics.EmptyCounterFactory;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.web.util.UrlPathHelper;
+
 /**
  * @author Marcos Barbero
  * @since 2017-06-30
  */
-public abstract class BaseRateLimitFilterTest {
+public abstract class BaseRateLimitPreFilterTest {
 
-    RateLimitFilter filter;
+    RateLimitPreFilter filter;
 
     MockHttpServletRequest request;
     MockHttpServletResponse response;
@@ -79,7 +80,8 @@ public abstract class BaseRateLimitFilterTest {
         this.request = new MockHttpServletRequest();
         this.response = new MockHttpServletResponse();
         this.rateLimitKeyGenerator = new DefaultRateLimitKeyGenerator(this.properties());
-        this.filter = new RateLimitFilter(this.rateLimiter, this.properties(), this.routeLocator(), this.rateLimitKeyGenerator);
+        UrlPathHelper urlPathHelper = new UrlPathHelper();
+        this.filter = new RateLimitPreFilter(this.properties(), this.routeLocator(), urlPathHelper, this.rateLimiter, this.rateLimitKeyGenerator);
         this.context = new RequestContext();
         RequestContext.testSetCurrentContext(this.context);
         this.context.clear();
@@ -98,13 +100,13 @@ public abstract class BaseRateLimitFilterTest {
             this.filter.run();
         }
 
-        String remaining = this.response.getHeader(RateLimitFilter.REMAINING_HEADER);
+        String remaining = this.response.getHeader(RateLimitPreFilter.REMAINING_HEADER);
         assertEquals("0", remaining);
 
         TimeUnit.SECONDS.sleep(3);
 
         this.filter.run();
-        remaining = this.response.getHeader(RateLimitFilter.REMAINING_HEADER);
+        remaining = this.response.getHeader(RateLimitPreFilter.REMAINING_HEADER);
         assertEquals(remaining, "1");
     }
 

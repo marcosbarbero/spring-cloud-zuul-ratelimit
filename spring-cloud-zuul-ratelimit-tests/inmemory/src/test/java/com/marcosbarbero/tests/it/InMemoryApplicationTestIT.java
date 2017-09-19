@@ -5,20 +5,20 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitFilter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
 import com.marcosbarbero.tests.InMemoryApplication;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.ApplicationContext;
@@ -30,6 +30,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @author Marcos Barbero
  * @since 2017-06-27
  */
+@EnableAutoConfiguration
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class InMemoryApplicationTestIT {
@@ -54,7 +55,7 @@ public class InMemoryApplicationTestIT {
 
     @Test
     public void testNotExceedingCapacityRequest() {
-        ResponseEntity<String> response = this.restTemplate.exchange("/serviceA", GET, null, String.class);
+        ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceA", String.class);
         HttpHeaders headers = response.getHeaders();
         assertHeaders(headers, false);
         assertEquals(OK, response.getStatusCode());
@@ -62,13 +63,13 @@ public class InMemoryApplicationTestIT {
 
     @Test
     public void testExceedingCapacity() throws InterruptedException {
-        ResponseEntity<String> response = this.restTemplate.exchange("/serviceB", GET, null, String.class);
+        ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceB", String.class);
         HttpHeaders headers = response.getHeaders();
         assertHeaders(headers, false);
         assertEquals(OK, response.getStatusCode());
 
         for (int i = 0; i < 2; i++) {
-            response = this.restTemplate.exchange("/serviceB", GET, null, String.class);
+            response = this.restTemplate.getForEntity("/serviceB", String.class);
         }
 
         assertEquals(TOO_MANY_REQUESTS, response.getStatusCode());
@@ -76,7 +77,7 @@ public class InMemoryApplicationTestIT {
 
         TimeUnit.SECONDS.sleep(2);
 
-        response = this.restTemplate.exchange("/serviceB", GET, null, String.class);
+        response = this.restTemplate.getForEntity("/serviceB", String.class);
         headers = response.getHeaders();
         assertHeaders(headers, false);
         assertEquals(OK, response.getStatusCode());
@@ -84,7 +85,7 @@ public class InMemoryApplicationTestIT {
 
     @Test
     public void testNoRateLimit() {
-        ResponseEntity<String> response = this.restTemplate.exchange("/serviceC", GET, null, String.class);
+        ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceC", String.class);
         HttpHeaders headers = response.getHeaders();
         assertHeaders(headers, true);
         assertEquals(OK, response.getStatusCode());
@@ -100,8 +101,7 @@ public class InMemoryApplicationTestIT {
                 randomPath = UUID.randomUUID().toString();
             }
 
-            ResponseEntity<String> response = this.restTemplate.exchange("/serviceD/" + randomPath, GET, null, String
-                    .class);
+            ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceD/" + randomPath, String.class);
             HttpHeaders headers = response.getHeaders();
             assertHeaders(headers, false);
             assertEquals(OK, response.getStatusCode());
@@ -109,9 +109,9 @@ public class InMemoryApplicationTestIT {
     }
 
     private void assertHeaders(HttpHeaders headers, boolean nullable) {
-        String limit = headers.getFirst(RateLimitFilter.LIMIT_HEADER);
-        String remaining = headers.getFirst(RateLimitFilter.REMAINING_HEADER);
-        String reset = headers.getFirst(RateLimitFilter.RESET_HEADER);
+        String limit = headers.getFirst(RateLimitPreFilter.LIMIT_HEADER);
+        String remaining = headers.getFirst(RateLimitPreFilter.REMAINING_HEADER);
+        String reset = headers.getFirst(RateLimitPreFilter.RESET_HEADER);
 
         if (!nullable) {
             assertNotNull(limit);
