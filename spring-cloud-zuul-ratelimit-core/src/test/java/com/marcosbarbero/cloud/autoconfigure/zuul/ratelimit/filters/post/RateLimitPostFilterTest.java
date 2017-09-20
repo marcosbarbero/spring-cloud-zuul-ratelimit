@@ -1,0 +1,96 @@
+package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.post;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+import static org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST;
+
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPostFilter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
+import com.netflix.zuul.context.RequestContext;
+import javax.servlet.http.HttpServletRequest;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
+import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.util.UrlPathHelper;
+
+public class RateLimitPostFilterTest {
+
+    private RateLimitPostFilter target;
+
+    @Mock
+    private RouteLocator routeLocator;
+    @Mock
+    private RateLimiter rateLimiter;
+    @Mock
+    private RateLimitKeyGenerator rateLimitKeyGenerator;
+    @Mock
+    private RequestAttributes requestAttributes;
+    @Mock
+    private HttpServletRequest httpServletRequest;
+
+    private RateLimitProperties rateLimitProperties = new RateLimitProperties();
+
+    @Before
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
+        when(httpServletRequest.getContextPath()).thenReturn("/servicea/test");
+        when(httpServletRequest.getRequestURI()).thenReturn("/servicea/test");
+        RequestContext requestContext = new RequestContext();
+        requestContext.setRequest(httpServletRequest);
+        RequestContext.testSetCurrentContext(requestContext);
+        RequestContextHolder.setRequestAttributes(requestAttributes);
+        rateLimitProperties = new RateLimitProperties();
+        UrlPathHelper urlPathHelper = new UrlPathHelper();
+        target = new RateLimitPostFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter, rateLimitKeyGenerator);
+    }
+
+    @Test
+    public void testFilterType() {
+        assertThat(target.filterType()).isEqualTo(FilterConstants.POST_TYPE);
+    }
+
+    @Test
+    public void testFilterOrder() {
+        assertThat(target.filterOrder()).isEqualTo(FilterConstants.SEND_RESPONSE_FILTER_ORDER - 10);
+    }
+
+    @Test
+    public void testShouldFilterOnDisabledProperty() {
+        assertThat(target.shouldFilter()).isEqualTo(false);
+    }
+
+    @Test
+    public void testShouldFilterOnNoPolicy() {
+        rateLimitProperties.setEnabled(true);
+
+        assertThat(target.shouldFilter()).isEqualTo(false);
+    }
+
+    @Test
+    public void testShouldFilterOnNullStartTime() {
+        rateLimitProperties.setEnabled(true);
+        Policy defaultPolicy = new Policy();
+        rateLimitProperties.setDefaultPolicy(defaultPolicy);
+
+        assertThat(target.shouldFilter()).isEqualTo(false);
+    }
+
+    @Test
+    public void testShouldFilter() {
+        rateLimitProperties.setEnabled(true);
+        when(requestAttributes.getAttribute(RateLimitPreFilter.REQUEST_START_TIME, SCOPE_REQUEST)).thenReturn(5L);
+        Policy defaultPolicy = new Policy();
+        rateLimitProperties.setDefaultPolicy(defaultPolicy);
+
+        assertThat(target.shouldFilter()).isEqualTo(true);
+    }
+}

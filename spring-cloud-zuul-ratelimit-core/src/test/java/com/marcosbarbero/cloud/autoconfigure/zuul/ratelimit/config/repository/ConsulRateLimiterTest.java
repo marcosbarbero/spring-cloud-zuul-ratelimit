@@ -8,6 +8,7 @@ import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.kv.model.GetValue;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
+import java.util.Base64;
 import java.util.Map;
 import org.junit.Before;
 import org.mockito.Mock;
@@ -31,7 +32,8 @@ public class ConsulRateLimiterTest extends BaseRateLimiterTest {
         when(consulClient.getKVValue(any())).thenAnswer(invocation -> {
             String key = invocation.getArgument(0);
             GetValue getValue = new GetValue();
-            getValue.setValue(repository.get(key));
+            String value = repository.get(key);
+            getValue.setValue(value != null ? Base64.getEncoder().encodeToString(value.getBytes()) : null);
             return new Response<>(getValue, 1L, true, 1L);
         });
         ObjectMapper objectMapper = new ObjectMapper();
