@@ -1,17 +1,23 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.pre;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
+import com.netflix.zuul.context.RequestContext;
+import javax.servlet.http.HttpServletRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.util.UrlPathHelper;
 
 public class RateLimitPreFilterTest {
@@ -24,11 +30,23 @@ public class RateLimitPreFilterTest {
     private RateLimiter rateLimiter;
     @Mock
     private RateLimitKeyGenerator rateLimitKeyGenerator;
+    @Mock
+    private RequestAttributes requestAttributes;
+    @Mock
+    private HttpServletRequest httpServletRequest;
+
+    private RateLimitProperties rateLimitProperties = new RateLimitProperties();
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        RateLimitProperties rateLimitProperties = new RateLimitProperties();
+        when(httpServletRequest.getContextPath()).thenReturn("/servicea/test");
+        when(httpServletRequest.getRequestURI()).thenReturn("/servicea/test");
+        RequestContext requestContext = new RequestContext();
+        requestContext.setRequest(httpServletRequest);
+        RequestContext.testSetCurrentContext(requestContext);
+        RequestContextHolder.setRequestAttributes(requestAttributes);
+        rateLimitProperties = new RateLimitProperties();
         UrlPathHelper urlPathHelper = new UrlPathHelper();
         target = new RateLimitPreFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter, rateLimitKeyGenerator);
     }
@@ -46,5 +64,21 @@ public class RateLimitPreFilterTest {
     @Test
     public void testShouldFilterOnDisabledProperty() {
         assertThat(target.shouldFilter()).isEqualTo(false);
+    }
+
+    @Test
+    public void testShouldFilterOnNoPolicy() {
+        rateLimitProperties.setEnabled(true);
+
+        assertThat(target.shouldFilter()).isEqualTo(false);
+    }
+
+    @Test
+    public void testShouldFilter() {
+        rateLimitProperties.setEnabled(true);
+        Policy defaultPolicy = new Policy();
+        rateLimitProperties.setDefaultPolicy(defaultPolicy);
+
+        assertThat(target.shouldFilter()).isEqualTo(true);
     }
 }
