@@ -60,7 +60,6 @@ public class ConsulRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
         GetValue getValue = mock(GetValue.class);
         when(this.consulClient.getKVValue(anyString())).thenReturn(response);
         when(response.getValue()).thenReturn(getValue);
-        when(response.getValue()).thenReturn(getValue);
         when(getValue.getDecodedValue()).thenReturn(this.objectMapper.writeValueAsString(this.rate(1)));
 
         this.request.setRequestURI("/serviceA");
@@ -77,7 +76,6 @@ public class ConsulRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
 
         TimeUnit.SECONDS.sleep(2);
 
-        when(response.getValue()).thenReturn(getValue);
         when(getValue.getDecodedValue()).thenReturn(this.objectMapper.writeValueAsString(this.rate(2)));
         this.filter.run();
         remaining = this.response.getHeader(RateLimitPreFilter.REMAINING_HEADER);
