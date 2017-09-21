@@ -21,11 +21,15 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.cloud.netflix.zuul.metrics.EmptyCounterFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.util.UrlPathHelper;
 
 /**
@@ -35,6 +39,9 @@ import org.springframework.web.util.UrlPathHelper;
 public abstract class BaseRateLimitPreFilterTest {
 
     RateLimitPreFilter filter;
+
+    @Mock
+    RequestAttributes requestAttributes;
 
     MockHttpServletRequest request;
     MockHttpServletResponse response;
@@ -56,6 +63,7 @@ public abstract class BaseRateLimitPreFilterTest {
 
         Policy policy = new Policy();
         policy.setLimit(2L);
+        policy.setQuota(2L);
         policy.setRefreshInterval(2L);
         policy.setType(asList(Policy.Type.ORIGIN, Policy.Type.URL, Policy.Type.USER));
 
@@ -76,6 +84,7 @@ public abstract class BaseRateLimitPreFilterTest {
 
     @Before
     public void setUp() {
+        MockitoAnnotations.initMocks(this);
         CounterFactory.initialize(new EmptyCounterFactory());
         this.request = new MockHttpServletRequest();
         this.response = new MockHttpServletResponse();
@@ -84,6 +93,7 @@ public abstract class BaseRateLimitPreFilterTest {
         this.filter = new RateLimitPreFilter(this.properties(), this.routeLocator(), urlPathHelper, this.rateLimiter, this.rateLimitKeyGenerator);
         this.context = new RequestContext();
         RequestContext.testSetCurrentContext(this.context);
+        RequestContextHolder.setRequestAttributes(requestAttributes);
         this.context.clear();
         this.context.setRequest(this.request);
         this.context.setResponse(this.response);

@@ -29,7 +29,7 @@ public class ConsulRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     private Rate rate(long remaining) {
-        return new Rate("key", remaining, null, 100L, new Date(System.currentTimeMillis() + SECONDS.toMillis(2)));
+        return new Rate("key", remaining, 2000L, 100L, new Date(System.currentTimeMillis() + SECONDS.toMillis(2)));
     }
 
     @Before
