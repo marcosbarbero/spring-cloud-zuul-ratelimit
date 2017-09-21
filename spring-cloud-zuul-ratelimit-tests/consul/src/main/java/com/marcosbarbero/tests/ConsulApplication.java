@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -28,7 +27,6 @@ public class ConsulApplication {
     }
 
     @RestController
-    @RequestMapping("/services")
     public class ServiceController {
 
         public static final String RESPONSE_BODY = "ResponseBody";
@@ -51,6 +49,12 @@ public class ConsulApplication {
         @GetMapping("/serviceD/{paramName}")
         public ResponseEntity<String> serviceD(@PathVariable String paramName) {
             return ResponseEntity.ok(RESPONSE_BODY + " " + paramName);
+        }
+
+        @GetMapping("/serviceE")
+        public ResponseEntity<String> serviceE() throws InterruptedException {
+            Thread.sleep(1100);
+            return ResponseEntity.ok(RESPONSE_BODY);
         }
     }
 

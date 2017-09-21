@@ -16,16 +16,13 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST;
 
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.netflix.zuul.context.RequestContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
@@ -75,7 +72,6 @@ public class RateLimitPostFilter extends AbstractRateLimitFilter {
 
     public Object run() {
         final RequestContext ctx = RequestContext.getCurrentContext();
-        final HttpServletResponse response = ctx.getResponse();
         final HttpServletRequest request = ctx.getRequest();
         final Route route = route();
 
@@ -83,15 +79,7 @@ public class RateLimitPostFilter extends AbstractRateLimitFilter {
 
             final Long requestTime = System.currentTimeMillis() - getRequestStartTime();
             final String key = rateLimitKeyGenerator.key(request, route, policy);
-            final Rate rate = rateLimiter.consume(policy, key, requestTime);
-
-            final Long quota = policy.getQuota();
-            final Long remainingQuota = rate.getRemainingQuota();
-            if (quota != null) {
-                RequestContextHolder.getRequestAttributes().setAttribute(REQUEST_START_TIME, System.currentTimeMillis(), SCOPE_REQUEST);
-                response.setHeader(QUOTA_HEADER, String.valueOf(quota));
-                response.setHeader(REMAINING_QUOTA_HEADER, String.valueOf(MILLISECONDS.toSeconds(Math.max(remainingQuota, 0))));
-            }
+            rateLimiter.consume(policy, key, requestTime);
         });
 
         return null;
