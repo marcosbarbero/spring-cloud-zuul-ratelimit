@@ -166,10 +166,8 @@
                     <destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
                     <dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
                     <excludes>
-                        <exclude>**/properties/**</exclude>
-                        <exclude>**/*Configuration.*</exclude>
-                        <exclude>**/*Application.*</exclude>
-                        <exclude>**/*Rate.*</exclude>
+                        <exclude>**/test/**</exclude>
+                        <exclude>**/tests/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>
