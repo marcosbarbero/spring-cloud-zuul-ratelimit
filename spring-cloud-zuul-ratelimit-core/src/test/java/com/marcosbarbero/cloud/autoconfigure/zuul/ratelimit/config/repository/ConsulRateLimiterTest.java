@@ -1,23 +1,34 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.kv.model.GetValue;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
+import java.io.IOException;
 import java.util.Base64;
 import java.util.Map;
 import org.junit.Before;
+import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 public class ConsulRateLimiterTest extends BaseRateLimiterTest {
 
     @Mock
     private ConsulClient consulClient;
+    @Mock
+    private ObjectMapper objectMapper;
 
     @Before
     public void setUp() {
@@ -38,5 +49,24 @@ public class ConsulRateLimiterTest extends BaseRateLimiterTest {
         });
         ObjectMapper objectMapper = new ObjectMapper();
         target = new ConsulRateLimiter(consulClient, objectMapper);
+    }
+
+    @Test
+    public void testGetRateException() throws IOException {
+        when(objectMapper.readValue(anyString(), eq(Rate.class))).thenThrow(new IOException());
+        ConsulRateLimiter consulRateLimiter = new ConsulRateLimiter(consulClient, objectMapper);
+
+        Rate rate = consulRateLimiter.getRate("");
+        assertThat(rate).isNull();
+    }
+
+    @Test
+    public void testSaveRateException() throws IOException {
+        JsonProcessingException jsonProcessingException = Mockito.mock(JsonProcessingException.class);
+        when(objectMapper.writeValueAsString(any(Rate.class))).thenThrow(jsonProcessingException);
+        ConsulRateLimiter consulRateLimiter = new ConsulRateLimiter(consulClient, objectMapper);
+
+        consulRateLimiter.saveRate(null);
+        verifyZeroInteractions(consulClient);
     }
 }
