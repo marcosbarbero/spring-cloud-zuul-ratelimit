@@ -16,6 +16,7 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
@@ -85,6 +86,8 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
             final Long remainingQuota = rate.getRemainingQuota();
             if (quota != null) {
                 RequestContextHolder.getRequestAttributes().setAttribute(REQUEST_START_TIME, System.currentTimeMillis(), SCOPE_REQUEST);
+                response.setHeader(QUOTA_HEADER, String.valueOf(quota));
+                response.setHeader(REMAINING_QUOTA_HEADER, String.valueOf(MILLISECONDS.toSeconds(Math.max(remainingQuota, 0))));
             }
 
             response.setHeader(RESET_HEADER, String.valueOf(rate.getReset()));

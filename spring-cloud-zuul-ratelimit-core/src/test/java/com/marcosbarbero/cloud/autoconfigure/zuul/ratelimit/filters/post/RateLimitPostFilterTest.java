@@ -1,6 +1,11 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.post;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST;
 
@@ -87,10 +92,29 @@ public class RateLimitPostFilterTest {
     @Test
     public void testShouldFilter() {
         rateLimitProperties.setEnabled(true);
-        when(requestAttributes.getAttribute(RateLimitPreFilter.REQUEST_START_TIME, SCOPE_REQUEST)).thenReturn(5L);
+        when(requestAttributes.getAttribute(RateLimitPreFilter.REQUEST_START_TIME, SCOPE_REQUEST)).thenReturn(System.currentTimeMillis());
         Policy defaultPolicy = new Policy();
         rateLimitProperties.setDefaultPolicy(defaultPolicy);
 
         assertThat(target.shouldFilter()).isEqualTo(true);
+    }
+
+    @Test
+    public void testRunNoPolicy() {
+        target.run();
+        verifyZeroInteractions(rateLimiter);
+    }
+
+    @Test
+    public void testRun() {
+        rateLimitProperties.setEnabled(true);
+        when(requestAttributes.getAttribute(RateLimitPreFilter.REQUEST_START_TIME, SCOPE_REQUEST)).thenReturn(System.currentTimeMillis());
+        Policy defaultPolicy = new Policy();
+        defaultPolicy.setQuota(2L);
+        rateLimitProperties.setDefaultPolicy(defaultPolicy);
+        when(rateLimitKeyGenerator.key(any(), any(), any())).thenReturn("generatedKey");
+
+        target.run();
+        verify(rateLimiter).consume(eq(defaultPolicy), eq("generatedKey"), anyLong());
     }
 }

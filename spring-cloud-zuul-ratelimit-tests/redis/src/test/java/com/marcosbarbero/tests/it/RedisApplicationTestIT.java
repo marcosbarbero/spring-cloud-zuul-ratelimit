@@ -48,7 +48,7 @@ public class RedisApplicationTestIT {
     public void testNotExceedingCapacityRequest() {
         ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceA", String.class);
         HttpHeaders headers = response.getHeaders();
-        assertHeaders(headers, false);
+        assertHeaders(headers, false, false);
         assertEquals(OK, response.getStatusCode());
     }
 
@@ -56,7 +56,7 @@ public class RedisApplicationTestIT {
     public void testExceedingCapacity() throws InterruptedException {
         ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceB", String.class);
         HttpHeaders headers = response.getHeaders();
-        assertHeaders(headers, false);
+        assertHeaders(headers, false, false);
         assertEquals(OK, response.getStatusCode());
 
         for (int i = 0; i < 2; i++) {
@@ -70,7 +70,7 @@ public class RedisApplicationTestIT {
 
         response = this.restTemplate.getForEntity("/serviceB", String.class);
         headers = response.getHeaders();
-        assertHeaders(headers, false);
+        assertHeaders(headers, false, false);
         assertEquals(OK, response.getStatusCode());
     }
 
@@ -78,7 +78,7 @@ public class RedisApplicationTestIT {
     public void testNoRateLimit() {
         ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceC", String.class);
         HttpHeaders headers = response.getHeaders();
-        assertHeaders(headers, true);
+        assertHeaders(headers, true, false);
         assertEquals(OK, response.getStatusCode());
     }
 
@@ -93,25 +93,49 @@ public class RedisApplicationTestIT {
 
             ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceD/" + randomPath, String.class);
             HttpHeaders headers = response.getHeaders();
-            assertHeaders(headers, false);
+            assertHeaders(headers, false, false);
             assertEquals(OK, response.getStatusCode());
         }
     }
 
-    private void assertHeaders(HttpHeaders headers, boolean nullable) {
+    @Test
+    public void testExceedingQuotaCapacityRequest() {
+        ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceE", String.class);
+        HttpHeaders headers = response.getHeaders();
+        assertHeaders(headers, false, true);
+        assertEquals(OK, response.getStatusCode());
+
+        response = this.restTemplate.getForEntity("/serviceE", String.class);
+        headers = response.getHeaders();
+        assertHeaders(headers, false, true);
+        assertEquals(TOO_MANY_REQUESTS, response.getStatusCode());
+    }
+
+    private void assertHeaders(HttpHeaders headers, boolean nullable, boolean quotaHeaders) {
+        String quota = headers.getFirst(RateLimitPreFilter.QUOTA_HEADER);
+        String remainingQuota = headers.getFirst(RateLimitPreFilter.REMAINING_QUOTA_HEADER);
         String limit = headers.getFirst(RateLimitPreFilter.LIMIT_HEADER);
         String remaining = headers.getFirst(RateLimitPreFilter.REMAINING_HEADER);
         String reset = headers.getFirst(RateLimitPreFilter.RESET_HEADER);
 
         if (nullable) {
-            assertNull(limit);
-            assertNull(remaining);
+            if (quotaHeaders) {
+                assertNull(quota);
+                assertNull(remainingQuota);
+            } else {
+                assertNull(limit);
+                assertNull(remaining);
+            }
             assertNull(reset);
         } else {
-            assertNotNull(limit);
-            assertNotNull(remaining);
+            if (quotaHeaders) {
+                assertNotNull(quota);
+                assertNotNull(remainingQuota);
+            } else {
+                assertNotNull(limit);
+                assertNotNull(remaining);
+            }
             assertNotNull(reset);
         }
     }
-
 }
