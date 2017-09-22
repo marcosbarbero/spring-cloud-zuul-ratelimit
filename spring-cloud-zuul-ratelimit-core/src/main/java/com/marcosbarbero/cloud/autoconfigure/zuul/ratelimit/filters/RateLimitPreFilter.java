@@ -38,6 +38,7 @@ import org.springframework.web.util.UrlPathHelper;
 /**
  * @author Marcos Barbero
  * @author Michal Šváb
+ * @author Liel Chayoun
  */
 public class RateLimitPreFilter extends AbstractRateLimitFilter {
 

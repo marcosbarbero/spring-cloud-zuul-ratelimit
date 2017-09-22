@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
  * In memory rate limiter configuration for dev environment.
  *
  * @author Marcos Barbero
+ * @author Liel Chayoun
  * @since 2017-06-23
  */
 @RequiredArgsConstructor

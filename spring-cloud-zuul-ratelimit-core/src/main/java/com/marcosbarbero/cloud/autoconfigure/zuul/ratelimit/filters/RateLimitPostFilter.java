@@ -16,19 +16,21 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
-import static org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST;
-
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.netflix.zuul.context.RequestContext;
-import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.util.UrlPathHelper;
+
+import javax.servlet.http.HttpServletRequest;
+
+import static org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST;
 
 /**
  * @author Marcos Barbero
@@ -40,11 +42,11 @@ public class RateLimitPostFilter extends AbstractRateLimitFilter {
     private final RateLimitKeyGenerator rateLimitKeyGenerator;
 
     public RateLimitPostFilter(
-        RateLimitProperties properties,
-        RouteLocator routeLocator,
-        UrlPathHelper urlPathHelper,
-        RateLimiter rateLimiter,
-        RateLimitKeyGenerator rateLimitKeyGenerator) {
+            RateLimitProperties properties,
+            RouteLocator routeLocator,
+            UrlPathHelper urlPathHelper,
+            RateLimiter rateLimiter,
+            RateLimitKeyGenerator rateLimitKeyGenerator) {
         super(properties, routeLocator, urlPathHelper);
         this.rateLimiter = rateLimiter;
         this.rateLimitKeyGenerator = rateLimitKeyGenerator;
@@ -70,6 +72,7 @@ public class RateLimitPostFilter extends AbstractRateLimitFilter {
         return (Long) requestAttributes.getAttribute(RateLimitPreFilter.REQUEST_START_TIME, SCOPE_REQUEST);
     }
 
+    @Override
     public Object run() {
         final RequestContext ctx = RequestContext.getCurrentContext();
         final HttpServletRequest request = ctx.getRequest();

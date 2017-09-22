@@ -26,6 +26,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 /**
  * @author Marcos Barbero
+ * @author Liel Chayoun
  */
 @RequiredArgsConstructor
 @SuppressWarnings("unchecked")

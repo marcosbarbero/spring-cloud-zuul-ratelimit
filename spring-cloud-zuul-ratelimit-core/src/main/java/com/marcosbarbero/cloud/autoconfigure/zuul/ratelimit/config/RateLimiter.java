@@ -20,6 +20,7 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
 
 /**
  * @author Marcos Barbero
+ * @author Liel Chayoun
  */
 public interface RateLimiter {
 

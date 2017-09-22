@@ -32,6 +32,7 @@ import lombok.NoArgsConstructor;
  * reset - Epoch when the rate is replenished by limit. Maps to X-RateLimit-Reset header
  *
  * @author Marcos Barbero
+ * @author Liel Chayoun
  */
 @Data
 @Entity
