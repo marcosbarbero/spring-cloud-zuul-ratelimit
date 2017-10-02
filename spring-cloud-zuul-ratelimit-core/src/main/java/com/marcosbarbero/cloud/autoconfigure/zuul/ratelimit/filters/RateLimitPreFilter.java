@@ -17,6 +17,8 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORM_BODY_WRAPPER_FILTER_ORDER;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 import static org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
@@ -58,12 +60,12 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
 
     @Override
     public String filterType() {
-        return FilterConstants.PRE_TYPE;
+        return PRE_TYPE;
     }
 
     @Override
     public int filterOrder() {
-        return FilterConstants.FORM_BODY_WRAPPER_FILTER_ORDER;
+        return FORM_BODY_WRAPPER_FILTER_ORDER;
     }
 
     public Object run() {

@@ -30,6 +30,8 @@ import org.springframework.web.util.UrlPathHelper;
 
 import javax.servlet.http.HttpServletRequest;
 
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_RESPONSE_FILTER_ORDER;
 import static org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST;
 
 /**
@@ -54,12 +56,12 @@ public class RateLimitPostFilter extends AbstractRateLimitFilter {
 
     @Override
     public String filterType() {
-        return FilterConstants.POST_TYPE;
+        return POST_TYPE;
     }
 
     @Override
     public int filterOrder() {
-        return FilterConstants.SEND_RESPONSE_FILTER_ORDER - 10;
+        return SEND_RESPONSE_FILTER_ORDER - 10;
     }
 
     @Override

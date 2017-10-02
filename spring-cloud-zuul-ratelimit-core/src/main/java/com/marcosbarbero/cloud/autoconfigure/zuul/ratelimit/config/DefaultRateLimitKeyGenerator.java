@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import lombok.RequiredArgsConstructor;
 
-import static com.google.common.net.HttpHeaders.X_FORWARDED_FOR;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_FOR_HEADER;
 
 
 @RequiredArgsConstructor
@@ -59,8 +59,8 @@ public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
     }
 
     private String getRemoteAddr(final HttpServletRequest request) {
-        if (properties.isBehindProxy() && request.getHeader(X_FORWARDED_FOR) != null) {
-            return request.getHeader(X_FORWARDED_FOR);
+        if (properties.isBehindProxy() && request.getHeader(X_FORWARDED_FOR_HEADER) != null) {
+            return request.getHeader(X_FORWARDED_FOR_HEADER);
         }
         return request.getRemoteAddr();
     }
