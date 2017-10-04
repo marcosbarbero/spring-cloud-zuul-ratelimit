@@ -16,12 +16,13 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
+
 import java.util.Date;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * Abstract implementation for {@link RateLimiter}.
@@ -33,28 +34,30 @@ import java.util.Date;
 public abstract class AbstractRateLimiter implements RateLimiter {
 
     protected abstract Rate getRate(String key);
+
     protected abstract void saveRate(Rate rate);
 
     @Override
     public synchronized Rate consume(final Policy policy, final String key, final Long requestTime) {
         Rate rate = this.create(policy, key);
-        this.updateRate(policy, rate, requestTime);
-        this.saveRate(rate);
+        updateRate(policy, rate, requestTime);
+        saveRate(rate);
         return rate;
     }
 
     private Rate create(final Policy policy, final String key) {
         Rate rate = this.getRate(key);
-        if (isExpired(rate)) {
 
-            final Long limit = policy.getLimit();
-            final Long quota = policy.getQuota() != null ? SECONDS.toMillis(policy.getQuota()) : null;
-            final Long refreshInterval = SECONDS.toMillis(policy.getRefreshInterval());
-            final Date expiration = new Date(System.currentTimeMillis() + refreshInterval);
-
-            rate = new Rate(key, limit, quota, refreshInterval, expiration);
+        if (!isExpired(rate)) {
+            return rate;
         }
-        return rate;
+
+        Long limit = policy.getLimit();
+        Long quota = policy.getQuota() != null ? SECONDS.toMillis(policy.getQuota()) : null;
+        Long refreshInterval = SECONDS.toMillis(policy.getRefreshInterval());
+        Date expiration = new Date(System.currentTimeMillis() + refreshInterval);
+
+        return new Rate(key, limit, quota, refreshInterval, expiration);
     }
 
     private void updateRate(final Policy policy, final Rate rate, final Long requestTime) {

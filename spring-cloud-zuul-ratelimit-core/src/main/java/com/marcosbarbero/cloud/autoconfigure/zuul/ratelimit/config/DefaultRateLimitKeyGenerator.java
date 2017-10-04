@@ -59,8 +59,9 @@ public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
     }
 
     private String getRemoteAddr(final HttpServletRequest request) {
-        if (properties.isBehindProxy() && request.getHeader(X_FORWARDED_FOR_HEADER) != null) {
-            return request.getHeader(X_FORWARDED_FOR_HEADER);
+        String xForwardedFor = request.getHeader(X_FORWARDED_FOR_HEADER);
+        if (properties.isBehindProxy() && xForwardedFor != null) {
+            return xForwardedFor;
         }
         return request.getRemoteAddr();
     }

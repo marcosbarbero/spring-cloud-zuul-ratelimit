@@ -118,7 +118,7 @@ public class RateLimitAutoConfiguration {
     public static class SpringDataConfiguration {
 
         @Bean
-        public RateLimiter springDataRateLimiter(RateLimiterRepository rateLimiterRepository) {
+        public RateLimiter springDataRateLimiter(final RateLimiterRepository rateLimiterRepository) {
             return new JpaRateLimiter(rateLimiterRepository);
         }
 

@@ -17,6 +17,7 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
