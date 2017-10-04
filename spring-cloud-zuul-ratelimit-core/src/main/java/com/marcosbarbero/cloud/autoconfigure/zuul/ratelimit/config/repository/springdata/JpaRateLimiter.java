@@ -18,6 +18,7 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.s
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.AbstractRateLimiter;
+
 import lombok.RequiredArgsConstructor;
 
 /**

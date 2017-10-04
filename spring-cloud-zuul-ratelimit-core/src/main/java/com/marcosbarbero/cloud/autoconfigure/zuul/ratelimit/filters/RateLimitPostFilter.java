@@ -23,7 +23,6 @@ import com.netflix.zuul.context.RequestContext;
 
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
-import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.util.UrlPathHelper;
@@ -43,12 +42,9 @@ public class RateLimitPostFilter extends AbstractRateLimitFilter {
     private final RateLimiter rateLimiter;
     private final RateLimitKeyGenerator rateLimitKeyGenerator;
 
-    public RateLimitPostFilter(
-            RateLimitProperties properties,
-            RouteLocator routeLocator,
-            UrlPathHelper urlPathHelper,
-            RateLimiter rateLimiter,
-            RateLimitKeyGenerator rateLimitKeyGenerator) {
+    public RateLimitPostFilter(final RateLimitProperties properties, final RouteLocator routeLocator,
+                               final UrlPathHelper urlPathHelper, final RateLimiter rateLimiter,
+                               final RateLimitKeyGenerator rateLimitKeyGenerator) {
         super(properties, routeLocator, urlPathHelper);
         this.rateLimiter = rateLimiter;
         this.rateLimitKeyGenerator = rateLimitKeyGenerator;
@@ -81,7 +77,6 @@ public class RateLimitPostFilter extends AbstractRateLimitFilter {
         final Route route = route();
 
         policy(route).ifPresent(policy -> {
-
             final Long requestTime = System.currentTimeMillis() - getRequestStartTime();
             final String key = rateLimitKeyGenerator.key(request, route, policy);
             rateLimiter.consume(policy, key, requestTime);

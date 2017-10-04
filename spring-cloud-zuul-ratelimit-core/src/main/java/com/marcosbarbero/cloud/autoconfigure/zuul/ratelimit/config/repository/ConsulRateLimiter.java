@@ -21,10 +21,15 @@ import com.ecwid.consul.v1.kv.model.GetValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
+
 import java.io.IOException;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.util.StringUtils;
+
+import static org.springframework.util.StringUtils.hasText;
 
 /**
  * Consul rate limiter configuration.
@@ -63,7 +68,7 @@ public class ConsulRateLimiter extends AbstractRateLimiter {
             log.error("Failed to serialize Rate", e);
         }
 
-        if (StringUtils.hasText(value)) {
+        if (hasText(value)) {
             this.consulClient.setKVValue(rate.getKey(), value);
         }
     }

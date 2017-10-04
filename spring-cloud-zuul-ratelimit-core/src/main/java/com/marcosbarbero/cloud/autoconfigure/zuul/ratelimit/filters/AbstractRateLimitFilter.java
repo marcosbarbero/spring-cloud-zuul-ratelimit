@@ -49,7 +49,7 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
         return properties.isEnabled() && policy(route()).isPresent();
     }
 
-    protected Route route() {
+    Route route() {
         String requestURI = urlPathHelper.getPathWithinApplication(RequestContext.getCurrentContext().getRequest());
         return routeLocator.getMatchingRoute(requestURI);
     }
