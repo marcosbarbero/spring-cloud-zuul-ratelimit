@@ -10,13 +10,13 @@ jdk:
 install:
   - mvn install -Dmaven.test.skip=true
 script:
-  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar
+  - mvn -pl '!spring-cloud-zuul-ratelimit-dependencies' \
+    clean jacoco:prepare-agent verify jacoco:report coveralls:report \
+    package sonar:sonar
 cache:
   directories:
     - '$HOME/.m2/repository'
     - '$HOME/.sonar/cache'
-after_success:
-  - mvn -pl '!spring-cloud-zuul-ratelimit-dependencies' clean jacoco:prepare-agent verify jacoco:report coveralls:report
 notifications:
   email:
   - marcos.hgb@gmail.com
