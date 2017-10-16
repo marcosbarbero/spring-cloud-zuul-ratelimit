@@ -7,7 +7,7 @@ install:
  - mvn install -Dmaven.test.skip=true
 
 after_success:
-  - mvn -pl '!spring-cloud-zuul-ratelimit-dependencies' clean jacoco:prepare-agent verify jacoco:report coveralls:report
+  - mvn -pl '!spring-cloud-zuul-ratelimit-dependencies' clean jacoco:prepare-agent verify jacoco:report coveralls:report sonar:sonar
 
 notifications:
   email:
