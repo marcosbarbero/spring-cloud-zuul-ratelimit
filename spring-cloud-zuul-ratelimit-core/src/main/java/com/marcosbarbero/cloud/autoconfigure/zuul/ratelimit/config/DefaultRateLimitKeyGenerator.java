@@ -20,13 +20,23 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.Type;
+
 import java.util.List;
 import java.util.StringJoiner;
+
 import javax.servlet.http.HttpServletRequest;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.cloud.netflix.zuul.filters.Route;
 
-
+/**
+ * Default KeyGenerator implementation.
+ *
+ * @author roxspring (github user)
+ * @author Marcos Barbero
+ * @author Liel Chayoun
+ */
 @RequiredArgsConstructor
 public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
 
