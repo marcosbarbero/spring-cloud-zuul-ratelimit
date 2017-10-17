@@ -119,17 +119,17 @@ Further Customization
 If your application needs to control the key strategy beyond the options offered by the type property then you can 
 supply a custom `RateLimitKeyGenerator` implementation adding further qualifiers or something entirely different:
 
-    ```java
-    @Bean
-    public RateLimitKeyGenerator rateLimitKeyGenerator(final RateLimitProperties properties) {
-        return new DefaultRateLimitKeyGenerator(properties) {
-            @Override
-            public String key(HttpServletRequest request, Route route, RateLimitProperties.Policy policy) {
-                return super.key(request, route, policy) + ":" + request.getMethod();
-            }
-        };
-    }
-    ```
+```java
+  @Bean
+  public RateLimitKeyGenerator rateLimitKeyGenerator(final RateLimitProperties properties) {
+      return new DefaultRateLimitKeyGenerator(properties) {
+          @Override
+          public String key(HttpServletRequest request, Route route, RateLimitProperties.Policy policy) {
+              return super.key(request, route, policy) + ":" + request.getMethod();
+          }
+      };
+  }
+```
 
 Contributing
 ---
