@@ -117,7 +117,7 @@ public abstract class BaseRateLimitPreFilterTest {
 
         this.filter.run();
         remaining = this.response.getHeader(RateLimitPreFilter.REMAINING_HEADER);
-        assertEquals(remaining, "1");
+        assertEquals("1", remaining);
     }
 
     @Test
@@ -138,7 +138,7 @@ public abstract class BaseRateLimitPreFilterTest {
 
         String exceeded = (String) this.context.get("rateLimitExceeded");
         assertTrue("RateLimit Exceeded", Boolean.valueOf(exceeded));
-        assertEquals("Too many requests", this.context.getResponseStatusCode(), TOO_MANY_REQUESTS.value());
+        assertEquals("Too many requests", TOO_MANY_REQUESTS.value(), this.context.getResponseStatusCode());
     }
 
     @Test

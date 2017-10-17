@@ -67,6 +67,6 @@ public class RedisRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
         when(ops.increment(anyLong())).thenReturn(1L);
         this.filter.run();
         remaining = this.response.getHeader(RateLimitPreFilter.REMAINING_HEADER);
-        assertEquals(remaining, "1");
+        assertEquals("1", remaining);
     }
 }
