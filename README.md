@@ -55,6 +55,10 @@ Add the following dependency accordingly to the chosen data storage:
     <artifactId>spring-boot-starter-data-jpa</artifactId>
   </dependency>
   ```
+  
+  4. InMemory
+  For `InMemory` implementation there's no need to add any extra dependency other than
+   `com.marcosbarbero.cloud:spring-cloud-zuul-ratelimit` 
 
 Sample configuration
 ```yaml
