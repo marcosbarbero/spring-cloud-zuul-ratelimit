@@ -22,7 +22,7 @@ Usage
 >This project is available on maven central
 
 Add the dependency on pom.xml
-```
+```xml
 <dependency>
     <groupId>com.marcosbarbero.cloud</groupId>
     <artifactId>spring-cloud-zuul-ratelimit</artifactId>
@@ -30,32 +30,34 @@ Add the dependency on pom.xml
 </dependency>
 ```
 
-In case you are using Redis there will be needed to add the following dependency
-```
- <dependency>
+Add the following dependency accordingly to the chosen data storage: 
+
+ 1. Redis
+  ```xml
+   <dependency>
      <groupId>org.springframework.boot</groupId>
      <artifactId>spring-boot-starter-data-redis</artifactId>
- </dependency>
-```
+   </dependency>
+  ```
 
-In case you are using Consul there will be needed to add the following dependency
-```
-<dependency>
+ 2. Consul
+  ```xml
+  <dependency>
     <groupId>org.springframework.cloud</groupId>
     <artifactId>spring-cloud-starter-consul</artifactId>
-</dependency>
-```
+  </dependency>
+  ```
 
-In case you are using Spring Data there will be needed to add the following dependency
-```
-<dependency>
+  3. Spring Data JPA
+  ```xml
+  <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-jpa</artifactId>
-</dependency>
-```
+  </dependency>
+  ```
 
 Sample configuration
-```
+```yaml
 zuul:
   ratelimit:
     key-prefix: your-prefix 
@@ -117,6 +119,7 @@ Further Customization
 If your application needs to control the key strategy beyond the options offered by the type property then you can 
 supply a custom `RateLimitKeyGenerator` implementation adding further qualifiers or something entirely different:
 
+    ```java
     @Bean
     public RateLimitKeyGenerator rateLimitKeyGenerator(final RateLimitProperties properties) {
         return new DefaultRateLimitKeyGenerator(properties) {
@@ -126,7 +129,7 @@ supply a custom `RateLimitKeyGenerator` implementation adding further qualifiers
             }
         };
     }
-
+    ```
 
 Contributing
 ---
