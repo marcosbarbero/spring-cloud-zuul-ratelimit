@@ -19,6 +19,7 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_FOR_HEADER;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.Type;
 
 import java.util.List;
@@ -45,7 +46,7 @@ public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
     private final RateLimitProperties properties;
 
     @Override
-    public String key(final HttpServletRequest request, final Route route, final RateLimitProperties.Policy policy) {
+    public String key(final HttpServletRequest request, final Route route, final Policy policy) {
         final List<Type> types = policy.getType();
         final StringJoiner joiner = new StringJoiner(":");
         joiner.add(properties.getKeyPrefix());
@@ -57,16 +58,16 @@ public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
                 joiner.add(route.getPath());
             }
             if (types.contains(Type.ORIGIN)) {
-                joiner.add(getRemoteAddr(request));
+                joiner.add(getRemoteAddress(request));
             }
             if (types.contains(Type.USER)) {
-                joiner.add(request.getUserPrincipal() != null ? request.getUserPrincipal().getName() : ANONYMOUS_USER);
+                joiner.add(request.getRemoteUser() != null ? request.getRemoteUser() : ANONYMOUS_USER);
             }
         }
         return joiner.toString();
     }
 
-    private String getRemoteAddr(final HttpServletRequest request) {
+    private String getRemoteAddress(final HttpServletRequest request) {
         String xForwardedFor = request.getHeader(X_FORWARDED_FOR_HEADER);
         if (properties.isBehindProxy() && xForwardedFor != null) {
             return xForwardedFor;
