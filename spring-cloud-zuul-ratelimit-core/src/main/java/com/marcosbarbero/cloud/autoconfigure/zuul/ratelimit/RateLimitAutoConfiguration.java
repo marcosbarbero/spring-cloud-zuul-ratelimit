@@ -61,18 +61,20 @@ public class RateLimitAutoConfiguration {
     public ZuulFilter rateLimiterPreFilter(final RateLimiter rateLimiter,
                                            final RateLimitProperties rateLimitProperties,
                                            final RouteLocator routeLocator,
-                                           final RateLimitKeyGenerator rateLimitKeyGenerator) {
+                                           final RateLimitKeyGenerator rateLimitKeyGenerator,
+                                           final UserIdGetter userIdGetter) {
         return new RateLimitPreFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter,
-                rateLimitKeyGenerator);
+                rateLimitKeyGenerator, userIdGetter);
     }
 
     @Bean
     public ZuulFilter rateLimiterPostFilter(final RateLimiter rateLimiter,
                                             final RateLimitProperties rateLimitProperties,
                                             final RouteLocator routeLocator,
-                                            final RateLimitKeyGenerator rateLimitKeyGenerator) {
+                                            final RateLimitKeyGenerator rateLimitKeyGenerator,
+                                            final UserIdGetter userIdGetter) {
         return new RateLimitPostFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter,
-                rateLimitKeyGenerator);
+                rateLimitKeyGenerator, userIdGetter);
     }
 
     @Bean

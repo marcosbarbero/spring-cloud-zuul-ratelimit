@@ -61,10 +61,12 @@ public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
                     joiner.add(userIdGetter.getUserId(context));
                     break;
                 case ROUTE:
-                    joiner.add(route.getId());
+                    if (route != null) {
+                        joiner.add(route.getId());
+                    }
                     break;
                 case URL:
-                    joiner.add(route.getPath());
+                    joiner.add(context.getRequest().getRequestURI());
             }
         });
         return joiner.toString();

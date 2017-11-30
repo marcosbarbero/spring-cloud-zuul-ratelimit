@@ -16,18 +16,24 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.UserIdGetter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.web.util.UrlPathHelper;
 
-import java.util.Collections;
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_FOR_HEADER;
 
 /**
  * @author Marcos Barbero
@@ -43,9 +49,12 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
     public static final String RESET_HEADER = "X-RateLimit-Reset";
     public static final String REQUEST_START_TIME = "rateLimitRequestStartTime";
 
+    public static final String LIMIT_POLICIES = "limit-policies";
+
     private final RateLimitProperties properties;
     private final RouteLocator routeLocator;
     private final UrlPathHelper urlPathHelper;
+    private final UserIdGetter userIdGetter;
 
     @Override
     public boolean shouldFilter() {
@@ -58,7 +67,37 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
     }
 
     protected List<Policy> policy(RequestContext context) {
-        // TODO 根据context获取policies
-        return Collections.emptyList();
+        if (context.containsKey(LIMIT_POLICIES)) {
+            return (List<Policy>) context.get(LIMIT_POLICIES);
+        }
+        HashMap<Policy.Type, String> map = new HashMap<>(8);
+        map.put(Policy.Type.URL, context.getRequest().getRequestURI());
+        map.put(Policy.Type.USER, userIdGetter.getUserId(context));
+        map.put(Policy.Type.ORIGIN, getRemoteAddress(context.getRequest()));
+        map.put(Policy.Type.ROUTE, route().getId());
+        List<Policy> policies = properties.getPolicies().stream()
+                .filter(policy -> match(policy, map))
+                .collect(Collectors.toList());
+        context.set(LIMIT_POLICIES, policies);
+        return policies;
     }
+
+    protected boolean match(Policy policy, Map<Policy.Type, String> requestInfo) {
+        Map<Policy.Type, String> types = policy.getTypes();
+        return types.entrySet().stream()
+                .filter(entry ->
+                        StringUtils.isNotEmpty(entry.getValue()) &&
+                                entry.getValue().equals(requestInfo.get(entry.getKey())))
+                .findFirst()
+                .isPresent();
+    }
+
+    private String getRemoteAddress(final HttpServletRequest request) {
+        String xForwardedFor = request.getHeader(X_FORWARDED_FOR_HEADER);
+        if (properties.isBehindProxy() && xForwardedFor != null) {
+            return xForwardedFor;
+        }
+        return request.getRemoteAddr();
+    }
+
 }

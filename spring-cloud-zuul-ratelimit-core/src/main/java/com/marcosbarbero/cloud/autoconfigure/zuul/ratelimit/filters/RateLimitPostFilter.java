@@ -18,6 +18,7 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.UserIdGetter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.netflix.zuul.context.RequestContext;
 import org.springframework.cloud.netflix.zuul.filters.Route;
@@ -43,8 +44,9 @@ public class RateLimitPostFilter extends AbstractRateLimitFilter {
 
     public RateLimitPostFilter(final RateLimitProperties properties, final RouteLocator routeLocator,
                                final UrlPathHelper urlPathHelper, final RateLimiter rateLimiter,
-                               final RateLimitKeyGenerator rateLimitKeyGenerator) {
-        super(properties, routeLocator, urlPathHelper);
+                               final RateLimitKeyGenerator rateLimitKeyGenerator,
+                               final UserIdGetter userIdGetter) {
+        super(properties, routeLocator, urlPathHelper, userIdGetter);
         this.rateLimiter = rateLimiter;
         this.rateLimitKeyGenerator = rateLimitKeyGenerator;
     }
