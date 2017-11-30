@@ -84,7 +84,7 @@ public class RateLimitProperties {
         private List<Type> type = Lists.newArrayList();
 
         public enum Type {
-            ORIGIN, USER, URL
+            ORIGIN, USER, URL, ROUTE
         }
     }
 }

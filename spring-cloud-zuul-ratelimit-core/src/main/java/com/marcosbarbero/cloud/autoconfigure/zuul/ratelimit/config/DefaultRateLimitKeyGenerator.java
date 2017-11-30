@@ -16,20 +16,17 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config;
 
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_FOR_HEADER;
-
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.Type;
+import lombok.RequiredArgsConstructor;
+import org.springframework.cloud.netflix.zuul.filters.Route;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.StringJoiner;
 
-import javax.servlet.http.HttpServletRequest;
-
-import lombok.RequiredArgsConstructor;
-
-import org.springframework.cloud.netflix.zuul.filters.Route;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_FOR_HEADER;
 
 /**
  * Default KeyGenerator implementation.
@@ -50,7 +47,7 @@ public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
         final List<Type> types = policy.getType();
         final StringJoiner joiner = new StringJoiner(":");
         joiner.add(properties.getKeyPrefix());
-        if (route != null) {
+        if (needAddRoute(route, types)) {
             joiner.add(route.getId());
         }
         if (!types.isEmpty()) {
@@ -65,6 +62,17 @@ public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
             }
         }
         return joiner.toString();
+    }
+
+    /**
+     * if types length == 0 , default add type ROUTE
+     *
+     * @param route The {@link Route}
+     * @param types The {@link Type}
+     * @return
+     */
+    private static final boolean needAddRoute(Route route, List<Type> types) {
+        return route != null && (types.size() == 0 || types.contains(Type.ROUTE));
     }
 
     private String getRemoteAddress(final HttpServletRequest request) {
