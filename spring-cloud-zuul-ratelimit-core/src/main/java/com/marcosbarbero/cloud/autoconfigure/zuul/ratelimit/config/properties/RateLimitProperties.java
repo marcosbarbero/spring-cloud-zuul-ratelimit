@@ -18,19 +18,15 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-
-import javax.validation.constraints.NotNull;
-
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 
@@ -48,7 +44,7 @@ public class RateLimitProperties {
     private Policy defaultPolicy;
 
     @NotNull
-    private Map<String, Policy> policies = Maps.newHashMap();
+    private List<Policy> policies = Lists.newArrayList();
 
     private boolean behindProxy;
 
@@ -65,10 +61,6 @@ public class RateLimitProperties {
         REDIS, CONSUL, JPA, IN_MEMORY
     }
 
-    public Optional<Policy> getPolicy(String key) {
-        return Optional.ofNullable(policies.getOrDefault(key, defaultPolicy));
-    }
-
     @Data
     @NoArgsConstructor
     public static class Policy {
@@ -81,7 +73,7 @@ public class RateLimitProperties {
         private Long quota;
 
         @NotNull
-        private List<Type> type = Lists.newArrayList();
+        private Map<Type, String> types = Maps.newHashMap();
 
         public enum Type {
             ORIGIN, USER, URL, ROUTE
