@@ -41,8 +41,6 @@ public class RateLimitProperties {
 
     public static final String PREFIX = "zuul.ratelimit";
 
-    private Policy defaultPolicy;
-
     @NotNull
     private List<Policy> policies = Lists.newArrayList();
 

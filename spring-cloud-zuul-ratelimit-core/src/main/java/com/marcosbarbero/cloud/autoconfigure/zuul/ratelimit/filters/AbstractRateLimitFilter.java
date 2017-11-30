@@ -58,7 +58,7 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
 
     @Override
     public boolean shouldFilter() {
-        return properties.isEnabled() && policy(RequestContext.getCurrentContext()).isEmpty();
+        return properties.isEnabled() && policy(RequestContext.getCurrentContext()).size() > 0;
     }
 
     Route route() {
@@ -74,7 +74,8 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
         map.put(Policy.Type.URL, context.getRequest().getRequestURI());
         map.put(Policy.Type.USER, userIdGetter.getUserId(context));
         map.put(Policy.Type.ORIGIN, getRemoteAddress(context.getRequest()));
-        map.put(Policy.Type.ROUTE, route().getId());
+        Route route = route();
+        map.put(Policy.Type.ROUTE, route == null ? null : route.getId());
         List<Policy> policies = properties.getPolicies().stream()
                 .filter(policy -> match(policy, map))
                 .collect(Collectors.toList());
@@ -84,10 +85,10 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
 
     protected boolean match(Policy policy, Map<Policy.Type, String> requestInfo) {
         Map<Policy.Type, String> types = policy.getTypes();
-        return types.entrySet().stream()
+        return !types.entrySet().stream()
                 .filter(entry ->
                         StringUtils.isNotEmpty(entry.getValue()) &&
-                                entry.getValue().equals(requestInfo.get(entry.getKey())))
+                                !entry.getValue().equals(requestInfo.get(entry.getKey())))
                 .findFirst()
                 .isPresent();
     }

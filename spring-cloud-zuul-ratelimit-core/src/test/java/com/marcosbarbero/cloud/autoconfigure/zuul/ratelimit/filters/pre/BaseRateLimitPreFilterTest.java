@@ -71,6 +71,7 @@ public abstract class BaseRateLimitPreFilterTest {
         map.put(Policy.Type.URL, "");
         map.put(Policy.Type.USER, "");
         policy.setTypes(map);
+        policies.add(policy);
 
         properties.setPolicies(policies);
 
