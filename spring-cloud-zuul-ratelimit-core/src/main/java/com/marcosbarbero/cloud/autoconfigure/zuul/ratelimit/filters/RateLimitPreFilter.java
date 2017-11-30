@@ -22,7 +22,6 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
-
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.cloud.netflix.zuul.util.ZuulRuntimeException;
@@ -68,45 +67,56 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
 
     @Override
     public Object run() {
+        policy(route()).ifPresent(this::doPrePolicy);
+        return null;
+    }
+
+    /**
+     * do pre policy
+     *
+     * @param policy Rate Limit Policy
+     */
+    protected void doPrePolicy(RateLimitProperties.Policy policy) {
         final RequestContext ctx = RequestContext.getCurrentContext();
         final HttpServletResponse response = ctx.getResponse();
         final HttpServletRequest request = ctx.getRequest();
         final Route route = route();
 
-        policy(route).ifPresent(policy -> {
-            final String key = rateLimitKeyGenerator.key(request, route, policy);
-            final Rate rate = rateLimiter.consume(policy, key, null);
+        final String key = rateLimitKeyGenerator.key(request, route, policy);
+        final Rate rate = rateLimiter.consume(policy, key, null);
 
-            final Long limit = policy.getLimit();
-            final Long remaining = rate.getRemaining();
-            if (limit != null) {
-                response.setHeader(LIMIT_HEADER, String.valueOf(limit));
-                response.setHeader(REMAINING_HEADER, String.valueOf(Math.max(remaining, 0)));
-            }
+        final Long limit = policy.getLimit();
+        final Long remaining = rate.getRemaining();
+        if (limit != null) {
+            response.setHeader(LIMIT_HEADER, String.valueOf(limit));
+            response.setHeader(REMAINING_HEADER, String.valueOf(Math.max(remaining, 0)));
+        }
 
-            final Long quota = policy.getQuota();
-            final Long remainingQuota = rate.getRemainingQuota();
-            if (quota != null) {
-                RequestContextHolder.getRequestAttributes()
-                        .setAttribute(REQUEST_START_TIME, System.currentTimeMillis(), SCOPE_REQUEST);
-                response.setHeader(QUOTA_HEADER, String.valueOf(quota));
-                response.setHeader(REMAINING_QUOTA_HEADER,
-                        String.valueOf(MILLISECONDS.toSeconds(Math.max(remainingQuota, 0))));
-            }
+        final Long quota = policy.getQuota();
+        final Long remainingQuota = rate.getRemainingQuota();
+        if (quota != null) {
+            RequestContextHolder.getRequestAttributes()
+                    .setAttribute(REQUEST_START_TIME, System.currentTimeMillis(), SCOPE_REQUEST);
+            response.setHeader(QUOTA_HEADER, String.valueOf(quota));
+            response.setHeader(REMAINING_QUOTA_HEADER,
+                    String.valueOf(MILLISECONDS.toSeconds(Math.max(remainingQuota, 0))));
+        }
 
-            response.setHeader(RESET_HEADER, String.valueOf(rate.getReset()));
+        response.setHeader(RESET_HEADER, String.valueOf(rate.getReset()));
 
-            if ((limit != null && remaining < 0) || (quota != null && remainingQuota < 0)) {
-                HttpStatus tooManyRequests = HttpStatus.TOO_MANY_REQUESTS;
-                ctx.setResponseStatusCode(tooManyRequests.value());
-                ctx.put("rateLimitExceeded", "true");
-                ctx.setSendZuulResponse(false);
-                ZuulException zuulException = new ZuulException(tooManyRequests.toString(), tooManyRequests.value(),
-                        null);
-                throw new ZuulRuntimeException(zuulException);
-            }
-        });
-
-        return null;
+        if (isLimit(policy, remaining, remainingQuota)) {
+            HttpStatus tooManyRequests = HttpStatus.TOO_MANY_REQUESTS;
+            ctx.setResponseStatusCode(tooManyRequests.value());
+            ctx.put("rateLimitExceeded", "true");
+            ctx.setSendZuulResponse(false);
+            ZuulException zuulException = new ZuulException(tooManyRequests.toString(), tooManyRequests.value(),
+                    null);
+            throw new ZuulRuntimeException(zuulException);
+        }
     }
+
+    protected static final boolean isLimit(RateLimitProperties.Policy policy, Long remaining, Long remainingQuota) {
+        return (policy.getLimit() != null && remaining < 0) || (policy.getQuota() != null && remainingQuota < 0);
+    }
+
 }

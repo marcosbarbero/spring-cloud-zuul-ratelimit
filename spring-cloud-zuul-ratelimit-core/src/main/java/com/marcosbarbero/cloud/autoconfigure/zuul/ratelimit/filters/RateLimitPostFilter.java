@@ -20,7 +20,6 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyG
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.netflix.zuul.context.RequestContext;
-
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.web.context.request.RequestAttributes;
@@ -72,16 +71,23 @@ public class RateLimitPostFilter extends AbstractRateLimitFilter {
 
     @Override
     public Object run() {
+        policy(route()).ifPresent(this::doPostPolicy);
+        return null;
+    }
+
+    /**
+     * do post policy
+     *
+     * @param policy Rate Limit Policy
+     */
+    protected void doPostPolicy(RateLimitProperties.Policy policy) {
         final RequestContext ctx = RequestContext.getCurrentContext();
         final HttpServletRequest request = ctx.getRequest();
         final Route route = route();
 
-        policy(route).ifPresent(policy -> {
-            final Long requestTime = System.currentTimeMillis() - getRequestStartTime();
-            final String key = rateLimitKeyGenerator.key(request, route, policy);
-            rateLimiter.consume(policy, key, requestTime);
-        });
-
-        return null;
+        final Long requestTime = System.currentTimeMillis() - getRequestStartTime();
+        final String key = rateLimitKeyGenerator.key(request, route, policy);
+        rateLimiter.consume(policy, key, requestTime);
     }
+
 }
