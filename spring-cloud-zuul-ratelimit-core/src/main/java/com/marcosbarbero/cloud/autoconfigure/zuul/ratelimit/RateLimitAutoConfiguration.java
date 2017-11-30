@@ -18,9 +18,7 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.DefaultRateLimitKeyGenerator;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.*;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.ConsulRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
@@ -78,9 +76,16 @@ public class RateLimitAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean(UserIdGetter.class)
+    public UserIdGetter userIdGetter() {
+        return new DefaultUserIdGetter();
+    }
+
+    @Bean
     @ConditionalOnMissingBean(RateLimitKeyGenerator.class)
-    public RateLimitKeyGenerator ratelimitKeyGenerator(final RateLimitProperties properties) {
-        return new DefaultRateLimitKeyGenerator(properties);
+    public RateLimitKeyGenerator ratelimitKeyGenerator(final RateLimitProperties properties,
+                                                       final UserIdGetter userIdGetter) {
+        return new DefaultRateLimitKeyGenerator(userIdGetter, properties);
     }
 
     @ConditionalOnClass(RedisTemplate.class)

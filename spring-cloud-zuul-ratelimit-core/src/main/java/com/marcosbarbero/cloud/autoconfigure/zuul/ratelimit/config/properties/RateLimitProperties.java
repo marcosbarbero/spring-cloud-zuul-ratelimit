@@ -73,7 +73,7 @@ public class RateLimitProperties {
         private Long quota;
 
         @NotNull
-        private Map<Type, String> types = Maps.newHashMap();
+        private Map<Type, String> types = Maps.newLinkedHashMap();
 
         public enum Type {
             ORIGIN, USER, URL, ROUTE

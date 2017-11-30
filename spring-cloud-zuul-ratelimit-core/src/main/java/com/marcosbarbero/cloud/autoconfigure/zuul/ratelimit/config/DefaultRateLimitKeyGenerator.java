@@ -19,11 +19,13 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.Type;
+import com.netflix.zuul.context.RequestContext;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
+import java.util.Map;
 import java.util.StringJoiner;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_FOR_HEADER;
@@ -38,41 +40,34 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 @RequiredArgsConstructor
 public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
 
-    private static final String ANONYMOUS_USER = "anonymous";
-
+    private final UserIdGetter userIdGetter;
     private final RateLimitProperties properties;
 
     @Override
-    public String key(final HttpServletRequest request, final Route route, final Policy policy) {
-        final List<Type> types = policy.getType();
+    public String key(final RequestContext context, final Route route, final Policy policy) {
+        final Map<Type, String> types = policy.getTypes();
         final StringJoiner joiner = new StringJoiner(":");
         joiner.add(properties.getKeyPrefix());
-        if (needAddRoute(route, types)) {
-            joiner.add(route.getId());
-        }
-        if (!types.isEmpty()) {
-            if (types.contains(Type.URL) && route != null) {
-                joiner.add(route.getPath());
+        types.forEach((type, value) -> {
+            if (StringUtils.isNotEmpty(value)) {
+                joiner.add(value);
+                return;
             }
-            if (types.contains(Type.ORIGIN)) {
-                joiner.add(getRemoteAddress(request));
+            switch (type) {
+                case ORIGIN:
+                    joiner.add(getRemoteAddress(context.getRequest()));
+                    break;
+                case USER:
+                    joiner.add(userIdGetter.getUserId(context));
+                    break;
+                case ROUTE:
+                    joiner.add(route.getId());
+                    break;
+                case URL:
+                    joiner.add(route.getPath());
             }
-            if (types.contains(Type.USER)) {
-                joiner.add(request.getRemoteUser() != null ? request.getRemoteUser() : ANONYMOUS_USER);
-            }
-        }
+        });
         return joiner.toString();
-    }
-
-    /**
-     * if types length == 0 , default add type ROUTE
-     *
-     * @param route The {@link Route}
-     * @param types The {@link Type}
-     * @return
-     */
-    private static final boolean needAddRoute(Route route, List<Type> types) {
-        return route != null && (types.size() == 0 || types.contains(Type.ROUTE));
     }
 
     private String getRemoteAddress(final HttpServletRequest request) {

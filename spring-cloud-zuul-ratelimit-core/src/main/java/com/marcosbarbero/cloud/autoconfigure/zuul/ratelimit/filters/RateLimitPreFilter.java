@@ -67,7 +67,7 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
 
     @Override
     public Object run() {
-        policy(route()).ifPresent(this::doPrePolicy);
+        policy(RequestContext.getCurrentContext()).forEach(this::doPrePolicy);
         return null;
     }
 
@@ -79,10 +79,9 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
     protected void doPrePolicy(RateLimitProperties.Policy policy) {
         final RequestContext ctx = RequestContext.getCurrentContext();
         final HttpServletResponse response = ctx.getResponse();
-        final HttpServletRequest request = ctx.getRequest();
         final Route route = route();
 
-        final String key = rateLimitKeyGenerator.key(request, route, policy);
+        final String key = rateLimitKeyGenerator.key(ctx, route, policy);
         final Rate rate = rateLimiter.consume(policy, key, null);
 
         final Long limit = policy.getLimit();
