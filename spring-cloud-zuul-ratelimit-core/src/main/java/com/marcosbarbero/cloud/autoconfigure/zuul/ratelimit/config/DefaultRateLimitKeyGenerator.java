@@ -24,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 import java.util.Optional;
 import java.util.StringJoiner;
@@ -47,12 +46,19 @@ public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
         final Map<Type, String> types = policy.getTypes();
         final StringJoiner joiner = new StringJoiner(":");
         joiner.add(properties.getKeyPrefix());
-        if (StringUtils.isNotEmpty(policy.getName())) {
+        boolean hasPolicyName = StringUtils.isNotEmpty(policy.getName());
+        if (hasPolicyName) {
             joiner.add(policy.getName());
         }
         types.forEach((type, value) -> {
+            /**
+             * if value is not empty, we have a const value or more const value
+             * we want use policy name replace it to mark key
+             */
             if (StringUtils.isNotEmpty(value)) {
-                joiner.add(value);
+                if (!hasPolicyName) {
+                    joiner.add(value);
+                }
                 return;
             }
             switch (type) {

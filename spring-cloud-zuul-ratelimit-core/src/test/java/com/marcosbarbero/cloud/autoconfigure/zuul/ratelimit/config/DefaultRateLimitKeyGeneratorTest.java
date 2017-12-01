@@ -52,6 +52,40 @@ public class DefaultRateLimitKeyGeneratorTest {
     }
 
     @Test
+    public void testKeyName() {
+        Policy policy = new Policy();
+        policy.setName("policy-name");
+        LinkedHashMap<Type, String> map = Maps.newLinkedHashMap();
+        policy.setTypes(map);
+
+        String key = target.key(context, null, policy);
+        assertThat(key).isEqualTo("key-prefix:policy-name");
+    }
+
+    @Test
+    public void testKeyNameUrl() {
+        Policy policy = new Policy();
+        policy.setName("policy-name");
+        LinkedHashMap<Type, String> map = Maps.newLinkedHashMap();
+        map.put(Type.URL, "/**");
+        policy.setTypes(map);
+
+        String key = target.key(context, null, policy);
+        assertThat(key).isEqualTo("key-prefix:policy-name");
+    }
+
+    @Test
+    public void testKeyNotNameUrl() {
+        Policy policy = new Policy();
+        LinkedHashMap<Type, String> map = Maps.newLinkedHashMap();
+        map.put(Type.URL, "/**");
+        policy.setTypes(map);
+
+        String key = target.key(context, null, policy);
+        assertThat(key).isEqualTo("key-prefix:/**");
+    }
+
+    @Test
     public void testKeyUrlNullRoute() {
         Policy policy = new Policy();
         LinkedHashMap<Type, String> map = Maps.newLinkedHashMap();
@@ -66,8 +100,8 @@ public class DefaultRateLimitKeyGeneratorTest {
     @Test
     public void testRouteKeyUrl() {
         Policy policy = new Policy();
-        LinkedHashMap<Type, String> map = Maps.newLinkedHashMap();
         when(httpServletRequest.getRequestURI()).thenReturn("/**");
+        LinkedHashMap<Type, String> map = Maps.newLinkedHashMap();
         map.put(Type.ROUTE, "");
         map.put(Type.URL, "");
         policy.setTypes(map);
