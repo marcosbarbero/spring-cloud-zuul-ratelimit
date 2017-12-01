@@ -16,6 +16,7 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RequestUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.UserIdGetter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
@@ -73,7 +74,7 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
         HashMap<Policy.Type, String> map = new HashMap<>(8);
         map.put(Policy.Type.URL, context.getRequest().getRequestURI());
         map.put(Policy.Type.USER, userIdGetter.getUserId(context));
-        map.put(Policy.Type.ORIGIN, getRemoteAddress(context.getRequest()));
+        map.put(Policy.Type.ORIGIN, RequestUtils.getRealIp(context.getRequest(), properties.isBehindProxy()));
         Route route = route();
         map.put(Policy.Type.ROUTE, route == null ? null : route.getId());
         List<Policy> policies = properties.getPolicies().stream()
@@ -91,14 +92,6 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
                                 !entry.getValue().equals(requestInfo.get(entry.getKey())))
                 .findFirst()
                 .isPresent();
-    }
-
-    private String getRemoteAddress(final HttpServletRequest request) {
-        String xForwardedFor = request.getHeader(X_FORWARDED_FOR_HEADER);
-        if (properties.isBehindProxy() && xForwardedFor != null) {
-            return xForwardedFor;
-        }
-        return request.getRemoteAddr();
     }
 
 }

@@ -26,9 +26,8 @@ import org.springframework.cloud.netflix.zuul.filters.Route;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
+import java.util.Optional;
 import java.util.StringJoiner;
-
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_FOR_HEADER;
 
 /**
  * Default KeyGenerator implementation.
@@ -55,28 +54,18 @@ public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
             }
             switch (type) {
                 case ORIGIN:
-                    joiner.add(getRemoteAddress(context.getRequest()));
+                    joiner.add(RequestUtils.getRealIp(context.getRequest(), properties.isBehindProxy()));
                     break;
                 case USER:
                     joiner.add(userIdGetter.getUserId(context));
                     break;
                 case ROUTE:
-                    if (route != null) {
-                        joiner.add(route.getId());
-                    }
+                    Optional.ofNullable(route).ifPresent(r -> joiner.add(r.getId()));
                     break;
                 case URL:
                     joiner.add(context.getRequest().getRequestURI());
             }
         });
         return joiner.toString();
-    }
-
-    private String getRemoteAddress(final HttpServletRequest request) {
-        String xForwardedFor = request.getHeader(X_FORWARDED_FOR_HEADER);
-        if (properties.isBehindProxy() && xForwardedFor != null) {
-            return xForwardedFor;
-        }
-        return request.getRemoteAddr();
     }
 }
