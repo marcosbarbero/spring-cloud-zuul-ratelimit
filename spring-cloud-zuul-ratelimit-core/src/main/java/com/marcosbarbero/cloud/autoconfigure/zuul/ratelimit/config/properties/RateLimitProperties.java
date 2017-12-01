@@ -18,10 +18,13 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.DefaultRateLimitKeyGenerator;
+import com.netflix.zuul.context.RequestContext;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotNull;
@@ -62,6 +65,26 @@ public class RateLimitProperties {
     @Data
     @NoArgsConstructor
     public static class Policy {
+
+        /**
+         * if name not empty, will add to key in {@link DefaultRateLimitKeyGenerator#key}
+         * why?
+         * Because we may have the same types of types, but they have different requirements for time
+         * such as :
+         * ```
+         * - limit: 10
+         *   refresh-interval: 60
+         *   types:
+         *      user:
+         * - limit: 1000
+         *   refresh-interval: 6000000
+         *   types: #optional
+         *      user:
+         * ```
+         * These two policy generated ids are the same, This will result in a failure of our policy
+         * so we need a name field
+         */
+        private String name;
 
         @NotNull
         private Long refreshInterval = MINUTES.toSeconds(1L);

@@ -47,6 +47,9 @@ public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
         final Map<Type, String> types = policy.getTypes();
         final StringJoiner joiner = new StringJoiner(":");
         joiner.add(properties.getKeyPrefix());
+        if (StringUtils.isNotEmpty(policy.getName())) {
+            joiner.add(policy.getName());
+        }
         types.forEach((type, value) -> {
             if (StringUtils.isNotEmpty(value)) {
                 joiner.add(value);
