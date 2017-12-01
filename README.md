@@ -68,23 +68,38 @@ zuul:
     enabled: true 
     repository: REDIS 
     behind-proxy: true
-    default-policy: #optional - will apply unless specific policy exists
-      limit: 10 #optional - request number limit per refresh interval window
-      quota: 1000 #optional - request time limit per refresh interval window (in seconds)
-      refresh-interval: 60 #default value (in seconds)
-      type: #optional
-        - user
-        - origin
-        - url
     policies:
-      myServiceId:
-        limit: 10 #optional - request number limit per refresh interval window
-        quota: 1000 #optional - request time limit per refresh interval window (in seconds)
-        refresh-interval: 60 #default value (in seconds)
-        type: #optional
-          - user
-          - origin
-          - url
+      #optional - will apply unless specific policy exists
+      #optional name - this policy name , types value is not empty recommend use
+      - name: all
+        #optional - request number limit per refresh interval window
+        limit: 50
+        #optional - request time limit per refresh interval window (in seconds)
+        quota: 50000
+        #default value (in seconds)
+        refresh-interval: 1
+        #optional - can select request and mark key 
+        types:
+          route: 
+          origin:
+          user:
+          url:
+      - name: user-send-mail
+        limit: 20
+        refresh-interval: 1
+        # this type can filter in request url is `/api/send/mail`
+        types:
+          url: /api/send/mail
+          user:
+      - name: user-send-mail-and-sms
+        limit: 20
+        refresh-interval: 1
+        # this type can filter in request url is `/api/send/mail`
+        # key is `${key-prefix}:user-send-mail-and-sms:${user}`
+        types:
+          # url support url,url1,url2 (split with `,`) & support ant path
+          url: /api/send/mail,/api/send/sms/*
+          user:
 ```
 
 Available implementations
@@ -121,7 +136,7 @@ Further Customization
 ---
 
 If your application needs to control the key strategy beyond the options offered by the type property then you can 
-supply a custom `RateLimitKeyGenerator` implementation adding further qualifiers or something entirely different:
+supply a custom `RateLimitKeyGenerator & UserIdGetter` implementation adding further qualifiers or something entirely different:
 
 ```java
   @Bean
@@ -132,6 +147,17 @@ supply a custom `RateLimitKeyGenerator` implementation adding further qualifiers
               return super.key(request, route, policy) + ":" + request.getMethod();
           }
       };
+  }
+  
+  @Bean
+  public UserIdGetter userIdGetter() {
+    return new DefaultUserIdGetter() {
+        @Override
+        public String getUserId(RequestContext context) {
+            HttpServletRequest request = context.getRequest();
+            return request.getRemoteUser() != null ? request.getRemoteUser() : ANONYMOUS_USER;
+        }
+    }
   }
 ```
 

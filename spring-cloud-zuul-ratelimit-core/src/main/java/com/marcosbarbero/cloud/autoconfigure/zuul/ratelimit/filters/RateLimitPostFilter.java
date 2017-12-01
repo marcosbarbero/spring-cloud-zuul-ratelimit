@@ -71,18 +71,13 @@ public class RateLimitPostFilter extends AbstractRateLimitFilter {
         return (Long) requestAttributes.getAttribute(RateLimitPreFilter.REQUEST_START_TIME, SCOPE_REQUEST);
     }
 
-    @Override
-    public Object run() {
-        policy(RequestContext.getCurrentContext()).forEach(this::doPostPolicy);
-        return null;
-    }
-
     /**
      * do post policy
      *
-     * @param policy Rate Limit Policy
+     * @param policy {@link RateLimitProperties.Policy}
      */
-    protected void doPostPolicy(RateLimitProperties.Policy policy) {
+    @Override
+    protected void doPolicy(RateLimitProperties.Policy policy) {
         final RequestContext ctx = RequestContext.getCurrentContext();
         final Route route = route();
 

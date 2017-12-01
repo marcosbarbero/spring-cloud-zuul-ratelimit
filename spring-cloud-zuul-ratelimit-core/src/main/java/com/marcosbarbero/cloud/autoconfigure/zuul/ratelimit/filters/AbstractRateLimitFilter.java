@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 /**
  * @author Marcos Barbero
  * @author Liel Chayoun
+ * @author fudali [fudali113@gmail.com]
  */
 @RequiredArgsConstructor
 public abstract class AbstractRateLimitFilter extends ZuulFilter {
@@ -62,11 +63,31 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
         return properties.isEnabled() && policy(RequestContext.getCurrentContext()).size() > 0;
     }
 
+    @Override
+    public Object run() {
+        policy(RequestContext.getCurrentContext()).forEach(this::doPolicy);
+        return null;
+    }
+
+    /**
+     * exec policy in this method
+     *
+     * @param policy {@link Policy}
+     */
+    protected abstract void doPolicy(RateLimitProperties.Policy policy);
+
     Route route() {
         String requestURI = urlPathHelper.getPathWithinApplication(RequestContext.getCurrentContext().getRequest());
         return routeLocator.getMatchingRoute(requestURI);
     }
 
+    /**
+     * foreach all policy, filter not match policy {@link #match(Policy, Map)}
+     *
+     * @param context {@link RequestContext}
+     * @return this request should do policies {@link List<Policy>}
+     * @author fudali [fudali113@gmail.com]
+     */
     protected List<Policy> policy(RequestContext context) {
         if (context.containsKey(LIMIT_POLICIES)) {
             return (List<Policy>) context.get(LIMIT_POLICIES);
@@ -84,6 +105,20 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
         return policies;
     }
 
+    /**
+     * in types, foreach types
+     * if value is empty, this type can match any request
+     * if not empty
+     * ORIGIN{@link Policy.Type#ORIGIN}, USER{@link Policy.Type#USER}, ROUTE{@link Policy.Type#ROUTE}:
+     * this type match value equal request information
+     * URL:
+     * url value can be url1,url2 & url support ant path (such as /api/*)
+     *
+     * @param policy      {@link Policy}
+     * @param requestInfo this request information
+     * @return is need do this policy
+     * @author fudali [fudali113@gmail.com]
+     */
     protected boolean match(Policy policy, Map<Policy.Type, String> requestInfo) {
         Map<Policy.Type, String> types = policy.getTypes();
         return !types.entrySet().stream()
@@ -95,9 +130,10 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
     /**
      * url type support multiple & antPath
      *
-     * @param entry  {@link Map.Entry<Policy.Type, String>}
+     * @param entry       {@link Map.Entry<Policy.Type, String>}
      * @param requestInfo {@link Map.Entry<Policy.Type, String>}
      * @return isMatch
+     * @author fudali [fudali113@gmail.com]
      */
     private boolean isMatch(Map.Entry<Policy.Type, String> entry, Map<Policy.Type, String> requestInfo) {
         if (entry.getKey() == Policy.Type.URL) {

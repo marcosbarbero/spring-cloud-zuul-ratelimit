@@ -30,7 +30,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.util.UrlPathHelper;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -67,18 +66,13 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
         return FORM_BODY_WRAPPER_FILTER_ORDER;
     }
 
-    @Override
-    public Object run() {
-        policy(RequestContext.getCurrentContext()).forEach(this::doPrePolicy);
-        return null;
-    }
-
     /**
      * do pre policy
      *
-     * @param policy Rate Limit Policy
+     * @param policy {@link RateLimitProperties.Policy}
      */
-    protected void doPrePolicy(RateLimitProperties.Policy policy) {
+    @Override
+    protected void doPolicy(RateLimitProperties.Policy policy) {
         final RequestContext ctx = RequestContext.getCurrentContext();
         final HttpServletResponse response = ctx.getResponse();
         final Route route = route();
@@ -88,13 +82,17 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
 
         final Long limit = policy.getLimit();
         final Long remaining = rate.getRemaining();
+
         if (limit != null) {
             response.setHeader(LIMIT_HEADER, String.valueOf(limit));
             response.setHeader(REMAINING_HEADER, String.valueOf(Math.max(remaining, 0)));
         }
 
+        response.setHeader(RESET_HEADER, String.valueOf(rate.getReset()));
+
         final Long quota = policy.getQuota();
         final Long remainingQuota = rate.getRemainingQuota();
+
         if (quota != null) {
             RequestContextHolder.getRequestAttributes()
                     .setAttribute(REQUEST_START_TIME, System.currentTimeMillis(), SCOPE_REQUEST);
@@ -102,8 +100,6 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
             response.setHeader(REMAINING_QUOTA_HEADER,
                     String.valueOf(MILLISECONDS.toSeconds(Math.max(remainingQuota, 0))));
         }
-
-        response.setHeader(RESET_HEADER, String.valueOf(rate.getReset()));
 
         if (isLimit(policy, remaining, remainingQuota)) {
             HttpStatus tooManyRequests = HttpStatus.TOO_MANY_REQUESTS;
