@@ -26,15 +26,14 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.util.UrlPathHelper;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_FOR_HEADER;
 
 /**
  * @author Marcos Barbero
@@ -56,6 +55,7 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
     private final RouteLocator routeLocator;
     private final UrlPathHelper urlPathHelper;
     private final UserIdGetter userIdGetter;
+    private final AntPathMatcher antPathMatcher = new AntPathMatcher();
 
     @Override
     public boolean shouldFilter() {
@@ -87,11 +87,26 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
     protected boolean match(Policy policy, Map<Policy.Type, String> requestInfo) {
         Map<Policy.Type, String> types = policy.getTypes();
         return !types.entrySet().stream()
-                .filter(entry ->
-                        StringUtils.isNotEmpty(entry.getValue()) &&
-                                !entry.getValue().equals(requestInfo.get(entry.getKey())))
+                .filter(entry -> StringUtils.isNotEmpty(entry.getValue()) && !isMatch(entry, requestInfo))
                 .findFirst()
                 .isPresent();
+    }
+
+    /**
+     * url type support multiple & antPath
+     *
+     * @param entry  {@link Map.Entry<Policy.Type, String>}
+     * @param requestInfo {@link Map.Entry<Policy.Type, String>}
+     * @return isMatch
+     */
+    private boolean isMatch(Map.Entry<Policy.Type, String> entry, Map<Policy.Type, String> requestInfo) {
+        if (entry.getKey() == Policy.Type.URL) {
+            return Arrays.stream(entry.getValue().split(","))
+                    .filter(url -> antPathMatcher.match(url, requestInfo.get(entry.getKey())))
+                    .findFirst()
+                    .isPresent();
+        }
+        return entry.getValue().equals(requestInfo.get(entry.getKey()));
     }
 
 }
