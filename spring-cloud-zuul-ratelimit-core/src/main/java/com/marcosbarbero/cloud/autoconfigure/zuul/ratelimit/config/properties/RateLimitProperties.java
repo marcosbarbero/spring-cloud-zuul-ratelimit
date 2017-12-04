@@ -93,6 +93,11 @@ public class RateLimitProperties {
 
         private Long quota;
 
+        /**
+         * if this request in limited , show this alert message
+         */
+        private String alertMessage;
+
         @NotNull
         private Map<Type, String> types = Maps.newLinkedHashMap();
 

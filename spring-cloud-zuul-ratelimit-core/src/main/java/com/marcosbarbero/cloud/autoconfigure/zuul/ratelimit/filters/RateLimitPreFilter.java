@@ -16,13 +16,11 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.UserIdGetter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.*;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.cloud.netflix.zuul.util.ZuulRuntimeException;
@@ -43,6 +41,8 @@ import static org.springframework.web.context.request.RequestAttributes.SCOPE_RE
  * @author Liel Chayoun
  */
 public class RateLimitPreFilter extends AbstractRateLimitFilter {
+
+    public static final String RATE_LIMIT_EXCEEDED = "rateLimitExceeded";
 
     private final RateLimiter rateLimiter;
     private final RateLimitKeyGenerator rateLimitKeyGenerator;
@@ -104,10 +104,13 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
         if (isLimit(policy, remaining, remainingQuota)) {
             HttpStatus tooManyRequests = HttpStatus.TOO_MANY_REQUESTS;
             ctx.setResponseStatusCode(tooManyRequests.value());
-            ctx.put("rateLimitExceeded", "true");
+            ctx.set(RATE_LIMIT_EXCEEDED);
             ctx.setSendZuulResponse(false);
-            ZuulException zuulException = new ZuulException(tooManyRequests.toString(), tooManyRequests.value(),
-                    null);
+            String message = StringUtils.isEmpty(policy.getAlertMessage())
+                    ? tooManyRequests.toString()
+                    : policy.getAlertMessage();
+            ZuulException zuulException =
+                    new ZuulException(new RateLimitException(message), tooManyRequests.value(), null);
             throw new ZuulRuntimeException(zuulException);
         }
     }
