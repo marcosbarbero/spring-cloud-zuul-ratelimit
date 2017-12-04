@@ -104,7 +104,7 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
         if (isLimit(policy, remaining, remainingQuota)) {
             HttpStatus tooManyRequests = HttpStatus.TOO_MANY_REQUESTS;
             ctx.setResponseStatusCode(tooManyRequests.value());
-            ctx.set(RATE_LIMIT_EXCEEDED);
+            ctx.put(RATE_LIMIT_EXCEEDED, Boolean.TRUE.toString());
             ctx.setSendZuulResponse(false);
             String message = StringUtils.isEmpty(policy.getAlertMessage())
                     ? tooManyRequests.toString()
