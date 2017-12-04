@@ -17,13 +17,11 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
+import com.netflix.zuul.util.HTTPRequestUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
-
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_FOR_HEADER;
 
 /**
  * RequestUtils
@@ -39,12 +37,10 @@ public class RequestUtils {
      * from: https://en.wikipedia.org/wiki/X-Forwarded-For
      *
      * @param request {@link HttpServletRequest}
-     * @return {@link Optional<String>}
+     * @return origin client ip
      */
     public static final String getRealIp(final HttpServletRequest request) {
-        return Optional.ofNullable(request.getHeader(X_FORWARDED_FOR_HEADER))
-                .map(xForwardedForStr -> xForwardedForStr.split(",")[0])
-                .orElseGet(request::getRemoteAddr);
+        return HTTPRequestUtils.getInstance().getClientIP(request);
     }
 
     /**
