@@ -78,7 +78,7 @@ public class RateLimitPreFilterTest {
     public void testShouldFilter() {
         rateLimitProperties.setEnabled(true);
         Policy defaultPolicy = new Policy();
-        rateLimitProperties.getPolicies().add(defaultPolicy);
+        rateLimitProperties.setDefaultPolicy(defaultPolicy);
 
         assertThat(target.shouldFilter()).isEqualTo(true);
     }

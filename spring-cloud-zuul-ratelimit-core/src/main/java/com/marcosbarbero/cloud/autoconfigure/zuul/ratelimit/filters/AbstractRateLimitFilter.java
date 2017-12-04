@@ -50,7 +50,7 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
     public static final String RESET_HEADER = "X-RateLimit-Reset";
     public static final String REQUEST_START_TIME = "rateLimitRequestStartTime";
 
-    public static final String LIMIT_POLICIES = "limit-policies";
+    public static final String LIMIT_POLICIES = "limit-policyList";
 
     private final RateLimitProperties properties;
     private final RouteLocator routeLocator;
@@ -85,7 +85,7 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
      * foreach all policy, filter not match policy {@link #match(Policy, Map)}
      *
      * @param context {@link RequestContext}
-     * @return this request should do policies {@link List<Policy>}
+     * @return this request should do policyList {@link List<Policy>}
      * @author fudali [fudali113@gmail.com]
      */
     protected List<Policy> policy(RequestContext context) {
@@ -98,7 +98,13 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
         map.put(Policy.Type.ORIGIN, RequestUtils.getRealIp(context.getRequest(), properties.isBehindProxy()));
         Route route = route();
         map.put(Policy.Type.ROUTE, route == null ? null : route.getId());
-        List<Policy> policies = properties.getPolicies().stream()
+        List<Policy> policies = properties.getNewPolicies().stream()
+                .map(policy -> {
+                    policy.getType().stream()
+                            .filter(type -> !policy.getTypes().containsKey(type))
+                            .forEach(type -> policy.getTypes().put(type, ""));
+                    return policy;
+                })
                 .filter(policy -> match(policy, map))
                 .collect(Collectors.toList());
         context.set(LIMIT_POLICIES, policies);

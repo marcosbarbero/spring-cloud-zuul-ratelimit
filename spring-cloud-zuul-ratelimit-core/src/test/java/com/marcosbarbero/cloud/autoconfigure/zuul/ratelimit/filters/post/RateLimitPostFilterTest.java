@@ -85,7 +85,7 @@ public class RateLimitPostFilterTest {
     public void testShouldFilterOnNullStartTime() {
         rateLimitProperties.setEnabled(true);
         Policy defaultPolicy = new Policy();
-        rateLimitProperties.getPolicies().add(defaultPolicy);
+        rateLimitProperties.setDefaultPolicy(defaultPolicy);
 
         assertThat(target.shouldFilter()).isEqualTo(false);
     }
@@ -95,7 +95,7 @@ public class RateLimitPostFilterTest {
         rateLimitProperties.setEnabled(true);
         when(requestAttributes.getAttribute(RateLimitPreFilter.REQUEST_START_TIME, SCOPE_REQUEST)).thenReturn(System.currentTimeMillis());
         Policy defaultPolicy = new Policy();
-        rateLimitProperties.getPolicies().add(defaultPolicy);
+        rateLimitProperties.setDefaultPolicy(defaultPolicy);
 
         assertThat(target.shouldFilter()).isEqualTo(true);
     }
@@ -112,7 +112,7 @@ public class RateLimitPostFilterTest {
         when(requestAttributes.getAttribute(RateLimitPreFilter.REQUEST_START_TIME, SCOPE_REQUEST)).thenReturn(System.currentTimeMillis());
         Policy defaultPolicy = new Policy();
         defaultPolicy.setQuota(2L);
-        rateLimitProperties.getPolicies().add(defaultPolicy);
+        rateLimitProperties.setDefaultPolicy(defaultPolicy);
         when(rateLimitKeyGenerator.key(any(), any(), any())).thenReturn("generatedKey");
 
         target.run();

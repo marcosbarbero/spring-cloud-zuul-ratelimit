@@ -73,7 +73,7 @@ public abstract class BaseRateLimitPreFilterTest {
         policy.setTypes(map);
         policies.add(policy);
 
-        properties.setPolicies(policies);
+        properties.setPolicyList(policies);
 
         return properties;
     }
