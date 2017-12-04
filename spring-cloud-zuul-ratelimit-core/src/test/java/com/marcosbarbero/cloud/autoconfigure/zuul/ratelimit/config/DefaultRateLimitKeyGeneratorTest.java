@@ -28,7 +28,7 @@ public class DefaultRateLimitKeyGeneratorTest {
 
     private Route route = new Route("id", "/**", null, "/id", null, Collections.emptySet());
     private RateLimitProperties properties;
-    private UserIdGetter userIdGetter;
+    private UserIDGenerator userIDGenerator;
     private RequestContext context = new RequestContext();
 
     @Before
@@ -36,10 +36,10 @@ public class DefaultRateLimitKeyGeneratorTest {
         MockitoAnnotations.initMocks(this);
         when(httpServletRequest.getRemoteAddr()).thenReturn("remote");
         properties = new RateLimitProperties();
-        userIdGetter = new DefaultUserIdGetter();
+        userIDGenerator = new DefaultUserIDGenerator();
         properties.setKeyPrefix("key-prefix");
         context.setRequest(httpServletRequest);
-        target = new DefaultRateLimitKeyGenerator(userIdGetter, properties);
+        target = new DefaultRateLimitKeyGenerator(userIDGenerator, properties);
     }
 
     @Test

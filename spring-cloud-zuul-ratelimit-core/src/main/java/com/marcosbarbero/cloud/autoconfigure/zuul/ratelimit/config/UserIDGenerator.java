@@ -19,12 +19,12 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config;
 import com.netflix.zuul.context.RequestContext;
 
 /**
- * UserIdGetter
+ * UserIDGenerator
  *
- * @author doob  fudali113@gmail.com
+ * @author doob [fudali113@gmail.com]
  * @since 2017/11/30
  */
-public interface UserIdGetter {
+public interface UserIDGenerator {
 
     String ANONYMOUS_USER = "anonymous";
 

@@ -38,7 +38,7 @@ import java.util.StringJoiner;
 @RequiredArgsConstructor
 public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
 
-    private final UserIdGetter userIdGetter;
+    private final UserIDGenerator userIDGenerator;
     private final RateLimitProperties properties;
 
     @Override
@@ -66,7 +66,7 @@ public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
                     joiner.add(RequestUtils.getRealIp(context.getRequest(), properties.isBehindProxy()));
                     break;
                 case USER:
-                    joiner.add(userIdGetter.getUserId(context));
+                    joiner.add(userIDGenerator.getUserId(context));
                     break;
                 case ROUTE:
                     Optional.ofNullable(route).ifPresent(r -> joiner.add(r.getId()));

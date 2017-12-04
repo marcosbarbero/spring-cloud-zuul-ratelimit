@@ -50,8 +50,8 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
     public RateLimitPreFilter(final RateLimitProperties properties, final RouteLocator routeLocator,
                               final UrlPathHelper urlPathHelper, final RateLimiter rateLimiter,
                               final RateLimitKeyGenerator rateLimitKeyGenerator,
-                              final UserIdGetter userIdGetter) {
-        super(properties, routeLocator, urlPathHelper, userIdGetter);
+                              final UserIDGenerator userIDGenerator) {
+        super(properties, routeLocator, urlPathHelper, userIDGenerator);
         this.rateLimiter = rateLimiter;
         this.rateLimitKeyGenerator = rateLimitKeyGenerator;
     }

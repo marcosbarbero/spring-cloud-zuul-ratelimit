@@ -62,9 +62,9 @@ public class RateLimitAutoConfiguration {
                                            final RateLimitProperties rateLimitProperties,
                                            final RouteLocator routeLocator,
                                            final RateLimitKeyGenerator rateLimitKeyGenerator,
-                                           final UserIdGetter userIdGetter) {
+                                           final UserIDGenerator userIDGenerator) {
         return new RateLimitPreFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter,
-                rateLimitKeyGenerator, userIdGetter);
+                rateLimitKeyGenerator, userIDGenerator);
     }
 
     @Bean
@@ -72,22 +72,22 @@ public class RateLimitAutoConfiguration {
                                             final RateLimitProperties rateLimitProperties,
                                             final RouteLocator routeLocator,
                                             final RateLimitKeyGenerator rateLimitKeyGenerator,
-                                            final UserIdGetter userIdGetter) {
+                                            final UserIDGenerator userIDGenerator) {
         return new RateLimitPostFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter,
-                rateLimitKeyGenerator, userIdGetter);
+                rateLimitKeyGenerator, userIDGenerator);
     }
 
     @Bean
-    @ConditionalOnMissingBean(UserIdGetter.class)
-    public UserIdGetter userIdGetter() {
-        return new DefaultUserIdGetter();
+    @ConditionalOnMissingBean(UserIDGenerator.class)
+    public UserIDGenerator userIdGetter() {
+        return new DefaultUserIDGenerator();
     }
 
     @Bean
     @ConditionalOnMissingBean(RateLimitKeyGenerator.class)
     public RateLimitKeyGenerator ratelimitKeyGenerator(final RateLimitProperties properties,
-                                                       final UserIdGetter userIdGetter) {
-        return new DefaultRateLimitKeyGenerator(userIdGetter, properties);
+                                                       final UserIDGenerator userIDGenerator) {
+        return new DefaultRateLimitKeyGenerator(userIDGenerator, properties);
     }
 
     @ConditionalOnClass(RedisTemplate.class)

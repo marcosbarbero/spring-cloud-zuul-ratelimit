@@ -17,7 +17,7 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RequestUtils;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.UserIdGetter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.UserIDGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.netflix.zuul.ZuulFilter;
@@ -55,7 +55,7 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
     private final RateLimitProperties properties;
     private final RouteLocator routeLocator;
     private final UrlPathHelper urlPathHelper;
-    private final UserIdGetter userIdGetter;
+    private final UserIDGenerator userIDGenerator;
     private final AntPathMatcher antPathMatcher = new AntPathMatcher();
 
     @Override
@@ -94,7 +94,7 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
         }
         HashMap<Policy.Type, String> map = new HashMap<>(8);
         map.put(Policy.Type.URL, context.getRequest().getRequestURI());
-        map.put(Policy.Type.USER, userIdGetter.getUserId(context));
+        map.put(Policy.Type.USER, userIDGenerator.getUserId(context));
         map.put(Policy.Type.ORIGIN, RequestUtils.getRealIp(context.getRequest(), properties.isBehindProxy()));
         Route route = route();
         map.put(Policy.Type.ROUTE, route == null ? null : route.getId());

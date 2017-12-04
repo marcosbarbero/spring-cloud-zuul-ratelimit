@@ -21,12 +21,12 @@ import com.netflix.zuul.context.RequestContext;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * DefaultUserIdGetter
+ * DefaultUserIDGenerator
  *
- * @author doob  fudali113@gmail.com
+ * @author doob [fudali113@gmail.com]
  * @since 2017/11/30
  */
-public class DefaultUserIdGetter implements UserIdGetter {
+public class DefaultUserIDGenerator implements UserIDGenerator {
     @Override
     public String getUserId(RequestContext context) {
         HttpServletRequest request = context.getRequest();

@@ -150,7 +150,7 @@ supply a custom `RateLimitKeyGenerator & UserIdGetter` implementation adding fur
   }
   
   @Bean
-  public UserIdGetter userIdGetter() {
+  public userIDGenerator userIDGenerator() {
     return new DefaultUserIdGetter() {
         @Override
         public String getUserId(RequestContext context) {

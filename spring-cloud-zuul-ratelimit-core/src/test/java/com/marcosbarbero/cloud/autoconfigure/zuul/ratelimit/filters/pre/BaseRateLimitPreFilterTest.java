@@ -48,7 +48,7 @@ public abstract class BaseRateLimitPreFilterTest {
     private RateLimiter rateLimiter;
     private RateLimitKeyGenerator rateLimitKeyGenerator;
 
-    private UserIdGetter userIdGetter = new DefaultUserIdGetter();
+    private UserIDGenerator userIDGenerator = new DefaultUserIDGenerator();
 
     private Route createRoute(String id, String path) {
         return new Route(id, path, null, null, false, Collections.emptySet());
@@ -93,7 +93,7 @@ public abstract class BaseRateLimitPreFilterTest {
         CounterFactory.initialize(new EmptyCounterFactory());
         this.request = new MockHttpServletRequest();
         this.response = new MockHttpServletResponse();
-        this.rateLimitKeyGenerator = new DefaultRateLimitKeyGenerator(this.userIdGetter, this.properties());
+        this.rateLimitKeyGenerator = new DefaultRateLimitKeyGenerator(this.userIDGenerator, this.properties());
         UrlPathHelper urlPathHelper = new UrlPathHelper();
         this.filter = new RateLimitPreFilter(
                 this.properties(),
@@ -101,7 +101,7 @@ public abstract class BaseRateLimitPreFilterTest {
                 urlPathHelper,
                 this.rateLimiter,
                 this.rateLimitKeyGenerator,
-                this.userIdGetter);
+                this.userIDGenerator);
         this.context = new RequestContext();
         RequestContext.testSetCurrentContext(this.context);
         RequestContextHolder.setRequestAttributes(requestAttributes);
