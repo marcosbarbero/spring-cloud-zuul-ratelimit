@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
+import org.springframework.cloud.netflix.zuul.util.ZuulRuntimeException;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.util.UrlPathHelper;
 
@@ -65,7 +66,14 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
 
     @Override
     public Object run() {
-        policy(RequestContext.getCurrentContext()).forEach(this::doPolicy);
+        try {
+            policy(RequestContext.getCurrentContext()).forEach(this::doPolicy);
+        } catch (RuntimeException e) {
+            if (e instanceof ZuulRuntimeException
+                    || properties.getRepositoryException() == RateLimitProperties.RepositoryException.THROW) {
+                throw e;
+            }
+        }
         return null;
     }
 

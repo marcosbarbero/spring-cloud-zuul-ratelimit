@@ -71,6 +71,16 @@ public class RateLimitProperties {
     private Repository repository = Repository.IN_MEMORY;
 
     /**
+     * whether the repository exception is thrown
+     *
+     * throw {@link RepositoryException#THROW}
+     * ignore {@link RepositoryException#IGNORE}
+     */
+    @NotNull
+    private RepositoryException repositoryException = RepositoryException.IGNORE;
+
+
+    /**
      * compatibility policies & defaultPolicy in config
      *
      * @return all policies
@@ -92,6 +102,10 @@ public class RateLimitProperties {
 
     public enum Repository {
         REDIS, CONSUL, JPA, IN_MEMORY
+    }
+
+    public enum RepositoryException {
+        IGNORE, THROW
     }
 
     @Data
