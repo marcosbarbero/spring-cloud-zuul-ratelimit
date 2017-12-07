@@ -15,9 +15,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 
+import static com.netflix.zuul.util.HTTPRequestUtils.X_FORWARDED_FOR_HEADER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_FOR_HEADER;
 
 public class DefaultRateLimitKeyGeneratorTest {
 
