@@ -16,20 +16,17 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config;
 
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_FOR_HEADER;
-
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.Type;
-
-import java.util.List;
-import java.util.StringJoiner;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.netflix.zuul.context.RequestContext;
 import lombok.RequiredArgsConstructor;
-
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.netflix.zuul.filters.Route;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.StringJoiner;
 
 /**
  * Default KeyGenerator implementation.
@@ -41,37 +38,43 @@ import org.springframework.cloud.netflix.zuul.filters.Route;
 @RequiredArgsConstructor
 public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
 
-    private static final String ANONYMOUS_USER = "anonymous";
-
+    private final UserIDGenerator userIDGenerator;
     private final RateLimitProperties properties;
 
     @Override
-    public String key(final HttpServletRequest request, final Route route, final Policy policy) {
-        final List<Type> types = policy.getType();
+    public String key(final RequestContext context, final Route route, final Policy policy) {
+        final Map<Type, String> types = policy.getTypes();
         final StringJoiner joiner = new StringJoiner(":");
         joiner.add(properties.getKeyPrefix());
-        if (route != null) {
-            joiner.add(route.getId());
+        boolean hasPolicyName = StringUtils.isNotEmpty(policy.getName());
+        if (hasPolicyName) {
+            joiner.add(policy.getName());
         }
-        if (!types.isEmpty()) {
-            if (types.contains(Type.URL) && route != null) {
-                joiner.add(route.getPath());
+        types.forEach((type, value) -> {
+            /**
+             * if value is not empty, we have a const value or more const value
+             * we want use policy name replace it to mark key
+             */
+            if (StringUtils.isNotEmpty(value)) {
+                if (!hasPolicyName) {
+                    joiner.add(value);
+                }
+                return;
             }
-            if (types.contains(Type.ORIGIN)) {
-                joiner.add(getRemoteAddress(request));
+            switch (type) {
+                case ORIGIN:
+                    joiner.add(RequestUtils.getRealIp(context.getRequest(), properties.isBehindProxy()));
+                    break;
+                case USER:
+                    joiner.add(userIDGenerator.getUserId(context));
+                    break;
+                case ROUTE:
+                    Optional.ofNullable(route).ifPresent(r -> joiner.add(r.getId()));
+                    break;
+                case URL:
+                    joiner.add(context.getRequest().getRequestURI());
             }
-            if (types.contains(Type.USER)) {
-                joiner.add(request.getRemoteUser() != null ? request.getRemoteUser() : ANONYMOUS_USER);
-            }
-        }
+        });
         return joiner.toString();
-    }
-
-    private String getRemoteAddress(final HttpServletRequest request) {
-        String xForwardedFor = request.getHeader(X_FORWARDED_FOR_HEADER);
-        if (properties.isBehindProxy() && xForwardedFor != null) {
-            return xForwardedFor;
-        }
-        return request.getRemoteAddr();
     }
 }

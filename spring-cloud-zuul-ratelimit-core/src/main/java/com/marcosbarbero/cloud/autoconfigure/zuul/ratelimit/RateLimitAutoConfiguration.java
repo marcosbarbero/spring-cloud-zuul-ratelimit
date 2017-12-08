@@ -18,9 +18,7 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.DefaultRateLimitKeyGenerator;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.*;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.ConsulRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
@@ -63,24 +61,33 @@ public class RateLimitAutoConfiguration {
     public ZuulFilter rateLimiterPreFilter(final RateLimiter rateLimiter,
                                            final RateLimitProperties rateLimitProperties,
                                            final RouteLocator routeLocator,
-                                           final RateLimitKeyGenerator rateLimitKeyGenerator) {
+                                           final RateLimitKeyGenerator rateLimitKeyGenerator,
+                                           final UserIDGenerator userIDGenerator) {
         return new RateLimitPreFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter,
-                rateLimitKeyGenerator);
+                rateLimitKeyGenerator, userIDGenerator);
     }
 
     @Bean
     public ZuulFilter rateLimiterPostFilter(final RateLimiter rateLimiter,
                                             final RateLimitProperties rateLimitProperties,
                                             final RouteLocator routeLocator,
-                                            final RateLimitKeyGenerator rateLimitKeyGenerator) {
+                                            final RateLimitKeyGenerator rateLimitKeyGenerator,
+                                            final UserIDGenerator userIDGenerator) {
         return new RateLimitPostFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter,
-                rateLimitKeyGenerator);
+                rateLimitKeyGenerator, userIDGenerator);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(UserIDGenerator.class)
+    public UserIDGenerator userIdGetter() {
+        return new DefaultUserIDGenerator();
     }
 
     @Bean
     @ConditionalOnMissingBean(RateLimitKeyGenerator.class)
-    public RateLimitKeyGenerator ratelimitKeyGenerator(final RateLimitProperties properties) {
-        return new DefaultRateLimitKeyGenerator(properties);
+    public RateLimitKeyGenerator ratelimitKeyGenerator(final RateLimitProperties properties,
+                                                       final UserIDGenerator userIDGenerator) {
+        return new DefaultRateLimitKeyGenerator(userIDGenerator, properties);
     }
 
     @ConditionalOnClass(RedisTemplate.class)

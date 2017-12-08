@@ -16,19 +16,30 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RequestUtils;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.UserIDGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
+import org.springframework.cloud.netflix.zuul.util.ZuulRuntimeException;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.util.UrlPathHelper;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Marcos Barbero
  * @author Liel Chayoun
+ * @author fudali [fudali113@gmail.com]
  */
 @RequiredArgsConstructor
 public abstract class AbstractRateLimitFilter extends ZuulFilter {
@@ -40,24 +51,112 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
     public static final String RESET_HEADER = "X-RateLimit-Reset";
     public static final String REQUEST_START_TIME = "rateLimitRequestStartTime";
 
+    public static final String LIMIT_POLICIES = "limit-policyList";
+
     private final RateLimitProperties properties;
     private final RouteLocator routeLocator;
     private final UrlPathHelper urlPathHelper;
+    private final UserIDGenerator userIDGenerator;
+    private final AntPathMatcher antPathMatcher = new AntPathMatcher();
 
     @Override
     public boolean shouldFilter() {
-        return properties.isEnabled() && policy(route()).isPresent();
+        return properties.isEnabled() && policy(RequestContext.getCurrentContext()).size() > 0;
     }
+
+    @Override
+    public Object run() {
+        try {
+            policy(RequestContext.getCurrentContext()).forEach(this::doPolicy);
+        } catch (RuntimeException e) {
+            if (e instanceof ZuulRuntimeException
+                    || properties.getRepositoryException() == RateLimitProperties.RepositoryException.THROW) {
+                throw e;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * exec policy in this method
+     *
+     * @param policy {@link Policy}
+     */
+    protected abstract void doPolicy(RateLimitProperties.Policy policy);
 
     Route route() {
         String requestURI = urlPathHelper.getPathWithinApplication(RequestContext.getCurrentContext().getRequest());
         return routeLocator.getMatchingRoute(requestURI);
     }
 
-    protected Optional<Policy> policy(final Route route) {
-        if (route != null) {
-            return properties.getPolicy(route.getId());
+    /**
+     * foreach all policy, filter not match policy {@link #match(Policy, Map)}
+     *
+     * @param context {@link RequestContext}
+     * @return this request should do policyList {@link List<Policy>}
+     * @author fudali [fudali113@gmail.com]
+     */
+    protected List<Policy> policy(RequestContext context) {
+        if (context.containsKey(LIMIT_POLICIES)) {
+            return (List<Policy>) context.get(LIMIT_POLICIES);
         }
-        return Optional.ofNullable(properties.getDefaultPolicy());
+        HashMap<Policy.Type, String> map = new HashMap<>(8);
+        map.put(Policy.Type.URL, context.getRequest().getRequestURI());
+        map.put(Policy.Type.USER, userIDGenerator.getUserId(context));
+        map.put(Policy.Type.ORIGIN, RequestUtils.getRealIp(context.getRequest(), properties.isBehindProxy()));
+        Route route = route();
+        map.put(Policy.Type.ROUTE, route == null ? null : route.getId());
+        List<Policy> policies = properties.getNewPolicies().stream()
+                .map(policy -> {
+                    policy.getType().stream()
+                            .filter(type -> !policy.getTypes().containsKey(type))
+                            .forEach(type -> policy.getTypes().put(type, ""));
+                    return policy;
+                })
+                .filter(policy -> match(policy, map))
+                .collect(Collectors.toList());
+        context.set(LIMIT_POLICIES, policies);
+        return policies;
     }
+
+    /**
+     * in types, foreach types
+     * if value is empty, this type can match any request
+     * if not empty
+     * ORIGIN{@link Policy.Type#ORIGIN}, USER{@link Policy.Type#USER}, ROUTE{@link Policy.Type#ROUTE}:
+     * this type match value equal request information
+     * URL:
+     * url value can be url1,url2 & url support ant path (such as /api/*)
+     *
+     * @param policy      {@link Policy}
+     * @param requestInfo this request information
+     * @return is need do this policy
+     * @author fudali [fudali113@gmail.com]
+     */
+    protected boolean match(Policy policy, Map<Policy.Type, String> requestInfo) {
+        Map<Policy.Type, String> types = policy.getTypes();
+        return !types.entrySet().stream()
+                .filter(entry -> StringUtils.isNotEmpty(entry.getValue()) && !isMatch(entry, requestInfo))
+                .findFirst()
+                .isPresent();
+    }
+
+    /**
+     * url type support multiple & antPath
+     *
+     * @param entry       {@link Map.Entry<Policy.Type, String>}
+     * @param requestInfo {@link Map.Entry<Policy.Type, String>}
+     * @return isMatch
+     * @author fudali [fudali113@gmail.com]
+     */
+    private boolean isMatch(Map.Entry<Policy.Type, String> entry, Map<Policy.Type, String> requestInfo) {
+        if (entry.getKey() == Policy.Type.URL) {
+            return Arrays.stream(entry.getValue().split(","))
+                    .filter(url -> antPathMatcher.match(url, requestInfo.get(entry.getKey())))
+                    .findFirst()
+                    .isPresent();
+        }
+        return entry.getValue().equals(requestInfo.get(entry.getKey()));
+    }
+
 }

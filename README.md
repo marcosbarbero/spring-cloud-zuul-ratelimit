@@ -84,6 +84,38 @@ zuul:
           - user
           - origin
           - url
+    policyList:
+      #optional - will apply unless specific policy exists
+      #optional name - this policy name , types value is not empty recommend use
+      - name: all
+        #optional - request number limit per refresh interval window
+        limit: 50
+        #optional - request time limit per refresh interval window (in seconds)
+        quota: 50000
+        #default value (in seconds)
+        refresh-interval: 1
+        #optional - can select request and mark key 
+        types:
+          route: 
+          origin:
+          user:
+          url:
+      - name: user-send-mail
+        limit: 20
+        refresh-interval: 1
+        # this type can filter in request url is `/api/send/mail`
+        types:
+          url: /api/send/mail
+          user:
+      - name: user-send-mail-and-sms
+        limit: 20
+        refresh-interval: 1
+        # this type can filter in request url is `/api/send/mail`
+        # key is `${key-prefix}:user-send-mail-and-sms:${user}`
+        types:
+          # url support url,url1,url2 (split with `,`) & support ant path
+          url: /api/send/mail,/api/send/sms/*
+          user:
 ```
 
 Available implementations
@@ -105,7 +137,7 @@ Property namespace: __zuul.ratelimit__
 |key-prefix    |String                       |${spring.application.name:rate-limit-application}|
 |repository    |CONSUL, REDIS, JPA, IN_MEMORY|IN_MEMORY|
 |default-policy|[Policy](https://github.com/marcosbarbero/spring-cloud-zuul-ratelimit/blob/master/spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L64)| - |
-|policies      |List of [Policy](https://github.com/marcosbarbero/spring-cloud-zuul-ratelimit/blob/master/spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L64)| - |
+|policyList      |List of [Policy](https://github.com/marcosbarbero/spring-cloud-zuul-ratelimit/blob/master/spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L64)| - |
 
 Policy properties:
 
@@ -120,7 +152,7 @@ Further Customization
 ---
 
 If your application needs to control the key strategy beyond the options offered by the type property then you can 
-supply a custom `RateLimitKeyGenerator` implementation adding further qualifiers or something entirely different:
+supply a custom `RateLimitKeyGenerator & UserIdGetter` implementation adding further qualifiers or something entirely different:
 
 ```java
   @Bean
@@ -131,6 +163,17 @@ supply a custom `RateLimitKeyGenerator` implementation adding further qualifiers
               return super.key(request, route, policy) + ":" + request.getMethod();
           }
       };
+  }
+  
+  @Bean
+  public userIDGenerator userIDGenerator() {
+    return new DefaultUserIdGenerator() {
+        @Override
+        public String getUserId(RequestContext context) {
+            HttpServletRequest request = context.getRequest();
+            return request.getRemoteUser() != null ? request.getRemoteUser() : ANONYMOUS_USER;
+        }
+    }
   }
 ```
 

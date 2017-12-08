@@ -3,6 +3,7 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.pre;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.DefaultUserIDGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
@@ -48,7 +49,7 @@ public class RateLimitPreFilterTest {
         RequestContextHolder.setRequestAttributes(requestAttributes);
         rateLimitProperties = new RateLimitProperties();
         UrlPathHelper urlPathHelper = new UrlPathHelper();
-        target = new RateLimitPreFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter, rateLimitKeyGenerator);
+        target = new RateLimitPreFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter, rateLimitKeyGenerator, new DefaultUserIDGenerator());
     }
 
     @Test

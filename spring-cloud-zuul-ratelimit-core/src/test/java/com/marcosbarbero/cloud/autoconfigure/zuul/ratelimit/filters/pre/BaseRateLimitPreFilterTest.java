@@ -6,18 +6,16 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.DefaultRateLimitKeyGenerator;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
+import com.google.common.collect.Maps;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.*;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.commons.TestRouteLocator;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.monitoring.CounterFactory;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,6 +48,8 @@ public abstract class BaseRateLimitPreFilterTest {
     private RateLimiter rateLimiter;
     private RateLimitKeyGenerator rateLimitKeyGenerator;
 
+    private UserIDGenerator userIDGenerator = new DefaultUserIDGenerator();
+
     private Route createRoute(String id, String path) {
         return new Route(id, path, null, null, false, Collections.emptySet());
     }
@@ -59,16 +59,21 @@ public abstract class BaseRateLimitPreFilterTest {
         properties.setEnabled(true);
         properties.setBehindProxy(true);
 
-        Map<String, Policy> policies = new HashMap<>();
+        List<Policy> policies = new ArrayList<>();
 
         Policy policy = new Policy();
         policy.setLimit(2L);
         policy.setQuota(2L);
         policy.setRefreshInterval(2L);
-        policy.setType(asList(Policy.Type.ORIGIN, Policy.Type.URL, Policy.Type.USER));
+        LinkedHashMap<Policy.Type, String> map = Maps.newLinkedHashMap();
+        map.put(Policy.Type.ROUTE, "serviceA");
+        map.put(Policy.Type.ORIGIN, "");
+        map.put(Policy.Type.URL, "");
+        map.put(Policy.Type.USER, "");
+        policy.setTypes(map);
+        policies.add(policy);
 
-        policies.put("serviceA", policy);
-        properties.setPolicies(policies);
+        properties.setPolicyList(policies);
 
         return properties;
     }
@@ -88,9 +93,15 @@ public abstract class BaseRateLimitPreFilterTest {
         CounterFactory.initialize(new EmptyCounterFactory());
         this.request = new MockHttpServletRequest();
         this.response = new MockHttpServletResponse();
-        this.rateLimitKeyGenerator = new DefaultRateLimitKeyGenerator(this.properties());
+        this.rateLimitKeyGenerator = new DefaultRateLimitKeyGenerator(this.userIDGenerator, this.properties());
         UrlPathHelper urlPathHelper = new UrlPathHelper();
-        this.filter = new RateLimitPreFilter(this.properties(), this.routeLocator(), urlPathHelper, this.rateLimiter, this.rateLimitKeyGenerator);
+        this.filter = new RateLimitPreFilter(
+                this.properties(),
+                this.routeLocator(),
+                urlPathHelper,
+                this.rateLimiter,
+                this.rateLimitKeyGenerator,
+                this.userIDGenerator);
         this.context = new RequestContext();
         RequestContext.testSetCurrentContext(this.context);
         RequestContextHolder.setRequestAttributes(requestAttributes);
