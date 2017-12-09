@@ -8,10 +8,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.DefaultRateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.ConsulRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RedisRateLimiter;
 import com.netflix.zuul.ZuulFilter;
+import java.util.List;
 import java.util.Map;
 import org.junit.After;
 import org.junit.Assert;
@@ -101,6 +104,27 @@ public class RateLimitAutoConfigurationTest {
 
         Assert.assertTrue(this.context.getBean(RateLimiter.class) instanceof InMemoryRateLimiter);
         Assert.assertTrue(this.context.getBean(RateLimitKeyGenerator.class) instanceof DefaultRateLimitKeyGenerator);
+    }
+
+    @Test
+    public void testPolicyAdjuster() {
+        System.setProperty(PREFIX + ".defaultPolicy.limit", "3");
+        System.setProperty(PREFIX + ".defaultPolicyList[0].limit", "4");
+        System.setProperty(PREFIX + ".policies.a.limit", "5");
+        System.setProperty(PREFIX + ".policyList.a[0].limit", "6");
+        this.context.refresh();
+
+        RateLimitProperties rateLimitProperties = this.context.getBean(RateLimitProperties.class);
+        List<Policy> defaultPolicyList = rateLimitProperties.getDefaultPolicyList();
+        assertThat(defaultPolicyList).hasSize(2);
+        assertThat(defaultPolicyList.get(0).getLimit()).isEqualTo(3);
+        assertThat(defaultPolicyList.get(1).getLimit()).isEqualTo(4);
+        Map<String, List<Policy>> policyList = rateLimitProperties.getPolicyList();
+        assertThat(policyList).hasSize(1);
+        List<Policy> policyA = policyList.get("a");
+        assertThat(policyA).hasSize(2);
+        assertThat(policyA.get(0).getLimit()).isEqualTo(5);
+        assertThat(policyA.get(1).getLimit()).isEqualTo(6);
     }
 
     @Configuration
