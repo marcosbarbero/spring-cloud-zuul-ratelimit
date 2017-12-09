@@ -35,11 +35,9 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPos
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
 import com.netflix.zuul.ZuulFilter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -54,8 +52,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UrlPathHelper;
 
 /**
@@ -142,7 +138,6 @@ public class RateLimitAutoConfiguration {
             return new InMemoryRateLimiter();
         }
     }
-
 
     @Configuration
     @RequiredArgsConstructor
