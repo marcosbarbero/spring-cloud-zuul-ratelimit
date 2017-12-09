@@ -154,13 +154,13 @@ public class RateLimitAutoConfiguration {
                 rateLimitProperties.setDefaultPolicyList(defaultPolicies);
             }
             rateLimitProperties.getPolicies().forEach((route, policy) ->
-                rateLimitProperties.getPolicyList().compute(route, (k, v) -> getPolicies(policy, v)));
+                rateLimitProperties.getPolicyList().compute(route, (key, policies) -> getPolicies(policy, policies)));
         }
 
-        private List<Policy> getPolicies(Policy policy, List<Policy> v) {
+        private List<Policy> getPolicies(Policy policy, List<Policy> policies) {
             List<Policy> combinedPolicies = Lists.newArrayList(policy);
-            if (v != null) {
-                combinedPolicies.addAll(v);
+            if (policies != null) {
+                combinedPolicies.addAll(policies);
             }
             return combinedPolicies;
         }
