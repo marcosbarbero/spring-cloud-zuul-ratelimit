@@ -71,14 +71,15 @@ public class ConsulRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
             this.filter.run();
         }
 
-        String remaining = this.response.getHeader(RateLimitPreFilter.REMAINING_HEADER);
+        String key = "null_serviceA_serviceA_10.0.0.100_anonymous";
+        String remaining = this.response.getHeader(RateLimitPreFilter.REMAINING_HEADER + key);
         assertEquals("0", remaining);
 
         TimeUnit.SECONDS.sleep(2);
 
         when(getValue.getDecodedValue()).thenReturn(this.objectMapper.writeValueAsString(this.rate(2)));
         this.filter.run();
-        remaining = this.response.getHeader(RateLimitPreFilter.REMAINING_HEADER);
+        remaining = this.response.getHeader(RateLimitPreFilter.REMAINING_HEADER + key);
         assertEquals("1", remaining);
     }
 }

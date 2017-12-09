@@ -20,7 +20,7 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
-import java.util.Optional;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
@@ -33,11 +33,11 @@ import org.springframework.web.util.UrlPathHelper;
 @RequiredArgsConstructor
 public abstract class AbstractRateLimitFilter extends ZuulFilter {
 
-    public static final String QUOTA_HEADER = "X-RateLimit-Quota";
-    public static final String REMAINING_QUOTA_HEADER = "X-RateLimit-Remaining-Quota";
-    public static final String LIMIT_HEADER = "X-RateLimit-Limit";
-    public static final String REMAINING_HEADER = "X-RateLimit-Remaining";
-    public static final String RESET_HEADER = "X-RateLimit-Reset";
+    public static final String QUOTA_HEADER = "X-RateLimit-Quota-";
+    public static final String REMAINING_QUOTA_HEADER = "X-RateLimit-Remaining-Quota-";
+    public static final String LIMIT_HEADER = "X-RateLimit-Limit-";
+    public static final String REMAINING_HEADER = "X-RateLimit-Remaining-";
+    public static final String RESET_HEADER = "X-RateLimit-Reset-";
     public static final String REQUEST_START_TIME = "rateLimitRequestStartTime";
 
     private final RateLimitProperties properties;
@@ -46,7 +46,7 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
 
     @Override
     public boolean shouldFilter() {
-        return properties.isEnabled() && policy(route()).isPresent();
+        return properties.isEnabled() && !policy(route()).isEmpty();
     }
 
     Route route() {
@@ -54,10 +54,10 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
         return routeLocator.getMatchingRoute(requestURI);
     }
 
-    protected Optional<Policy> policy(final Route route) {
+    protected List<Policy> policy(final Route route) {
         if (route != null) {
-            return properties.getPolicy(route.getId());
+            return properties.getPolicies(route.getId());
         }
-        return Optional.ofNullable(properties.getDefaultPolicy());
+        return properties.getDefaultPolicyList();
     }
 }

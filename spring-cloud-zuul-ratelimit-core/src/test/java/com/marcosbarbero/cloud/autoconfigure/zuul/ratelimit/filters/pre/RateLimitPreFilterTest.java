@@ -3,6 +3,7 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.pre;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import com.google.common.collect.Lists;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
@@ -77,7 +78,7 @@ public class RateLimitPreFilterTest {
     public void testShouldFilter() {
         rateLimitProperties.setEnabled(true);
         Policy defaultPolicy = new Policy();
-        rateLimitProperties.setDefaultPolicy(defaultPolicy);
+        rateLimitProperties.setDefaultPolicyList(Lists.newArrayList(defaultPolicy));
 
         assertThat(target.shouldFilter()).isEqualTo(true);
     }
