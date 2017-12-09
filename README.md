@@ -122,7 +122,9 @@ Property namespace: __zuul.ratelimit__
 |key-prefix    |String                       |${spring.application.name:rate-limit-application}|
 |repository    |CONSUL, REDIS, JPA, IN_MEMORY|IN_MEMORY|
 |default-policy|[Policy](https://github.com/marcosbarbero/spring-cloud-zuul-ratelimit/blob/master/spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L64)| - |
-|policies      |List of [Policy](https://github.com/marcosbarbero/spring-cloud-zuul-ratelimit/blob/master/spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L64)| - |
+|policies      |Map of [Policy](https://github.com/marcosbarbero/spring-cloud-zuul-ratelimit/blob/master/spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L64)| - |
+|default-policy-list|List of [Policy](https://github.com/marcosbarbero/spring-cloud-zuul-ratelimit/blob/master/spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L64)| - |
+|policy-list      |Map of Lists of [Policy](https://github.com/marcosbarbero/spring-cloud-zuul-ratelimit/blob/master/spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L64)| - |
 
 Policy properties:
 
