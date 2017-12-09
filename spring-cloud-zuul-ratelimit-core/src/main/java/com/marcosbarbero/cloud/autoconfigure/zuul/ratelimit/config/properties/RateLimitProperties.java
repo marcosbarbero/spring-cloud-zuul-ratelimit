@@ -16,23 +16,18 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
 
+import static java.util.concurrent.TimeUnit.MINUTES;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
+import java.util.List;
+import java.util.Map;
+import javax.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import javax.validation.constraints.NotNull;
-
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import static java.util.concurrent.TimeUnit.MINUTES;
 
 /**
  * @author Marcos Barbero
@@ -46,18 +41,17 @@ public class RateLimitProperties {
     public static final String PREFIX = "zuul.ratelimit";
 
     private Policy defaultPolicy;
-
+    @NotNull
+    private List<Policy> defaultPolicyList = Lists.newArrayList();
     @NotNull
     private Map<String, Policy> policies = Maps.newHashMap();
-
+    @NotNull
+    private Map<String, List<Policy>> policyList = Maps.newHashMap();
     private boolean behindProxy;
-
     private boolean enabled;
-
     @NotNull
     @Value("${spring.application.name:rate-limit-application}")
     private String keyPrefix;
-
     @NotNull
     private Repository repository = Repository.IN_MEMORY;
 
@@ -65,8 +59,8 @@ public class RateLimitProperties {
         REDIS, CONSUL, JPA, IN_MEMORY
     }
 
-    public Optional<Policy> getPolicy(String key) {
-        return Optional.ofNullable(policies.getOrDefault(key, defaultPolicy));
+    public List<Policy> getPolicies(String key) {
+        return policyList.getOrDefault(key, defaultPolicyList);
     }
 
     @Data

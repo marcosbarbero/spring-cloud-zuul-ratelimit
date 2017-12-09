@@ -16,12 +16,16 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit;
 
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.PREFIX;
+
 import com.ecwid.consul.v1.ConsulClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.DefaultRateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.ConsulRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RedisRateLimiter;
@@ -30,7 +34,10 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.sp
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPostFilter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
 import com.netflix.zuul.ZuulFilter;
-
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -46,8 +53,6 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.util.UrlPathHelper;
-
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.PREFIX;
 
 /**
  * @author Marcos Barbero
@@ -134,4 +139,30 @@ public class RateLimitAutoConfiguration {
         }
     }
 
+    @Configuration
+    @RequiredArgsConstructor
+    protected static class RateLimitPropertiesAdjuster {
+
+        private final RateLimitProperties rateLimitProperties;
+
+        @PostConstruct
+        public void init() {
+            Policy defaultPolicy = rateLimitProperties.getDefaultPolicy();
+            if (defaultPolicy != null) {
+                ArrayList<Policy> defaultPolicies = Lists.newArrayList(defaultPolicy);
+                defaultPolicies.addAll(rateLimitProperties.getDefaultPolicyList());
+                rateLimitProperties.setDefaultPolicyList(defaultPolicies);
+            }
+            rateLimitProperties.getPolicies().forEach((route, policy) ->
+                rateLimitProperties.getPolicyList().compute(route, (key, policies) -> getPolicies(policy, policies)));
+        }
+
+        private List<Policy> getPolicies(Policy policy, List<Policy> policies) {
+            List<Policy> combinedPolicies = Lists.newArrayList(policy);
+            if (policies != null) {
+                combinedPolicies.addAll(policies);
+            }
+            return combinedPolicies;
+        }
+    }
 }

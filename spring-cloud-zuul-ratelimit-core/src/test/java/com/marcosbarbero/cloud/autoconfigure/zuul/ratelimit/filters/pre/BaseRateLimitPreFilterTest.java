@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
+import com.google.common.collect.Lists;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.DefaultRateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
@@ -17,6 +18,7 @@ import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.monitoring.CounterFactory;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.junit.Before;
@@ -41,14 +43,14 @@ public abstract class BaseRateLimitPreFilterTest {
     RateLimitPreFilter filter;
 
     @Mock
-    RequestAttributes requestAttributes;
+    private RequestAttributes requestAttributes;
 
     MockHttpServletRequest request;
     MockHttpServletResponse response;
+    RateLimitKeyGenerator rateLimitKeyGenerator;
 
     private RequestContext context;
     private RateLimiter rateLimiter;
-    private RateLimitKeyGenerator rateLimitKeyGenerator;
 
     private Route createRoute(String id, String path) {
         return new Route(id, path, null, null, false, Collections.emptySet());
@@ -59,7 +61,7 @@ public abstract class BaseRateLimitPreFilterTest {
         properties.setEnabled(true);
         properties.setBehindProxy(true);
 
-        Map<String, Policy> policies = new HashMap<>();
+        Map<String, List<Policy>> policies = new HashMap<>();
 
         Policy policy = new Policy();
         policy.setLimit(2L);
@@ -67,14 +69,14 @@ public abstract class BaseRateLimitPreFilterTest {
         policy.setRefreshInterval(2L);
         policy.setType(asList(Policy.Type.ORIGIN, Policy.Type.URL, Policy.Type.USER));
 
-        policies.put("serviceA", policy);
-        properties.setPolicies(policies);
+        policies.put("serviceA", Lists.newArrayList(policy));
+        properties.setPolicyList(policies);
 
         return properties;
     }
 
     private RouteLocator routeLocator() {
-        return new TestRouteLocator(asList("ignored"),
+        return new TestRouteLocator(Collections.singletonList("ignored"),
                 asList(createRoute("serviceA", "/serviceA"), createRoute("serviceB", "/serviceB")));
     }
 
@@ -88,9 +90,9 @@ public abstract class BaseRateLimitPreFilterTest {
         CounterFactory.initialize(new EmptyCounterFactory());
         this.request = new MockHttpServletRequest();
         this.response = new MockHttpServletResponse();
-        this.rateLimitKeyGenerator = new DefaultRateLimitKeyGenerator(this.properties());
+        rateLimitKeyGenerator = new DefaultRateLimitKeyGenerator(this.properties());
         UrlPathHelper urlPathHelper = new UrlPathHelper();
-        this.filter = new RateLimitPreFilter(this.properties(), this.routeLocator(), urlPathHelper, this.rateLimiter, this.rateLimitKeyGenerator);
+        this.filter = new RateLimitPreFilter(this.properties(), this.routeLocator(), urlPathHelper, this.rateLimiter, rateLimitKeyGenerator);
         this.context = new RequestContext();
         RequestContext.testSetCurrentContext(this.context);
         RequestContextHolder.setRequestAttributes(requestAttributes);
@@ -110,13 +112,14 @@ public abstract class BaseRateLimitPreFilterTest {
             this.filter.run();
         }
 
-        String remaining = this.response.getHeader(RateLimitPreFilter.REMAINING_HEADER);
+        String key = "null_serviceA_serviceA_10.0.0.100_anonymous";
+        String remaining = this.response.getHeader(RateLimitPreFilter.REMAINING_HEADER + key);
         assertEquals("0", remaining);
 
         TimeUnit.SECONDS.sleep(3);
 
         this.filter.run();
-        remaining = this.response.getHeader(RateLimitPreFilter.REMAINING_HEADER);
+        remaining = this.response.getHeader(RateLimitPreFilter.REMAINING_HEADER + key);
         assertEquals("1", remaining);
     }
 
