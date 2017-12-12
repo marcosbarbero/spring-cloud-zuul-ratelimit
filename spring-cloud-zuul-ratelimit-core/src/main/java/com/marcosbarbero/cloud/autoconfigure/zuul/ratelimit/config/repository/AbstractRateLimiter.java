@@ -22,6 +22,7 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import java.util.Date;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -32,10 +33,12 @@ import lombok.extern.slf4j.Slf4j;
  * @since 2017-08-28
  */
 @Slf4j
+@RequiredArgsConstructor
 public abstract class AbstractRateLimiter implements RateLimiter {
 
-    protected abstract Rate getRate(String key);
+    private final IRateLimiterErrorHandler rateLimiterErrorHandler;
 
+    protected abstract Rate getRate(String key);
     protected abstract void saveRate(Rate rate);
 
     @Override
@@ -45,7 +48,7 @@ public abstract class AbstractRateLimiter implements RateLimiter {
         try {
             saveRate(rate);
         } catch (RuntimeException e) {
-            log.error("Failed saving rate for " + key + ", returning unsaved rate", e);
+            rateLimiterErrorHandler.handleSaveError(key, e);
         }
         return rate;
     }
@@ -55,7 +58,7 @@ public abstract class AbstractRateLimiter implements RateLimiter {
         try {
             rate = this.getRate(key);
         } catch (RuntimeException e) {
-            log.error("Failed retrieving rate for " + key + ", will create new rate", e);
+            rateLimiterErrorHandler.handleFetchError(key, e);
         }
 
         if (!isExpired(rate)) {

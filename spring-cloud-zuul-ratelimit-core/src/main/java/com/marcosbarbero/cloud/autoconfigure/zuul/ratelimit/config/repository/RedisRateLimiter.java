@@ -36,6 +36,7 @@ public class RedisRateLimiter implements RateLimiter {
 
     private static final String QUOTA_SUFFIX = "-quota";
 
+    private final IRateLimiterErrorHandler rateLimiterErrorHandler;
     private final RedisTemplate redisTemplate;
 
     @Override
@@ -59,7 +60,8 @@ public class RedisRateLimiter implements RateLimiter {
             try {
                 current = this.redisTemplate.boundValueOps(key).increment(usage);
             } catch (RuntimeException e) {
-                log.error("Failed retrieving rate for " + key + ", will return limit", e);
+                String msg = "Failed retrieving rate for " + key + ", will return limit";
+                rateLimiterErrorHandler.handleError(msg, e);
             }
             rate.setRemaining(Math.max(-1, limit - current));
         }
@@ -75,7 +77,8 @@ public class RedisRateLimiter implements RateLimiter {
             try {
                 current = this.redisTemplate.boundValueOps(quotaKey).increment(usage);
             } catch (RuntimeException e) {
-                log.error("Failed retrieving rate for " + quotaKey + ", will return quota limit", e);
+                String msg = "Failed retrieving rate for " + quotaKey + ", will return quota limit";
+                rateLimiterErrorHandler.handleError(msg, e);
             }
             rate.setRemainingQuota(Math.max(-1, quota - current));
         }
@@ -90,7 +93,8 @@ public class RedisRateLimiter implements RateLimiter {
                 expire = refreshInterval;
             }
         } catch (RuntimeException e) {
-            log.error("Failed retrieving expiration for " + key + ", will reset now", e);
+            String msg = "Failed retrieving expiration for " + key + ", will reset now";
+            rateLimiterErrorHandler.handleError(msg, e);
         }
         rate.setReset(SECONDS.toMillis(expire == null ? 0L : expire));
     }
