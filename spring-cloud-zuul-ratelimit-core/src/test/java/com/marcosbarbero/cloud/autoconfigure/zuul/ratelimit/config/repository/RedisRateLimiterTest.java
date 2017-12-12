@@ -16,7 +16,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 public class RedisRateLimiterTest extends BaseRateLimiterTest {
 
     @Mock
-    private IRateLimiterErrorHandler rateLimiterErrorHandler;
+    private RateLimiterErrorHandler rateLimiterErrorHandler;
     @Mock
     private RedisTemplate redisTemplate;
 

@@ -36,7 +36,7 @@ public class RedisRateLimiter implements RateLimiter {
 
     private static final String QUOTA_SUFFIX = "-quota";
 
-    private final IRateLimiterErrorHandler rateLimiterErrorHandler;
+    private final RateLimiterErrorHandler rateLimiterErrorHandler;
     private final RedisTemplate redisTemplate;
 
     @Override

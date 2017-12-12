@@ -13,7 +13,7 @@ import com.ecwid.consul.v1.kv.model.GetValue;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.ConsulRateLimiter;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.IRateLimiterErrorHandler;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RateLimiterErrorHandler;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -36,7 +36,7 @@ public class ConsulRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
     @Before
     @Override
     public void setUp() {
-        IRateLimiterErrorHandler rateLimiterErrorHandler = mock(IRateLimiterErrorHandler.class);
+        RateLimiterErrorHandler rateLimiterErrorHandler = mock(RateLimiterErrorHandler.class);
         consulClient = mock(ConsulClient.class);
         this.setRateLimiter(new ConsulRateLimiter(rateLimiterErrorHandler, this.consulClient, this.objectMapper));
         super.setUp();

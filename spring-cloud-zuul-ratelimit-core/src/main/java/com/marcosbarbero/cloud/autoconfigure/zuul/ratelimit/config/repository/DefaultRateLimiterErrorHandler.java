@@ -3,7 +3,7 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class DefaultRateLimiterErrorHandler implements IRateLimiterErrorHandler {
+public class DefaultRateLimiterErrorHandler implements RateLimiterErrorHandler {
 
     @Override
     public void handleSaveError(String key, Exception e) {

@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public abstract class AbstractRateLimiter implements RateLimiter {
 
-    private final IRateLimiterErrorHandler rateLimiterErrorHandler;
+    private final RateLimiterErrorHandler rateLimiterErrorHandler;
 
     protected abstract Rate getRate(String key);
     protected abstract void saveRate(Rate rate);

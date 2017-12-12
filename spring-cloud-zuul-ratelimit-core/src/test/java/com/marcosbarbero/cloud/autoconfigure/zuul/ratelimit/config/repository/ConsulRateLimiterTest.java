@@ -26,7 +26,7 @@ import org.mockito.MockitoAnnotations;
 public class ConsulRateLimiterTest extends BaseRateLimiterTest {
 
     @Mock
-    private IRateLimiterErrorHandler rateLimiterErrorHandler;
+    private RateLimiterErrorHandler rateLimiterErrorHandler;
     @Mock
     private ConsulClient consulClient;
     @Mock

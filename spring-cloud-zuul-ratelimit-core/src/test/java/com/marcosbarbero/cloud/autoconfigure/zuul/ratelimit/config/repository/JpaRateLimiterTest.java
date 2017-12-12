@@ -15,7 +15,7 @@ import org.mockito.MockitoAnnotations;
 public class JpaRateLimiterTest extends BaseRateLimiterTest {
 
     @Mock
-    private IRateLimiterErrorHandler rateLimiterErrorHandler;
+    private RateLimiterErrorHandler rateLimiterErrorHandler;
     @Mock
     private RateLimiterRepository rateLimiterRepository;
 

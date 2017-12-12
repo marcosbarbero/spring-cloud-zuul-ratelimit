@@ -7,7 +7,7 @@ import org.mockito.MockitoAnnotations;
 public class InMemoryRateLimiterTest extends BaseRateLimiterTest {
 
     @Mock
-    private IRateLimiterErrorHandler rateLimiterErrorHandler;
+    private RateLimiterErrorHandler rateLimiterErrorHandler;
 
     @Before
     public void setUp() {

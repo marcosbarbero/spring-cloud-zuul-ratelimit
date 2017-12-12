@@ -32,7 +32,7 @@ public class InMemoryRateLimiter extends AbstractRateLimiter {
 
     private Map<String, Rate> repository = new ConcurrentHashMap<>();
 
-    public InMemoryRateLimiter(IRateLimiterErrorHandler rateLimiterErrorHandler) {
+    public InMemoryRateLimiter(RateLimiterErrorHandler rateLimiterErrorHandler) {
         super(rateLimiterErrorHandler);
     }
 
