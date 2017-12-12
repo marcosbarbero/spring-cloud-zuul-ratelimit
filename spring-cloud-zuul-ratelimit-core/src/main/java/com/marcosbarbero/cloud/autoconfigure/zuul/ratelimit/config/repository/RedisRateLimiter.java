@@ -16,20 +16,20 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
-
-import org.springframework.data.redis.core.RedisTemplate;
-
 import lombok.RequiredArgsConstructor;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 
 /**
  * @author Marcos Barbero
  * @author Liel Chayoun
  */
+@Slf4j
 @RequiredArgsConstructor
 @SuppressWarnings("unchecked")
 public class RedisRateLimiter implements RateLimiter {
@@ -55,7 +55,12 @@ public class RedisRateLimiter implements RateLimiter {
         if (limit != null) {
             handleExpiration(key, refreshInterval, rate);
             long usage = requestTime == null ? 1L : 0L;
-            Long current = this.redisTemplate.boundValueOps(key).increment(usage);
+            Long current = 0L;
+            try {
+                current = this.redisTemplate.boundValueOps(key).increment(usage);
+            } catch (RuntimeException e) {
+                log.error("Failed retrieving rate for " + key + ", will return limit", e);
+            }
             rate.setRemaining(Math.max(-1, limit - current));
         }
     }
@@ -66,17 +71,27 @@ public class RedisRateLimiter implements RateLimiter {
             String quotaKey = key + QUOTA_SUFFIX;
             handleExpiration(quotaKey, refreshInterval, rate);
             Long usage = requestTime != null ? requestTime : 0L;
-            Long current = this.redisTemplate.boundValueOps(quotaKey).increment(usage);
+            Long current = 0L;
+            try {
+                current = this.redisTemplate.boundValueOps(quotaKey).increment(usage);
+            } catch (RuntimeException e) {
+                log.error("Failed retrieving rate for " + quotaKey + ", will return quota limit", e);
+            }
             rate.setRemainingQuota(Math.max(-1, quota - current));
         }
     }
 
     private void handleExpiration(String key, Long refreshInterval, Rate rate) {
-        Long expire = this.redisTemplate.getExpire(key);
-        if (expire == null || expire == -1) {
-            this.redisTemplate.expire(key, refreshInterval, SECONDS);
-            expire = refreshInterval;
+        Long expire = null;
+        try {
+            expire = this.redisTemplate.getExpire(key);
+            if (expire == null || expire == -1) {
+                this.redisTemplate.expire(key, refreshInterval, SECONDS);
+                expire = refreshInterval;
+            }
+        } catch (RuntimeException e) {
+            log.error("Failed retrieving expiration for " + key + ", will reset now", e);
         }
-        rate.setReset(SECONDS.toMillis(expire));
+        rate.setReset(SECONDS.toMillis(expire == null ? 0L : expire));
     }
 }

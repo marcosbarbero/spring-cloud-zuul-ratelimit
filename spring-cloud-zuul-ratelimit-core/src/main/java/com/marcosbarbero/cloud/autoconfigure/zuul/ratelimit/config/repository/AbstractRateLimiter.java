@@ -16,13 +16,13 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
-
 import java.util.Date;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Abstract implementation for {@link RateLimiter}.
@@ -31,6 +31,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  * @author Marcos Barbero
  * @since 2017-08-28
  */
+@Slf4j
 public abstract class AbstractRateLimiter implements RateLimiter {
 
     protected abstract Rate getRate(String key);
@@ -41,12 +42,21 @@ public abstract class AbstractRateLimiter implements RateLimiter {
     public synchronized Rate consume(final Policy policy, final String key, final Long requestTime) {
         Rate rate = this.create(policy, key);
         updateRate(policy, rate, requestTime);
-        saveRate(rate);
+        try {
+            saveRate(rate);
+        } catch (RuntimeException e) {
+            log.error("Failed saving rate for " + key + ", returning unsaved rate", e);
+        }
         return rate;
     }
 
     private Rate create(final Policy policy, final String key) {
-        Rate rate = this.getRate(key);
+        Rate rate = null;
+        try {
+            rate = this.getRate(key);
+        } catch (RuntimeException e) {
+            log.error("Failed retrieving rate for " + key + ", will create new rate", e);
+        }
 
         if (!isExpired(rate)) {
             return rate;
