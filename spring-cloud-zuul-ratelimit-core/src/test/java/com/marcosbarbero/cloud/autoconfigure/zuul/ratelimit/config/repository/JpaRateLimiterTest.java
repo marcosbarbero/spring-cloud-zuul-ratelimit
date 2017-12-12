@@ -15,6 +15,8 @@ import org.mockito.MockitoAnnotations;
 public class JpaRateLimiterTest extends BaseRateLimiterTest {
 
     @Mock
+    private IRateLimiterErrorHandler rateLimiterErrorHandler;
+    @Mock
     private RateLimiterRepository rateLimiterRepository;
 
     @Before
@@ -31,6 +33,6 @@ public class JpaRateLimiterTest extends BaseRateLimiterTest {
             return repository.get(key);
         });
 
-        target = new JpaRateLimiter(rateLimiterRepository);
+        target = new JpaRateLimiter(rateLimiterErrorHandler, rateLimiterRepository);
     }
 }

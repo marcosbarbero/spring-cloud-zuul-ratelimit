@@ -16,6 +16,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 public class RedisRateLimiterTest extends BaseRateLimiterTest {
 
     @Mock
+    private IRateLimiterErrorHandler rateLimiterErrorHandler;
+    @Mock
     private RedisTemplate redisTemplate;
 
     @Before
@@ -33,7 +35,7 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
             });
             return mock;
         });
-        target = new RedisRateLimiter(redisTemplate);
+        target = new RedisRateLimiter(rateLimiterErrorHandler, redisTemplate);
     }
 
 }

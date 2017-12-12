@@ -26,6 +26,8 @@ import org.mockito.MockitoAnnotations;
 public class ConsulRateLimiterTest extends BaseRateLimiterTest {
 
     @Mock
+    private IRateLimiterErrorHandler rateLimiterErrorHandler;
+    @Mock
     private ConsulClient consulClient;
     @Mock
     private ObjectMapper objectMapper;
@@ -48,13 +50,13 @@ public class ConsulRateLimiterTest extends BaseRateLimiterTest {
             return new Response<>(getValue, 1L, true, 1L);
         });
         ObjectMapper objectMapper = new ObjectMapper();
-        target = new ConsulRateLimiter(consulClient, objectMapper);
+        target = new ConsulRateLimiter(rateLimiterErrorHandler, consulClient, objectMapper);
     }
 
     @Test
     public void testGetRateException() throws IOException {
         when(objectMapper.readValue(anyString(), eq(Rate.class))).thenThrow(new IOException());
-        ConsulRateLimiter consulRateLimiter = new ConsulRateLimiter(consulClient, objectMapper);
+        ConsulRateLimiter consulRateLimiter = new ConsulRateLimiter(rateLimiterErrorHandler, consulClient, objectMapper);
 
         Rate rate = consulRateLimiter.getRate("");
         assertThat(rate).isNull();
@@ -64,7 +66,7 @@ public class ConsulRateLimiterTest extends BaseRateLimiterTest {
     public void testSaveRateException() throws IOException {
         JsonProcessingException jsonProcessingException = Mockito.mock(JsonProcessingException.class);
         when(objectMapper.writeValueAsString(any(Rate.class))).thenThrow(jsonProcessingException);
-        ConsulRateLimiter consulRateLimiter = new ConsulRateLimiter(consulClient, objectMapper);
+        ConsulRateLimiter consulRateLimiter = new ConsulRateLimiter(rateLimiterErrorHandler, consulClient, objectMapper);
 
         consulRateLimiter.saveRate(null);
         verifyZeroInteractions(consulClient);
