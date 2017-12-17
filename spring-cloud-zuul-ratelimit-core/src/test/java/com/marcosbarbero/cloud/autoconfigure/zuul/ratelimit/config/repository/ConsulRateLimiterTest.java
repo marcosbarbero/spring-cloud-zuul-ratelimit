@@ -26,6 +26,8 @@ import org.mockito.MockitoAnnotations;
 public class ConsulRateLimiterTest extends BaseRateLimiterTest {
 
     @Mock
+    private RateLimiterErrorHandler rateLimiterErrorHandler;
+    @Mock
     private ConsulClient consulClient;
     @Mock
     private ObjectMapper objectMapper;
@@ -48,13 +50,16 @@ public class ConsulRateLimiterTest extends BaseRateLimiterTest {
             return new Response<>(getValue, 1L, true, 1L);
         });
         ObjectMapper objectMapper = new ObjectMapper();
-        target = new ConsulRateLimiter(consulClient, objectMapper);
+        target = new ConsulRateLimiter(rateLimiterErrorHandler, consulClient, objectMapper);
     }
 
     @Test
     public void testGetRateException() throws IOException {
+        GetValue getValue = new GetValue();
+        getValue.setValue("");
+        when(consulClient.getKVValue(any())).thenReturn(new Response<>(getValue, 1L, true, 1L));
         when(objectMapper.readValue(anyString(), eq(Rate.class))).thenThrow(new IOException());
-        ConsulRateLimiter consulRateLimiter = new ConsulRateLimiter(consulClient, objectMapper);
+        ConsulRateLimiter consulRateLimiter = new ConsulRateLimiter(rateLimiterErrorHandler, consulClient, objectMapper);
 
         Rate rate = consulRateLimiter.getRate("");
         assertThat(rate).isNull();
@@ -63,8 +68,8 @@ public class ConsulRateLimiterTest extends BaseRateLimiterTest {
     @Test
     public void testSaveRateException() throws IOException {
         JsonProcessingException jsonProcessingException = Mockito.mock(JsonProcessingException.class);
-        when(objectMapper.writeValueAsString(any(Rate.class))).thenThrow(jsonProcessingException);
-        ConsulRateLimiter consulRateLimiter = new ConsulRateLimiter(consulClient, objectMapper);
+        when(objectMapper.writeValueAsString(any())).thenThrow(jsonProcessingException);
+        ConsulRateLimiter consulRateLimiter = new ConsulRateLimiter(rateLimiterErrorHandler, consulClient, objectMapper);
 
         consulRateLimiter.saveRate(null);
         verifyZeroInteractions(consulClient);

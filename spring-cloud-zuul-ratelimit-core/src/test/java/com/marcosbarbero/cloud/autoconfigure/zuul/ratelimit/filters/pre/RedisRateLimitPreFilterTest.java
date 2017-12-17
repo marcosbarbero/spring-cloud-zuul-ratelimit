@@ -7,6 +7,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RateLimiterErrorHandler;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RedisRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +28,8 @@ public class RedisRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
     @Override
     public void setUp() {
         redisTemplate = mock(RedisTemplate.class);
-        this.setRateLimiter(new RedisRateLimiter(this.redisTemplate));
+        RateLimiterErrorHandler rateLimiterErrorHandler = mock(RateLimiterErrorHandler.class);
+        this.setRateLimiter(new RedisRateLimiter(rateLimiterErrorHandler, this.redisTemplate));
         super.setUp();
     }
 

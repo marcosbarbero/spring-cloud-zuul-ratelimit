@@ -16,13 +16,14 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
-
 import java.util.Date;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Abstract implementation for {@link RateLimiter}.
@@ -31,22 +32,34 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  * @author Marcos Barbero
  * @since 2017-08-28
  */
+@Slf4j
+@RequiredArgsConstructor
 public abstract class AbstractRateLimiter implements RateLimiter {
 
-    protected abstract Rate getRate(String key);
+    private final RateLimiterErrorHandler rateLimiterErrorHandler;
 
+    protected abstract Rate getRate(String key);
     protected abstract void saveRate(Rate rate);
 
     @Override
     public synchronized Rate consume(final Policy policy, final String key, final Long requestTime) {
         Rate rate = this.create(policy, key);
         updateRate(policy, rate, requestTime);
-        saveRate(rate);
+        try {
+            saveRate(rate);
+        } catch (RuntimeException e) {
+            rateLimiterErrorHandler.handleSaveError(key, e);
+        }
         return rate;
     }
 
     private Rate create(final Policy policy, final String key) {
-        Rate rate = this.getRate(key);
+        Rate rate = null;
+        try {
+            rate = this.getRate(key);
+        } catch (RuntimeException e) {
+            rateLimiterErrorHandler.handleFetchError(key, e);
+        }
 
         if (!isExpired(rate)) {
             return rate;

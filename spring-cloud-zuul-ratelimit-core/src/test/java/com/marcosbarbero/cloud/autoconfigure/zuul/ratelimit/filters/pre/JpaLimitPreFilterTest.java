@@ -5,9 +5,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RateLimiterErrorHandler;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata.JpaRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata.RateLimiterRepository;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.junit.Before;
@@ -32,7 +32,8 @@ public class JpaLimitPreFilterTest extends BaseRateLimitPreFilterTest {
             String key = invocationOnMock.getArgument(0);
             return repository.get(key);
         });
-        this.setRateLimiter(new JpaRateLimiter(rateLimiterRepository));
+        RateLimiterErrorHandler rateLimiterErrorHandler = mock(RateLimiterErrorHandler.class);
+        this.setRateLimiter(new JpaRateLimiter(rateLimiterErrorHandler, rateLimiterRepository));
         super.setUp();
     }
 }

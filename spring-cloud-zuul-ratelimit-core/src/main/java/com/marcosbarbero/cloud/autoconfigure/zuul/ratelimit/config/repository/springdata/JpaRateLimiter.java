@@ -18,8 +18,7 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.s
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.AbstractRateLimiter;
-
-import lombok.RequiredArgsConstructor;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RateLimiterErrorHandler;
 
 /**
  * In memory rate limiter configuration for dev environment.
@@ -28,10 +27,15 @@ import lombok.RequiredArgsConstructor;
  * @author Liel Chayoun
  * @since 2017-06-23
  */
-@RequiredArgsConstructor
 public class JpaRateLimiter extends AbstractRateLimiter {
 
     private final RateLimiterRepository repository;
+
+    public JpaRateLimiter(RateLimiterErrorHandler rateLimiterErrorHandler,
+        RateLimiterRepository repository) {
+        super(rateLimiterErrorHandler);
+        this.repository = repository;
+    }
 
     @Override
     protected Rate getRate(String key) {

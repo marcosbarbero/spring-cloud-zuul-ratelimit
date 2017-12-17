@@ -27,6 +27,8 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.ConsulRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.DefaultRateLimiterErrorHandler;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RateLimiterErrorHandler;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RedisRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata.JpaRateLimiter;
@@ -65,6 +67,12 @@ public class RateLimitAutoConfiguration {
     private final UrlPathHelper urlPathHelper = new UrlPathHelper();
 
     @Bean
+    @ConditionalOnMissingBean(RateLimiterErrorHandler.class)
+    public RateLimiterErrorHandler rateLimiterErrorHandler() {
+        return new DefaultRateLimiterErrorHandler();
+    }
+
+    @Bean
     public ZuulFilter rateLimiterPreFilter(final RateLimiter rateLimiter,
                                            final RateLimitProperties rateLimitProperties,
                                            final RouteLocator routeLocator,
@@ -99,8 +107,9 @@ public class RateLimitAutoConfiguration {
         }
 
         @Bean
-        public RateLimiter redisRateLimiter(@Qualifier("rateLimiterRedisTemplate") final RedisTemplate redisTemplate) {
-            return new RedisRateLimiter(redisTemplate);
+        public RateLimiter redisRateLimiter(RateLimiterErrorHandler rateLimiterErrorHandler,
+            @Qualifier("rateLimiterRedisTemplate") final RedisTemplate redisTemplate) {
+            return new RedisRateLimiter(rateLimiterErrorHandler, redisTemplate);
         }
     }
 
@@ -110,8 +119,9 @@ public class RateLimitAutoConfiguration {
     public static class ConsulConfiguration {
 
         @Bean
-        public RateLimiter consultRateLimiter(final ConsulClient consulClient, final ObjectMapper objectMapper) {
-            return new ConsulRateLimiter(consulClient, objectMapper);
+        public RateLimiter consultRateLimiter(final RateLimiterErrorHandler rateLimiterErrorHandler,
+            final ConsulClient consulClient, final ObjectMapper objectMapper) {
+            return new ConsulRateLimiter(rateLimiterErrorHandler, consulClient, objectMapper);
         }
 
     }
@@ -123,8 +133,9 @@ public class RateLimitAutoConfiguration {
     public static class SpringDataConfiguration {
 
         @Bean
-        public RateLimiter springDataRateLimiter(final RateLimiterRepository rateLimiterRepository) {
-            return new JpaRateLimiter(rateLimiterRepository);
+        public RateLimiter springDataRateLimiter(final RateLimiterErrorHandler rateLimiterErrorHandler,
+            final RateLimiterRepository rateLimiterRepository) {
+            return new JpaRateLimiter(rateLimiterErrorHandler, rateLimiterRepository);
         }
 
     }
@@ -134,8 +145,8 @@ public class RateLimitAutoConfiguration {
     public static class InMemoryConfiguration {
 
         @Bean
-        public RateLimiter inMemoryRateLimiter() {
-            return new InMemoryRateLimiter();
+        public RateLimiter inMemoryRateLimiter(final RateLimiterErrorHandler rateLimiterErrorHandler) {
+            return new InMemoryRateLimiter(rateLimiterErrorHandler);
         }
     }
 
