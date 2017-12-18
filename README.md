@@ -209,7 +209,7 @@ By participating, you are expected to uphold this code. Please report unacceptab
 
 Acknowledgement
 ---
-<img src="/assets/images/jetbrains_logo.png" width="50"/>
+<a href="https://www.jetbrains.com/" border="0"><img src="/assets/images/jetbrains_logo.png" width="150"/></a>
 
 Footnote
 ---
