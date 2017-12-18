@@ -207,9 +207,8 @@ This project adheres to the Contributor Covenant
 By participating, you are expected to uphold this code. Please report unacceptable behavior to marcos.hgb@gmail.com.
 
 
-Acknowledgement
----
-<a href="https://www.jetbrains.com/" border="0" target="_blank"><img src="/assets/images/jetbrains_logo.png" width="150"/></a>
+### Acknowledgement
+<a href="https://www.jetbrains.com/" border="0"><img src="/assets/images/jetbrains_logo.png" width="150"/></a>
 
 Footnote
 ---
