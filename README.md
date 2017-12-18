@@ -209,7 +209,7 @@ By participating, you are expected to uphold this code. Please report unacceptab
 
 Acknowledgement
 ---
-![JetBrains](/assets/images/jetbrains_logo.png?v=4&s=200) 
+<img src="/assets/images/jetbrains_logo.png" width="50"/>
 
 Footnote
 ---
