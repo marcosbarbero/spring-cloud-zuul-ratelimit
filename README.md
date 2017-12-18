@@ -25,7 +25,7 @@ Add the dependency on pom.xml
 <dependency>
     <groupId>com.marcosbarbero.cloud</groupId>
     <artifactId>spring-cloud-zuul-ratelimit</artifactId>
-    <version>1.3.4.RELEASE</version>
+    <version>1.4.0.RELEASE</version>
 </dependency>
 ```
 
@@ -137,9 +137,13 @@ Policy properties:
 
 Further Customization
 ---
+This section details how to add custom implementations 
 
-If your application needs to control the key strategy beyond the options offered by the type property then you can 
-supply a custom `RateLimitKeyGenerator` implementation adding further qualifiers or something entirely different:
+### Key Generator
+
+If the application needs to control the key strategy beyond the options offered by the type property then it can 
+be done just by creating a custom `RateLimitKeyGenerator` implementation adding further qualifiers or something 
+entirely different:
 
 ```java
   @Bean
@@ -150,6 +154,36 @@ supply a custom `RateLimitKeyGenerator` implementation adding further qualifiers
               return super.key(request, route, policy) + ":" + request.getMethod();
           }
       };
+  }
+```
+
+### Error Handling
+This framework uses some 3rd party applications to store and control the rate limit access, as it does not has control
+over those applications and they can fail once a while the framework itself handles the failure in the class 
+`DefaultRateLimiterErrorHandler` just by adding some error logs.  
+
+If there is a need to handle the errors differently, it can be achieved just by defining a custom `RateLimiterErrorHandler`
+bean, e.g:
+
+```java
+  @Bean
+  public RateLimiterErrorHandler rateLimitErrorHandler() {
+    return new DefaultRateLimiterErrorHandler() {
+        @Override
+        public void handleSaveError(String key, Exception e) {
+            // custom code
+        }
+        
+        @Override
+        public void handleFetchError(String key, Exception e) {
+            // custom code
+        }
+        
+        @Override
+        public void handleError(String msg, Exception e) {
+            // custom code
+        }
+    }
   }
 ```
 
