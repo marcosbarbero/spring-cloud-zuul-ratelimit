@@ -206,6 +206,11 @@ This project adheres to the Contributor Covenant
 [code of conduct](https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit/blob/master/docs/code-of-conduct.adoc). 
 By participating, you are expected to uphold this code. Please report unacceptable behavior to marcos.hgb@gmail.com.
 
+
+Acknowledgement
+---
+![JetBrains](/assets/images/jetbrains_logo.png?v=4&s=200) 
+
 Footnote
 ---
 Any doubt open an [issue](https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit/issues).  
