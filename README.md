@@ -1,6 +1,8 @@
 Spring Cloud Zuul RateLimit [![Build Status](https://travis-ci.org/marcosbarbero/spring-cloud-zuul-ratelimit.svg?branch=master)](https://travis-ci.org/marcosbarbero/spring-cloud-zuul-ratelimit) 
 [![Coverage Status](https://coveralls.io/repos/github/marcosbarbero/spring-cloud-zuul-ratelimit/badge.svg?branch=master)](https://coveralls.io/github/marcosbarbero/spring-cloud-zuul-ratelimit?branch=master) 
 ---
+
+[![Join the chat at https://gitter.im/spring-cloud-zuul-ratelimit/Lobby](https://badges.gitter.im/spring-cloud-zuul-ratelimit/Lobby.svg)](https://gitter.im/spring-cloud-zuul-ratelimit/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Module to enable rate limit per service in Netflix Zuul.  
 There are five built-in rate limit approaches:
  - Authenticated User
