@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -42,6 +43,7 @@ import lombok.NoArgsConstructor;
 public class Rate {
 
     @Id
+    @Column(name = "rate_key")
     private String key;
     private Long remaining;
     private Long remainingQuota;
