@@ -106,8 +106,8 @@ zuul:
 
 Available implementations
 ---
-There are three implementations provided:  
- * `InMemoryRateLimiter` - uses ConcurrentHashMap as data storage
+There are four implementations provided:  
+ * `InMemoryRateLimiter` - uses `ConcurrentHashMap` as data storage
  * `ConsulRateLimiter` - uses [Consul](https://www.consul.io/) as data storage
  * `RedisRateLimiter` - uses [Redis](https://redis.io/) as data storage
  * `SpringDataRateLimiter` - uses [Spring Data](https://projects.spring.io/spring-data-jpa/) as data storage
@@ -122,10 +122,10 @@ Property namespace: __zuul.ratelimit__
 |behind-proxy  |true/false                   |false|
 |key-prefix    |String                       |${spring.application.name:rate-limit-application}|
 |repository    |CONSUL, REDIS, JPA, IN_MEMORY|IN_MEMORY|
-|default-policy|[Policy](https://github.com/marcosbarbero/spring-cloud-zuul-ratelimit/blob/master/spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L64)| - |
-|policies      |Map of [Policy](https://github.com/marcosbarbero/spring-cloud-zuul-ratelimit/blob/master/spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L64)| - |
-|default-policy-list|List of [Policy](https://github.com/marcosbarbero/spring-cloud-zuul-ratelimit/blob/master/spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L64)| - |
-|policy-list      |Map of Lists of [Policy](https://github.com/marcosbarbero/spring-cloud-zuul-ratelimit/blob/master/spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L64)| - |
+|default-policy|[Policy](./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L68)| - |
+|policies      |Map of [Policy](.spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L68)| - |
+|default-policy-list|List of [Policy](./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L68)| - |
+|policy-list      |Map of Lists of [Policy](./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L68)| - |
 
 Policy properties:
 
@@ -143,7 +143,7 @@ This section details how to add custom implementations
 ### Key Generator
 
 If the application needs to control the key strategy beyond the options offered by the type property then it can 
-be done just by creating a custom `RateLimitKeyGenerator` implementation adding further qualifiers or something 
+be done just by creating a custom [`RateLimitKeyGenerator`](./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/RateLimitKeyGenerator.java) implementation adding further qualifiers or something 
 entirely different:
 
 ```java
@@ -161,9 +161,9 @@ entirely different:
 ### Error Handling
 This framework uses some 3rd party applications to store and control the rate limit access, as it does not has control
 over those applications and they can fail once a while the framework itself handles the failure in the class 
-`DefaultRateLimiterErrorHandler` just by adding some error logs.  
+[`DefaultRateLimiterErrorHandler`](./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/repository/DefaultRateLimiterErrorHandler.java) just by adding some error logs.  
 
-If there is a need to handle the errors differently, it can be achieved just by defining a custom `RateLimiterErrorHandler`
+If there is a need to handle the errors differently, it can be achieved just by defining a custom [`RateLimiterErrorHandler`](./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/repository/RateLimiterErrorHandler.java)
 bean, e.g:
 
 ```java
@@ -206,7 +206,6 @@ missing methods and fields.
 This project adheres to the Contributor Covenant 
 [code of conduct](https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit/blob/master/docs/code-of-conduct.adoc). 
 By participating, you are expected to uphold this code. Please report unacceptable behavior to marcos.hgb@gmail.com.
-
 
 ### Acknowledgement
 <a href="https://www.jetbrains.com/" border="0"><img src="/assets/images/jetbrains_logo.png" width="150"/></a>
