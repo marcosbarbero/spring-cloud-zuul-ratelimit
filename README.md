@@ -3,13 +3,13 @@ Spring Cloud Zuul RateLimit [![Build Status](https://travis-ci.org/marcosbarbero
 ---
 
 Module to enable rate limit per service in Netflix Zuul.  
-There are five built-in rate limit approaches:
+There are four built-in rate limit approaches:
  - Authenticated User
    - Uses the authenticated username or 'anonymous'
  - Request Origin 
    - Uses the user origin request
  - URL
-   - Uses the request path of the upstream service
+   - Uses the request path of the downstream service
  - Global configuration per service: 
    - This one does not validate the request Origin, Authenticated User or URI
    - To use this approach just don't set param 'type'
@@ -26,7 +26,7 @@ Add the dependency on pom.xml
 <dependency>
     <groupId>com.marcosbarbero.cloud</groupId>
     <artifactId>spring-cloud-zuul-ratelimit</artifactId>
-    <version>1.4.0.RELEASE</version>
+    <version>1.5.0.RELEASE</version>
 </dependency>
 ```
 
@@ -122,10 +122,10 @@ Property namespace: __zuul.ratelimit__
 |behind-proxy  |true/false                   |false|
 |key-prefix    |String                       |${spring.application.name:rate-limit-application}|
 |repository    |CONSUL, REDIS, JPA, IN_MEMORY|IN_MEMORY|
-|default-policy|[Policy](./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L68)| - |
-|policies      |Map of [Policy](.spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L68)| - |
-|default-policy-list|List of [Policy](./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L68)| - |
-|policy-list      |Map of Lists of [Policy](./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L68)| - |
+|default-policy|[Policy](./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86)| - |
+|policies      |Map of [Policy](.spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86)| - |
+|default-policy-list|List of [Policy](./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86)| - |
+|policy-list      |Map of Lists of [Policy](./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86)| - |
 
 Policy properties:
 

@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.5.8.RELEASE</version>
+        <version>1.5.9.RELEASE</version>
     </parent>
 
     <groupId>com.marcosbarbero.cloud</groupId>
@@ -19,7 +19,7 @@
         ]]>
     </description>
     <url>https://github.com/marcosbarbero/spring-cloud-zuul-ratelimit</url>
-    <version>1.4.0.RELEASE</version>
+    <version>1.5.0.RELEASE</version>
 
     <licenses>
         <license>
@@ -34,7 +34,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <java.version>1.8</java.version>
         <nexus-staging-maven-plugin.version>1.6.3</nexus-staging-maven-plugin.version>
-        <global.version>1.4.0.RELEASE</global.version>
+        <global.version>1.5.0.RELEASE</global.version>
         <jacoco.version>0.8.0</jacoco.version>
         <jacoco.it.execution.data.file>
             ${project.build.directory}/coverage-reports/jacoco.exec
@@ -52,6 +52,14 @@
             <name>Marcos Barbero</name>
             <timezone>CET</timezone>
         </developer>
+
+        <developer>
+            <id>lchayoun</id>
+            <email>lchayoun@gmail.com</email>
+            <name>Liel Chayoun</name>
+            <timezone>CET</timezone>
+        </developer>
+
     </developers>
 
     <scm>
@@ -68,7 +76,7 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
-                <version>Dalston.SR4</version>
+                <version>Edgware.SR1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -129,34 +137,6 @@
                     </jacocoReports>
                 </configuration>
             </plugin>
-
-            <!--<plugin>-->
-                <!--<groupId>org.jacoco</groupId>-->
-                <!--<artifactId>jacoco-maven-plugin</artifactId>-->
-                <!--<version>${jacoco.version}</version>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<id>agent-for-ut</id>-->
-                        <!--<goals>-->
-                            <!--<goal>prepare-agent</goal>-->
-                        <!--</goals>-->
-                        <!--<configuration>-->
-                            <!--<append>true</append>-->
-                            <!--<destFile>${jacoco.ut.execution.data.file}</destFile>-->
-                        <!--</configuration>-->
-                    <!--</execution>-->
-                    <!--<execution>-->
-                        <!--<id>agent-for-it</id>-->
-                        <!--<goals>-->
-                            <!--<goal>prepare-agent-integration</goal>-->
-                        <!--</goals>-->
-                        <!--<configuration>-->
-                            <!--<append>true</append>-->
-                            <!--<destFile>${jacoco.it.execution.data.file}</destFile>-->
-                        <!--</configuration>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-            <!--</plugin>-->
 
             <plugin>
                 <groupId>org.jacoco</groupId>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2017 the original author or authors.
+ * Copyright 2012-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,25 @@ public class RateLimitProperties {
     private Repository repository = Repository.IN_MEMORY;
 
     public enum Repository {
-        REDIS, CONSUL, JPA, IN_MEMORY
+        /**
+         * Uses Redis as data storage
+         */
+        REDIS,
+
+        /**
+         * Uses Consul as data storage
+         */
+        CONSUL,
+
+        /**
+         * Uses SQL database as data storage
+         */
+        JPA,
+
+        /**
+         * Uses a ConcurrentHashMap as data storage
+         */
+        IN_MEMORY
     }
 
     public List<Policy> getPolicies(String key) {
@@ -78,7 +96,20 @@ public class RateLimitProperties {
         private List<Type> type = Lists.newArrayList();
 
         public enum Type {
-            ORIGIN, USER, URL
+            /**
+             * Rate limit policy considering the user's origin.
+             */
+            ORIGIN,
+
+            /**
+             * Rate limit policy considering the authenticated user.
+             */
+            USER,
+
+            /**
+             * Rate limit policy considering the request path to the downstream service.
+             */
+            URL
         }
     }
 }
