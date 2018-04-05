@@ -1,5 +1,6 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.pre;
 
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -14,7 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.ConsulRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RateLimiterErrorHandler;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
+
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import org.junit.Before;
@@ -74,14 +75,14 @@ public class ConsulRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
         }
 
         String key = "null_serviceA_serviceA_10.0.0.100_anonymous";
-        String remaining = this.response.getHeader(RateLimitPreFilter.REMAINING_HEADER + key);
+        String remaining = this.response.getHeader(HEADER_REMAINING + key);
         assertEquals("0", remaining);
 
         TimeUnit.SECONDS.sleep(2);
 
         when(getValue.getDecodedValue()).thenReturn(this.objectMapper.writeValueAsString(this.rate(2)));
         this.filter.run();
-        remaining = this.response.getHeader(RateLimitPreFilter.REMAINING_HEADER + key);
+        remaining = this.response.getHeader(HEADER_REMAINING + key);
         assertEquals("1", remaining);
     }
 }

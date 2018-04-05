@@ -17,11 +17,12 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.AbstractRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RateLimiterErrorHandler;
 
 /**
- * In memory rate limiter configuration for dev environment.
+ * JPA {@link RateLimiter} configuration.
  *
  * @author Marcos Barbero
  * @author Liel Chayoun

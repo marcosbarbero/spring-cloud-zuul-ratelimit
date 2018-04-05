@@ -96,6 +96,7 @@ public class RateLimitAutoConfiguration {
         return new DefaultRateLimitKeyGenerator(properties);
     }
 
+    @Configuration
     @ConditionalOnClass(RedisTemplate.class)
     @ConditionalOnMissingBean(RateLimiter.class)
     @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "REDIS")
@@ -113,6 +114,7 @@ public class RateLimitAutoConfiguration {
         }
     }
 
+    @Configuration
     @ConditionalOnConsulEnabled
     @ConditionalOnMissingBean(RateLimiter.class)
     @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "CONSUL")
@@ -126,6 +128,7 @@ public class RateLimitAutoConfiguration {
 
     }
 
+    @Configuration
     @EntityScan
     @EnableJpaRepositories
     @ConditionalOnMissingBean(RateLimiter.class)
@@ -140,6 +143,7 @@ public class RateLimitAutoConfiguration {
 
     }
 
+    @Configuration
     @ConditionalOnMissingBean(RateLimiter.class)
     @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "IN_MEMORY", matchIfMissing = true)
     public static class InMemoryConfiguration {

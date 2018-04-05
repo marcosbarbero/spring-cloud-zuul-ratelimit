@@ -1,5 +1,6 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.pre;
 
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -113,13 +114,13 @@ public abstract class BaseRateLimitPreFilterTest {
         }
 
         String key = "null_serviceA_serviceA_10.0.0.100_anonymous";
-        String remaining = this.response.getHeader(RateLimitPreFilter.REMAINING_HEADER + key);
+        String remaining = this.response.getHeader(HEADER_REMAINING + key);
         assertEquals("0", remaining);
 
         TimeUnit.SECONDS.sleep(3);
 
         this.filter.run();
-        remaining = this.response.getHeader(RateLimitPreFilter.REMAINING_HEADER + key);
+        remaining = this.response.getHeader(HEADER_REMAINING + key);
         assertEquals("1", remaining);
     }
 

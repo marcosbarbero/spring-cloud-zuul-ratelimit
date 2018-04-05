@@ -13,12 +13,11 @@ public interface RateLimitKeyGenerator {
 
     /**
      * Returns a key based on {@link HttpServletRequest}, {@link Route} and
-     * {@link com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy}
+     * {@link RateLimitProperties.Policy}
      *
      * @param request The {@link HttpServletRequest}
      * @param route   The {@link Route}
-     * @param policy  The
-     * {@link com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy}
+     * @param policy  The {@link RateLimitProperties.Policy}
      * @return Generated key
      */
     String key(HttpServletRequest request, Route route, RateLimitProperties.Policy policy);

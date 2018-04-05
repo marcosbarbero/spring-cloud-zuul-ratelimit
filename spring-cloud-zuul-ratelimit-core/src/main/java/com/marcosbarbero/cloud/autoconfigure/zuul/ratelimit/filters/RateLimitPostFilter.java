@@ -16,6 +16,7 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.REQUEST_START_TIME;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_RESPONSE_FILTER_ORDER;
 import static org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST;
@@ -65,7 +66,7 @@ public class RateLimitPostFilter extends AbstractRateLimitFilter {
 
     private Long getRequestStartTime() {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        return (Long) requestAttributes.getAttribute(RateLimitPreFilter.REQUEST_START_TIME, SCOPE_REQUEST);
+        return (Long) requestAttributes.getAttribute(REQUEST_START_TIME, SCOPE_REQUEST);
     }
 
     @Override
