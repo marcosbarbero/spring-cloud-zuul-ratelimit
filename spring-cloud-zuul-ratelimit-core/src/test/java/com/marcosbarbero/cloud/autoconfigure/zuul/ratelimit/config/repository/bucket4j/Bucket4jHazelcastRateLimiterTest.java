@@ -4,6 +4,7 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.BaseRateLimiterTest;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.mockito.MockitoAnnotations;
@@ -26,5 +27,10 @@ public class Bucket4jHazelcastRateLimiterTest extends BaseRateLimiterTest {
     @After
     public void tearDown() {
         hazelcastInstance.getMap("rateLimit").destroy();
+    }
+
+    @AfterClass
+    public static void tearDownClass() {
+        Hazelcast.shutdownAll();
     }
 }

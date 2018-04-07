@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.mockito.MockitoAnnotations;
 
-public class Bucket4jIgniteRateLimiterTest extends BaseRateLimiterTest {
+public class Bucket4jJCacheRateLimiterTest extends BaseRateLimiterTest {
 
     private static Ignite ignite;
 
@@ -21,7 +21,7 @@ public class Bucket4jIgniteRateLimiterTest extends BaseRateLimiterTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        target = new Bucket4jIgniteRateLimiter(ignite.createCache("rateLimit"));
+        target = new Bucket4jJCacheRateLimiter(ignite.createCache("rateLimit"));
     }
 
     @After

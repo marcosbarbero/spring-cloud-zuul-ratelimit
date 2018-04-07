@@ -78,9 +78,15 @@ public abstract class Bucket4jRateLimiter<T extends ConfigurationBuilder<T>, E e
                 ConsumptionProbe limitConsumptionProbe = limitBucket.tryConsumeAndReturnRemaining(1);
                 long nanosToWaitForRefill = limitConsumptionProbe.getNanosToWaitForRefill();
                 rate.setReset(NANOSECONDS.toMillis(nanosToWaitForRefill));
-                rate.setRemaining(Math.max(-1, limitConsumptionProbe.getRemainingTokens()));
+                if (limitConsumptionProbe.isConsumed()) {
+                    rate.setRemaining(limitConsumptionProbe.getRemainingTokens());
+                } else {
+                    rate.setRemaining(-1L);
+                    limitBucket.tryConsumeAsMuchAsPossible(1);
+                }
             } else {
-                rate.setRemaining(Math.max(-1, limitBucket.getAvailableTokens()));
+                long availableTokens = limitBucket.getAvailableTokens();
+                rate.setRemaining(availableTokens > 0 ? availableTokens : -1);
             }
         }
     }
@@ -93,9 +99,15 @@ public abstract class Bucket4jRateLimiter<T extends ConfigurationBuilder<T>, E e
                 ConsumptionProbe quotaConsumptionProbe = quotaBucket.tryConsumeAndReturnRemaining(requestTime);
                 long nanosToWaitForRefill = quotaConsumptionProbe.getNanosToWaitForRefill();
                 rate.setReset(NANOSECONDS.toMillis(nanosToWaitForRefill));
-                rate.setRemainingQuota(Math.max(-1, quotaConsumptionProbe.getRemainingTokens()));
+                if (quotaConsumptionProbe.isConsumed()) {
+                    rate.setRemainingQuota(quotaConsumptionProbe.getRemainingTokens());
+                } else {
+                    rate.setRemainingQuota(-1L);
+                    quotaBucket.tryConsumeAsMuchAsPossible(requestTime);
+                }
             } else {
-                rate.setRemainingQuota(Math.max(-1, quotaBucket.getAvailableTokens()));
+                long availableTokens = quotaBucket.getAvailableTokens();
+                rate.setRemainingQuota(availableTokens > 0 ? availableTokens : -1);
             }
         }
     }

@@ -27,7 +27,6 @@ public class Bucket4jInfinispanRateLimiterTest extends BaseRateLimiterTest {
 
     @After
     public void tearDown() {
-        MockitoAnnotations.initMocks(this);
         DefaultCacheManager cacheManager = new DefaultCacheManager();
         cacheManager.removeCache("rateLimit");
     }
