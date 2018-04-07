@@ -18,6 +18,7 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.b
 
 import io.github.bucket4j.grid.GridBucketState;
 import io.github.bucket4j.grid.ProxyManager;
+import io.github.bucket4j.grid.jcache.JCache;
 import io.github.bucket4j.grid.jcache.JCacheBucketBuilder;
 import javax.cache.Cache;
 
@@ -27,7 +28,7 @@ import javax.cache.Cache;
  * @author Liel Chayoun
  * @since 2018-04-06
  */
-public class Bucket4jJCacheRateLimiter extends Bucket4jRateLimiter<JCacheBucketBuilder, io.github.bucket4j.grid.jcache.JCache> {
+public class Bucket4jJCacheRateLimiter extends AbstractBucket4jRateLimiter<JCacheBucketBuilder, JCache> {
 
     private final Cache<String, GridBucketState> cache;
 

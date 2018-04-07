@@ -19,6 +19,7 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.b
 import com.hazelcast.core.IMap;
 import io.github.bucket4j.grid.GridBucketState;
 import io.github.bucket4j.grid.ProxyManager;
+import io.github.bucket4j.grid.hazelcast.Hazelcast;
 import io.github.bucket4j.grid.hazelcast.HazelcastBucketBuilder;
 
 /**
@@ -27,7 +28,7 @@ import io.github.bucket4j.grid.hazelcast.HazelcastBucketBuilder;
  * @author Liel Chayoun
  * @since 2018-04-06
  */
-public class Bucket4jHazelcastRateLimiter extends Bucket4jRateLimiter<HazelcastBucketBuilder, io.github.bucket4j.grid.hazelcast.Hazelcast> {
+public class Bucket4jHazelcastRateLimiter extends AbstractBucket4jRateLimiter<HazelcastBucketBuilder, Hazelcast> {
 
     private final IMap<String, GridBucketState> rateLimit;
 

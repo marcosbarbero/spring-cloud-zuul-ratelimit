@@ -31,7 +31,7 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
 public abstract class AbstractCacheRateLimiter implements RateLimiter {
 
     @Override
-    public Rate consume(Policy policy, String key, Long requestTime) {
+    public synchronized Rate consume(Policy policy, String key, Long requestTime) {
         final Long refreshInterval = policy.getRefreshInterval();
         final Long quota = policy.getQuota() != null ? SECONDS.toMillis(policy.getQuota()) : null;
         final Rate rate = new Rate(key, policy.getLimit(), quota, null, null);

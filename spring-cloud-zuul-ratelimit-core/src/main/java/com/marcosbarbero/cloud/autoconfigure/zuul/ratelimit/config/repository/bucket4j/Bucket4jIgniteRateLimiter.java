@@ -18,6 +18,7 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.b
 
 import io.github.bucket4j.grid.GridBucketState;
 import io.github.bucket4j.grid.ProxyManager;
+import io.github.bucket4j.grid.ignite.Ignite;
 import io.github.bucket4j.grid.ignite.IgniteBucketBuilder;
 import org.apache.ignite.IgniteCache;
 
@@ -27,7 +28,7 @@ import org.apache.ignite.IgniteCache;
  * @author Liel Chayoun
  * @since 2018-04-06
  */
-public class Bucket4jIgniteRateLimiter extends Bucket4jRateLimiter<IgniteBucketBuilder, io.github.bucket4j.grid.ignite.Ignite> {
+public class Bucket4jIgniteRateLimiter extends AbstractBucket4jRateLimiter<IgniteBucketBuilder, Ignite> {
 
     private final IgniteCache<String, GridBucketState> cache;
 

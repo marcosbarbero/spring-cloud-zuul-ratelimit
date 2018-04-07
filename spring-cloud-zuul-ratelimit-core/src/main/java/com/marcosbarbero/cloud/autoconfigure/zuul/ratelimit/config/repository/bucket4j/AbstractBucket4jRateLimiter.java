@@ -37,12 +37,12 @@ import java.util.function.Supplier;
  * @author Liel Chayoun
  * @since 2018-04-06
  */
-public abstract class Bucket4jRateLimiter<T extends ConfigurationBuilder<T>, E extends Extension<T>> extends AbstractCacheRateLimiter {
+public abstract class AbstractBucket4jRateLimiter<T extends ConfigurationBuilder<T>, E extends Extension<T>> extends AbstractCacheRateLimiter {
 
     private final Class<E> extension;
     private ProxyManager<String> buckets;
 
-    public Bucket4jRateLimiter(Class<E> extension) {
+    public AbstractBucket4jRateLimiter(Class<E> extension) {
         this.extension = extension;
     }
 

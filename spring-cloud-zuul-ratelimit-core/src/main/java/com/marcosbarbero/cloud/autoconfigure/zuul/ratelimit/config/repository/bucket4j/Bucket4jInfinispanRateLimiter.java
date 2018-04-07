@@ -18,6 +18,7 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.b
 
 import io.github.bucket4j.grid.GridBucketState;
 import io.github.bucket4j.grid.ProxyManager;
+import io.github.bucket4j.grid.infinispan.Infinispan;
 import io.github.bucket4j.grid.infinispan.InfinispanBucketBuilder;
 import org.infinispan.functional.FunctionalMap.ReadWriteMap;
 
@@ -27,7 +28,7 @@ import org.infinispan.functional.FunctionalMap.ReadWriteMap;
  * @author Liel Chayoun
  * @since 2018-04-06
  */
-public class Bucket4jInfinispanRateLimiter extends Bucket4jRateLimiter<InfinispanBucketBuilder, io.github.bucket4j.grid.infinispan.Infinispan> {
+public class Bucket4jInfinispanRateLimiter extends AbstractBucket4jRateLimiter<InfinispanBucketBuilder, Infinispan> {
 
     private final ReadWriteMap<String, GridBucketState> readWriteMap;
 
