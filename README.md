@@ -173,6 +173,16 @@ There are four implementations provided:
  * `ConsulRateLimiter` - uses [Consul](https://www.consul.io/) as data storage
  * `RedisRateLimiter` - uses [Redis](https://redis.io/) as data storage
  * `SpringDataRateLimiter` - uses [Spring Data](https://projects.spring.io/spring-data-jpa/) as data storage
+ * `Bucket4jJCacheRateLimiter` - uses [Bucket4j](https://github.com/vladimir-bukhtoyarov/bucket4j) as data storage
+ * `Bucket4jHazelcastRateLimiter` - uses [Bucket4j](https://github.com/vladimir-bukhtoyarov/bucket4j) as data storage
+ * `Bucket4jIgniteRateLimiter` - uses [Bucket4j](https://github.com/vladimir-bukhtoyarov/bucket4j) as data storage
+ * `Bucket4jInfinispanRateLimiter` - uses [Bucket4j](https://github.com/vladimir-bukhtoyarov/bucket4j) as data storage
+ 
+Bucket4j implementations require the relevant bean with `@Qualifier("RateLimit")`:
+ * `JCache` - javax.cache.Cache
+ * `Hazelcast` - com.hazelcast.core.IMap
+ * `Ignite` - org.apache.ignite.IgniteCache
+ * `Infinispan` - org.infinispan.functional.ReadWriteMap
  
 Common application properties
 ---

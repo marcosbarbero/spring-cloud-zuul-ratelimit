@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hazelcast.core.IMap;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.DefaultRateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
@@ -13,14 +14,22 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.ConsulRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RedisRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j.Bucket4jHazelcastRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j.Bucket4jIgniteRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j.Bucket4jInfinispanRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j.Bucket4jJCacheRateLimiter;
 import com.netflix.zuul.ZuulFilter;
+import io.github.bucket4j.grid.GridBucketState;
 import java.util.List;
 import java.util.Map;
+import org.apache.ignite.IgniteCache;
+import org.infinispan.functional.FunctionalMap.ReadWriteMap;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,7 +55,7 @@ public class RateLimitAutoConfigurationTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         System.clearProperty(PREFIX + ".repository");
     }
 
@@ -88,6 +97,38 @@ public class RateLimitAutoConfigurationTest {
         this.context.refresh();
 
         Assert.assertTrue(this.context.getBean(RateLimiter.class) instanceof RedisRateLimiter);
+    }
+
+    @Test
+    public void testBucket4jJCacheRateLimiterByProperty() {
+        System.setProperty(PREFIX + ".repository", "BUCKET4J_JCACHE");
+        this.context.refresh();
+
+        Assert.assertTrue(this.context.getBean(RateLimiter.class) instanceof Bucket4jJCacheRateLimiter);
+    }
+
+    @Test
+    public void testBucket4jHazelcastRateLimiterByProperty() {
+        System.setProperty(PREFIX + ".repository", "BUCKET4J_HAZELCAST");
+        this.context.refresh();
+
+        Assert.assertTrue(this.context.getBean(RateLimiter.class) instanceof Bucket4jHazelcastRateLimiter);
+    }
+
+    @Test
+    public void testBucket4jIgniteRateLimiterByProperty() {
+        System.setProperty(PREFIX + ".repository", "BUCKET4J_IGNITE");
+        this.context.refresh();
+
+        Assert.assertTrue(this.context.getBean(RateLimiter.class) instanceof Bucket4jIgniteRateLimiter);
+    }
+
+    @Test
+    public void testBucket4jInfinispanRateLimiterByProperty() {
+        System.setProperty(PREFIX + ".repository", "BUCKET4J_INFINISPAN");
+        this.context.refresh();
+
+        Assert.assertTrue(this.context.getBean(RateLimiter.class) instanceof Bucket4jInfinispanRateLimiter);
     }
 
     @Test
@@ -148,6 +189,24 @@ public class RateLimitAutoConfigurationTest {
         @Bean
         public RedisConnectionFactory redisConnectionFactory() {
             return Mockito.mock(RedisConnectionFactory.class);
+        }
+
+        @Bean
+        @Qualifier("RateLimit")
+        public IMap<String, GridBucketState> hazelcastMap() {
+            return Mockito.mock(IMap.class);
+        }
+
+        @Bean
+        @Qualifier("RateLimit")
+        public IgniteCache<String, GridBucketState> igniteCache() {
+            return Mockito.mock(IgniteCache.class);
+        }
+
+        @Bean
+        @Qualifier("RateLimit")
+        public ReadWriteMap<String, GridBucketState> infinispanMap() {
+            return Mockito.mock(ReadWriteMap.class);
         }
     }
 }
