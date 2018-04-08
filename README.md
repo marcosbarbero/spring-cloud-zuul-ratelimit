@@ -56,7 +56,69 @@ Add the following dependency accordingly to the chosen data storage:
   </dependency>
   ```
   
-  4. InMemory  
+  4. Bucket4j JCache
+  ```xml
+  <dependency>
+      <groupId>com.github.vladimir-bukhtoyarov</groupId>
+      <artifactId>bucket4j-core</artifactId>
+  </dependency>
+  ```
+  ```xml
+  <dependency>
+      <groupId>com.github.vladimir-bukhtoyarov</groupId>
+      <artifactId>bucket4j-jcache</artifactId>
+  </dependency>
+  ```
+  ```xml
+  <dependency>
+      <groupId>javax.cache</groupId>
+      <artifactId>cache-api</artifactId>
+  </dependency>
+  ```
+
+  5. Bucket4j Hazelcast (depends on Bucket4j JCache)
+  ```xml
+  <dependency>
+      <groupId>com.github.vladimir-bukhtoyarov</groupId>
+      <artifactId>bucket4j-hazelcast</artifactId>
+  </dependency>
+  ```
+  ```xml
+  <dependency>
+      <groupId>com.hazelcast</groupId>
+      <artifactId>hazelcast</artifactId>
+  </dependency>
+  ```
+
+  6. Bucket4j Infinispan (depends on Bucket4j JCache)
+  ```xml
+  <dependency>
+      <groupId>com.github.vladimir-bukhtoyarov</groupId>
+      <artifactId>bucket4j-infinispan</artifactId>
+  </dependency>
+  ```
+  ```xml
+  <dependency>
+      <groupId>org.infinispan</groupId>
+      <artifactId>infinispan-core</artifactId>
+  </dependency>
+  ```
+  
+  7. Bucket4j Ignite (depends on Bucket4j JCache)
+  ```xml
+  <dependency>
+      <groupId>com.github.vladimir-bukhtoyarov</groupId>
+      <artifactId>bucket4j-ignite</artifactId>
+  </dependency>
+  ```
+  ```xml
+  <dependency>
+      <groupId>org.apache.ignite</groupId>
+      <artifactId>ignite-core</artifactId>
+  </dependency>
+  ```
+
+  8. InMemory  
   For `InMemory` implementation there's no need to add any extra dependency other than
    `com.marcosbarbero.cloud:spring-cloud-zuul-ratelimit` 
 
@@ -111,6 +173,16 @@ There are four implementations provided:
  * `ConsulRateLimiter` - uses [Consul](https://www.consul.io/) as data storage
  * `RedisRateLimiter` - uses [Redis](https://redis.io/) as data storage
  * `SpringDataRateLimiter` - uses [Spring Data](https://projects.spring.io/spring-data-jpa/) as data storage
+ * `Bucket4jJCacheRateLimiter` - uses [Bucket4j](https://github.com/vladimir-bukhtoyarov/bucket4j) as data storage
+ * `Bucket4jHazelcastRateLimiter` - uses [Bucket4j](https://github.com/vladimir-bukhtoyarov/bucket4j) as data storage
+ * `Bucket4jIgniteRateLimiter` - uses [Bucket4j](https://github.com/vladimir-bukhtoyarov/bucket4j) as data storage
+ * `Bucket4jInfinispanRateLimiter` - uses [Bucket4j](https://github.com/vladimir-bukhtoyarov/bucket4j) as data storage
+ 
+Bucket4j implementations require the relevant bean with `@Qualifier("RateLimit")`:
+ * `JCache` - javax.cache.Cache
+ * `Hazelcast` - com.hazelcast.core.IMap
+ * `Ignite` - org.apache.ignite.IgniteCache
+ * `Infinispan` - org.infinispan.functional.ReadWriteMap
  
 Common application properties
 ---
@@ -121,7 +193,7 @@ Property namespace: __zuul.ratelimit__
 |enabled       |true/false                   |false|
 |behind-proxy  |true/false                   |false|
 |key-prefix    |String                       |${spring.application.name:rate-limit-application}|
-|repository    |CONSUL, REDIS, JPA, IN_MEMORY|IN_MEMORY|
+|repository    |CONSUL, REDIS, JPA, BUCKET4J_JCACHE, BUCKET4J_HAZELCAST, BUCKET4J_INFINISPAN, BUCKET4J_IGNITE, IN_MEMORY|IN_MEMORY|
 |default-policy|[Policy](./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86)| - |
 |policies      |Map of [Policy](.spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86)| - |
 |default-policy-list|List of [Policy](./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86)| - |

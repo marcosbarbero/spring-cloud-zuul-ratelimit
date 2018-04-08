@@ -97,6 +97,10 @@
         <module>spring-cloud-zuul-ratelimit-tests/springdata</module>
         <module>spring-cloud-zuul-ratelimit-tests/inmemory</module>
         <module>spring-cloud-zuul-ratelimit-tests/redis</module>
+        <module>spring-cloud-zuul-ratelimit-tests/bucket4j-jcache</module>
+        <module>spring-cloud-zuul-ratelimit-tests/bucket4j-hazelcast</module>
+        <module>spring-cloud-zuul-ratelimit-tests/bucket4j-ignite</module>
+        <module>spring-cloud-zuul-ratelimit-tests/bucket4j-infinispan</module>
         <module>spring-cloud-zuul-ratelimit-coverage</module>
         <module>spring-cloud-zuul-ratelimit-dependencies</module>
         <module>spring-cloud-starter-zuul-ratelimit</module>
