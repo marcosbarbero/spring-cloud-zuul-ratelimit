@@ -72,6 +72,26 @@ public class RateLimitProperties {
         JPA,
 
         /**
+         * Uses Bucket4j JCache as data storage
+         */
+        BUCKET4J_JCACHE,
+
+        /**
+         * Uses Bucket4j Hazelcast as data storage
+         */
+        BUCKET4J_HAZELCAST,
+
+        /**
+         * Uses Bucket4j Ignite as data storage
+         */
+        BUCKET4J_IGNITE,
+
+        /**
+         * Uses Bucket4j Infinispan as data storage
+         */
+        BUCKET4J_INFINISPAN,
+
+        /**
          * Uses a ConcurrentHashMap as data storage
          */
         IN_MEMORY
