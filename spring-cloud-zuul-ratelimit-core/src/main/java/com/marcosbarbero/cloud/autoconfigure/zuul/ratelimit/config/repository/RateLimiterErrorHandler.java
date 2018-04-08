@@ -16,6 +16,11 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
+/**
+ * Handles the backend storage errors.
+ *
+ * @author Liel Chayoun
+ */
 public interface RateLimiterErrorHandler {
 
     void handleSaveError(String key, Exception e);

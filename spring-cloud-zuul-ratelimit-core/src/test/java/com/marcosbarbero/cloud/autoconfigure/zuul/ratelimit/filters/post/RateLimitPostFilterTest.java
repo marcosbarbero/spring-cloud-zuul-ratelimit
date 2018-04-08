@@ -1,5 +1,6 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.post;
 
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.REQUEST_START_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -93,7 +94,7 @@ public class RateLimitPostFilterTest {
     @Test
     public void testShouldFilter() {
         rateLimitProperties.setEnabled(true);
-        when(requestAttributes.getAttribute(RateLimitPreFilter.REQUEST_START_TIME, SCOPE_REQUEST)).thenReturn(System.currentTimeMillis());
+        when(requestAttributes.getAttribute(REQUEST_START_TIME, SCOPE_REQUEST)).thenReturn(System.currentTimeMillis());
         Policy defaultPolicy = new Policy();
         rateLimitProperties.setDefaultPolicyList(Lists.newArrayList(defaultPolicy));
 
@@ -109,7 +110,7 @@ public class RateLimitPostFilterTest {
     @Test
     public void testRun() {
         rateLimitProperties.setEnabled(true);
-        when(requestAttributes.getAttribute(RateLimitPreFilter.REQUEST_START_TIME, SCOPE_REQUEST)).thenReturn(System.currentTimeMillis());
+        when(requestAttributes.getAttribute(REQUEST_START_TIME, SCOPE_REQUEST)).thenReturn(System.currentTimeMillis());
         Policy defaultPolicy = new Policy();
         defaultPolicy.setQuota(2L);
         rateLimitProperties.setDefaultPolicyList(Lists.newArrayList(defaultPolicy));

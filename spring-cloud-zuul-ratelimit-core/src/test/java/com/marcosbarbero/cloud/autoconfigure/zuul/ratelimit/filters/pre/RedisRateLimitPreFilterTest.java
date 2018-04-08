@@ -1,5 +1,6 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.pre;
 
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyLong;
@@ -9,7 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RateLimiterErrorHandler;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RedisRateLimiter;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
+
 import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,14 +63,14 @@ public class RedisRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
         }
 
         String key = "null_serviceA_serviceA_10.0.0.100_anonymous";
-        String remaining = this.response.getHeader(RateLimitPreFilter.REMAINING_HEADER + key);
+        String remaining = this.response.getHeader(HEADER_REMAINING + key);
         assertEquals("0", remaining);
 
         TimeUnit.SECONDS.sleep(2);
 
         when(ops.increment(anyLong())).thenReturn(1L);
         this.filter.run();
-        remaining = this.response.getHeader(RateLimitPreFilter.REMAINING_HEADER + key);
+        remaining = this.response.getHeader(HEADER_REMAINING + key);
         assertEquals("1", remaining);
     }
 }

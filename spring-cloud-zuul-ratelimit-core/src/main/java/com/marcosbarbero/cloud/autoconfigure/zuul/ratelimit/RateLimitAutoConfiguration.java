@@ -71,6 +71,7 @@ import org.springframework.web.util.UrlPathHelper;
 
 /**
  * @author Marcos Barbero
+ * @author Liel Chayoun
  */
 @Configuration
 @EnableConfigurationProperties(RateLimitProperties.class)
@@ -109,6 +110,7 @@ public class RateLimitAutoConfiguration {
         return new DefaultRateLimitKeyGenerator(properties);
     }
 
+    @Configuration
     @ConditionalOnClass(RedisTemplate.class)
     @ConditionalOnMissingBean(RateLimiter.class)
     @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "REDIS")
@@ -126,6 +128,7 @@ public class RateLimitAutoConfiguration {
         }
     }
 
+    @Configuration
     @ConditionalOnConsulEnabled
     @ConditionalOnMissingBean(RateLimiter.class)
     @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "CONSUL")
@@ -139,6 +142,7 @@ public class RateLimitAutoConfiguration {
 
     }
 
+    @Configuration
     @ConditionalOnMissingBean(RateLimiter.class)
     @ConditionalOnClass({JCache.class, Cache.class})
     @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "BUCKET4J_JCACHE")
@@ -151,6 +155,7 @@ public class RateLimitAutoConfiguration {
         }
     }
 
+    @Configuration  
     @ConditionalOnMissingBean(RateLimiter.class)
     @ConditionalOnClass({Hazelcast.class, IMap.class})
     @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "BUCKET4J_HAZELCAST")
@@ -163,6 +168,7 @@ public class RateLimitAutoConfiguration {
         }
     }
 
+    @Configuration
     @ConditionalOnMissingBean(RateLimiter.class)
     @ConditionalOnClass({Ignite.class, IgniteCache.class})
     @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "BUCKET4J_IGNITE")
@@ -175,6 +181,7 @@ public class RateLimitAutoConfiguration {
         }
     }
 
+    @Configuration
     @ConditionalOnMissingBean(RateLimiter.class)
     @ConditionalOnClass({Infinispan.class, ReadWriteMap.class})
     @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "BUCKET4J_INFINISPAN")
@@ -188,6 +195,7 @@ public class RateLimitAutoConfiguration {
     }
 
     @EntityScan
+    @Configuration  
     @EnableJpaRepositories
     @ConditionalOnMissingBean(RateLimiter.class)
     @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "JPA")
@@ -201,6 +209,7 @@ public class RateLimitAutoConfiguration {
 
     }
 
+    @Configuration
     @ConditionalOnMissingBean(RateLimiter.class)
     @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "IN_MEMORY", matchIfMissing = true)
     public static class InMemoryConfiguration {
