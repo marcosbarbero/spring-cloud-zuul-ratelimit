@@ -21,6 +21,7 @@ import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.proper
 import com.ecwid.consul.v1.ConsulClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+import com.hazelcast.core.IMap;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.DefaultRateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
@@ -28,18 +29,30 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.ConsulRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.DefaultRateLimiterErrorHandler;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RateLimiterErrorHandler;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RateLimiterErrorHandler;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RedisRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j.Bucket4jHazelcastRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j.Bucket4jIgniteRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j.Bucket4jInfinispanRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j.Bucket4jJCacheRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata.JpaRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata.RateLimiterRepository;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPostFilter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
 import com.netflix.zuul.ZuulFilter;
+import io.github.bucket4j.grid.GridBucketState;
+import io.github.bucket4j.grid.hazelcast.Hazelcast;
+import io.github.bucket4j.grid.ignite.Ignite;
+import io.github.bucket4j.grid.infinispan.Infinispan;
+import io.github.bucket4j.grid.jcache.JCache;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
+import javax.cache.Cache;
 import lombok.RequiredArgsConstructor;
+import org.apache.ignite.IgniteCache;
+import org.infinispan.functional.FunctionalMap.ReadWriteMap;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -58,6 +71,7 @@ import org.springframework.web.util.UrlPathHelper;
 
 /**
  * @author Marcos Barbero
+ * @author Liel Chayoun
  */
 @Configuration
 @EnableConfigurationProperties(RateLimitProperties.class)
@@ -129,7 +143,59 @@ public class RateLimitAutoConfiguration {
     }
 
     @Configuration
+    @ConditionalOnMissingBean(RateLimiter.class)
+    @ConditionalOnClass({JCache.class, Cache.class})
+    @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "BUCKET4J_JCACHE")
+    public static class Bucket4jJCacheConfiguration {
+
+        @Bean
+        public RateLimiter jCache4jHazelcastRateLimiter(
+            @Qualifier("RateLimit") Cache<String, GridBucketState> cache) {
+            return new Bucket4jJCacheRateLimiter(cache);
+        }
+    }
+
+    @Configuration  
+    @ConditionalOnMissingBean(RateLimiter.class)
+    @ConditionalOnClass({Hazelcast.class, IMap.class})
+    @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "BUCKET4J_HAZELCAST")
+    public static class Bucket4jHazelcastConfiguration {
+
+        @Bean
+        public RateLimiter bucket4jHazelcastRateLimiter(
+            @Qualifier("RateLimit") IMap<String, GridBucketState> rateLimit) {
+            return new Bucket4jHazelcastRateLimiter(rateLimit);
+        }
+    }
+
+    @Configuration
+    @ConditionalOnMissingBean(RateLimiter.class)
+    @ConditionalOnClass({Ignite.class, IgniteCache.class})
+    @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "BUCKET4J_IGNITE")
+    public static class Bucket4jIgniteConfiguration {
+
+        @Bean
+        public RateLimiter bucket4jIgniteRateLimiter(
+            @Qualifier("RateLimit") IgniteCache<String, GridBucketState> cache) {
+            return new Bucket4jIgniteRateLimiter(cache);
+        }
+    }
+
+    @Configuration
+    @ConditionalOnMissingBean(RateLimiter.class)
+    @ConditionalOnClass({Infinispan.class, ReadWriteMap.class})
+    @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "BUCKET4J_INFINISPAN")
+    public static class Bucket4jInfinispanConfiguration {
+
+        @Bean
+        public RateLimiter bucket4jInfinispanRateLimiter(
+            @Qualifier("RateLimit") ReadWriteMap<String, GridBucketState> readWriteMap) {
+            return new Bucket4jInfinispanRateLimiter(readWriteMap);
+        }
+    }
+
     @EntityScan
+    @Configuration  
     @EnableJpaRepositories
     @ConditionalOnMissingBean(RateLimiter.class)
     @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "JPA")

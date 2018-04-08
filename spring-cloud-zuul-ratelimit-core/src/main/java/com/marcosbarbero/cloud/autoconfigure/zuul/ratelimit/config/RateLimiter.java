@@ -24,6 +24,8 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
  */
 public interface RateLimiter {
 
+    String QUOTA_SUFFIX = "-quota";
+
     /**
      * @param policy      Template for which rates should be created in case there's no rate limit associated with the
      *                    key
