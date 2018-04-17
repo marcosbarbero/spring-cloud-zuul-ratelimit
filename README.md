@@ -164,6 +164,10 @@ zuul:
             - user
             - origin
             - url
+        - type: #optional value for each type
+            - user=anonymous
+            - origin=somemachine.com
+            - url=/api #url prefix
 ```
 
 Available implementations
