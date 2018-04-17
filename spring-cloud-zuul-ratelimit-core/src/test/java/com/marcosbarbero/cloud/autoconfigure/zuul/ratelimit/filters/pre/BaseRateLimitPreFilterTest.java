@@ -13,8 +13,10 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyG
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.MatchType;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.commons.TestRouteLocator;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitUtils;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.monitoring.CounterFactory;
 import java.util.Collections;
@@ -48,7 +50,6 @@ public abstract class BaseRateLimitPreFilterTest {
 
     MockHttpServletRequest request;
     MockHttpServletResponse response;
-    RateLimitKeyGenerator rateLimitKeyGenerator;
 
     private RequestContext context;
     private RateLimiter rateLimiter;
@@ -68,7 +69,9 @@ public abstract class BaseRateLimitPreFilterTest {
         policy.setLimit(2L);
         policy.setQuota(2L);
         policy.setRefreshInterval(2L);
-        policy.setType(asList(Policy.Type.ORIGIN, Policy.Type.URL, Policy.Type.USER));
+        policy.getType().add(new MatchType(Policy.Type.ORIGIN, null));
+        policy.getType().add(new MatchType(Policy.Type.URL, null));
+        policy.getType().add(new MatchType(Policy.Type.USER, null));
 
         policies.put("serviceA", Lists.newArrayList(policy));
         properties.setPolicyList(policies);
@@ -91,9 +94,13 @@ public abstract class BaseRateLimitPreFilterTest {
         CounterFactory.initialize(new EmptyCounterFactory());
         this.request = new MockHttpServletRequest();
         this.response = new MockHttpServletResponse();
-        rateLimitKeyGenerator = new DefaultRateLimitKeyGenerator(this.properties());
+        RateLimitProperties properties = this.properties();
+        RateLimitUtils rateLimitUtils = new RateLimitUtils(properties);
+        RateLimitKeyGenerator rateLimitKeyGenerator = new DefaultRateLimitKeyGenerator(properties,
+            rateLimitUtils);
         UrlPathHelper urlPathHelper = new UrlPathHelper();
-        this.filter = new RateLimitPreFilter(this.properties(), this.routeLocator(), urlPathHelper, this.rateLimiter, rateLimitKeyGenerator);
+        this.filter = new RateLimitPreFilter(properties, this.routeLocator(), urlPathHelper, this.rateLimiter,
+            rateLimitKeyGenerator, rateLimitUtils);
         this.context = new RequestContext();
         RequestContext.testSetCurrentContext(this.context);
         RequestContextHolder.setRequestAttributes(requestAttributes);
@@ -146,7 +153,7 @@ public abstract class BaseRateLimitPreFilterTest {
     }
 
     @Test
-    public void testNoRateLimitService() throws Exception {
+    public void testNoRateLimitService() {
         this.request.setRequestURI("/serviceZ");
         this.request.setRemoteAddr("10.0.0.100");
 
@@ -165,7 +172,7 @@ public abstract class BaseRateLimitPreFilterTest {
     }
 
     @Test
-    public void testNoRateLimit() throws Exception {
+    public void testNoRateLimit() {
         this.request.setRequestURI("/serviceB");
         this.request.setRemoteAddr("127.0.0.1");
         assertFalse(this.filter.shouldFilter());

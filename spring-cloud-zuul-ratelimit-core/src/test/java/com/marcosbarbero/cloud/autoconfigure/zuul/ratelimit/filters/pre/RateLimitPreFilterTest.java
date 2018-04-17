@@ -9,6 +9,7 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitUtils;
 import com.netflix.zuul.context.RequestContext;
 import javax.servlet.http.HttpServletRequest;
 import org.junit.Before;
@@ -49,7 +50,8 @@ public class RateLimitPreFilterTest {
         RequestContextHolder.setRequestAttributes(requestAttributes);
         rateLimitProperties = new RateLimitProperties();
         UrlPathHelper urlPathHelper = new UrlPathHelper();
-        target = new RateLimitPreFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter, rateLimitKeyGenerator);
+        RateLimitUtils rateLimitUtils = new RateLimitUtils(rateLimitProperties);
+        target = new RateLimitPreFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter, rateLimitKeyGenerator, rateLimitUtils);
     }
 
     @Test

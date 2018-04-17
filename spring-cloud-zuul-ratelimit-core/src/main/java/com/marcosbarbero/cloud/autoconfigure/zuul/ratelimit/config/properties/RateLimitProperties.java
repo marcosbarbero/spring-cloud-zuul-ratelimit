@@ -22,29 +22,38 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.util.List;
 import java.util.Map;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.validation.annotation.Validated;
 
 /**
  * @author Marcos Barbero
+ * @author Liel Chayoun
  */
 @Data
 @Validated
+@RefreshScope
 @NoArgsConstructor
 @ConfigurationProperties(RateLimitProperties.PREFIX)
 public class RateLimitProperties {
 
     public static final String PREFIX = "zuul.ratelimit";
 
+    @Valid
     private Policy defaultPolicy;
+    @Valid
     @NotNull
     private List<Policy> defaultPolicyList = Lists.newArrayList();
+    @Valid
     @NotNull
     private Map<String, Policy> policies = Maps.newHashMap();
+    @Valid
     @NotNull
     private Map<String, List<Policy>> policyList = Maps.newHashMap();
     private boolean behindProxy;
@@ -52,6 +61,7 @@ public class RateLimitProperties {
     @NotNull
     @Value("${spring.application.name:rate-limit-application}")
     private String keyPrefix;
+    @Valid
     @NotNull
     private Repository repository = Repository.IN_MEMORY;
 
@@ -112,8 +122,20 @@ public class RateLimitProperties {
 
         private Long quota;
 
+        @Valid
         @NotNull
-        private List<Type> type = Lists.newArrayList();
+        private List<MatchType> type = Lists.newArrayList();
+
+        @Data
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class MatchType {
+
+            @Valid
+            @NotNull
+            private Type type;
+            private String matcher;
+        }
 
         public enum Type {
             /**

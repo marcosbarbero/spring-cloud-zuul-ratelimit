@@ -16,19 +16,16 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config;
 
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_FOR_HEADER;
-
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.MatchType;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.Type;
-
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitUtils;
 import java.util.List;
 import java.util.StringJoiner;
-
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
-
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.cloud.netflix.zuul.filters.Route;
 
 /**
@@ -41,13 +38,13 @@ import org.springframework.cloud.netflix.zuul.filters.Route;
 @RequiredArgsConstructor
 public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
 
-    private static final String ANONYMOUS_USER = "anonymous";
 
     private final RateLimitProperties properties;
+    private final RateLimitUtils rateLimitUtils;
 
     @Override
     public String key(final HttpServletRequest request, final Route route, final Policy policy) {
-        final List<Type> types = policy.getType();
+        final List<Type> types = policy.getType().stream().map(MatchType::getType).collect(Collectors.toList());
         final StringJoiner joiner = new StringJoiner(":");
         joiner.add(properties.getKeyPrefix());
         if (route != null) {
@@ -58,20 +55,12 @@ public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
                 joiner.add(route.getPath());
             }
             if (types.contains(Type.ORIGIN)) {
-                joiner.add(getRemoteAddress(request));
+                joiner.add(rateLimitUtils.getRemoteAddress(request));
             }
             if (types.contains(Type.USER)) {
-                joiner.add(request.getRemoteUser() != null ? request.getRemoteUser() : ANONYMOUS_USER);
+                joiner.add(rateLimitUtils.getUser(request));
             }
         }
         return joiner.toString();
-    }
-
-    private String getRemoteAddress(final HttpServletRequest request) {
-        String xForwardedFor = request.getHeader(X_FORWARDED_FOR_HEADER);
-        if (properties.isBehindProxy() && xForwardedFor != null) {
-            return xForwardedFor;
-        }
-        return request.getRemoteAddr();
     }
 }
