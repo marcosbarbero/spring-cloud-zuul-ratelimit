@@ -24,6 +24,7 @@ import static org.springframework.web.context.request.RequestAttributes.SCOPE_RE
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitUtils;
 import com.netflix.zuul.context.RequestContext;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.cloud.netflix.zuul.filters.Route;
@@ -41,10 +42,10 @@ public class RateLimitPostFilter extends AbstractRateLimitFilter {
     private final RateLimiter rateLimiter;
     private final RateLimitKeyGenerator rateLimitKeyGenerator;
 
-    public RateLimitPostFilter(final RateLimitProperties properties, final RouteLocator routeLocator,
-                               final UrlPathHelper urlPathHelper, final RateLimiter rateLimiter,
-                               final RateLimitKeyGenerator rateLimitKeyGenerator) {
-        super(properties, routeLocator, urlPathHelper);
+    public RateLimitPostFilter(RateLimitProperties properties, RouteLocator routeLocator,
+                               UrlPathHelper urlPathHelper, RateLimiter rateLimiter,
+                               RateLimitKeyGenerator rateLimitKeyGenerator, RateLimitUtils rateLimitUtils) {
+        super(properties, routeLocator, urlPathHelper, rateLimitKeyGenerator, rateLimitUtils);
         this.rateLimiter = rateLimiter;
         this.rateLimitKeyGenerator = rateLimitKeyGenerator;
     }
@@ -71,13 +72,13 @@ public class RateLimitPostFilter extends AbstractRateLimitFilter {
 
     @Override
     public Object run() {
-        final RequestContext ctx = RequestContext.getCurrentContext();
-        final HttpServletRequest request = ctx.getRequest();
-        final Route route = route();
+        RequestContext ctx = RequestContext.getCurrentContext();
+        HttpServletRequest request = ctx.getRequest();
+        Route route = route(request);
 
-        policy(route).forEach(policy -> {
-            final Long requestTime = System.currentTimeMillis() - getRequestStartTime();
-            final String key = rateLimitKeyGenerator.key(request, route, policy);
+        policy(route, request).forEach(policy -> {
+            Long requestTime = System.currentTimeMillis() - getRequestStartTime();
+            String key = rateLimitKeyGenerator.key(request, route, policy);
             rateLimiter.consume(policy, key, requestTime > 0 ? requestTime : 1);
         });
 

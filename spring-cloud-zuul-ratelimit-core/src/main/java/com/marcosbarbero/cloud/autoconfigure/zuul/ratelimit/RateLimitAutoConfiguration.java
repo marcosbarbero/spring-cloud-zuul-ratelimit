@@ -40,6 +40,8 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.sp
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata.RateLimiterRepository;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPostFilter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitUtils;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.StringToMatchTypeConverter;
 import com.netflix.zuul.ZuulFilter;
 import io.github.bucket4j.grid.GridBucketState;
 import io.github.bucket4j.grid.hazelcast.Hazelcast;
@@ -54,10 +56,12 @@ import lombok.RequiredArgsConstructor;
 import org.apache.ignite.IgniteCache;
 import org.infinispan.functional.FunctionalMap.ReadWriteMap;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
@@ -78,7 +82,11 @@ import org.springframework.web.util.UrlPathHelper;
 @ConditionalOnProperty(prefix = PREFIX, name = "enabled", havingValue = "true")
 public class RateLimitAutoConfiguration {
 
-    private final UrlPathHelper urlPathHelper = new UrlPathHelper();
+    @Bean
+    @ConfigurationPropertiesBinding
+    public StringToMatchTypeConverter stringToMatchTypeConverter() {
+        return new StringToMatchTypeConverter();
+    }
 
     @Bean
     @ConditionalOnMissingBean(RateLimiterErrorHandler.class)
@@ -87,27 +95,28 @@ public class RateLimitAutoConfiguration {
     }
 
     @Bean
-    public ZuulFilter rateLimiterPreFilter(final RateLimiter rateLimiter,
-                                           final RateLimitProperties rateLimitProperties,
-                                           final RouteLocator routeLocator,
-                                           final RateLimitKeyGenerator rateLimitKeyGenerator) {
-        return new RateLimitPreFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter,
-                rateLimitKeyGenerator);
+    public RateLimitUtils rateLimitUtils(RateLimitProperties rateLimitProperties) {
+        return new RateLimitUtils(rateLimitProperties);
     }
 
     @Bean
-    public ZuulFilter rateLimiterPostFilter(final RateLimiter rateLimiter,
-                                            final RateLimitProperties rateLimitProperties,
-                                            final RouteLocator routeLocator,
-                                            final RateLimitKeyGenerator rateLimitKeyGenerator) {
-        return new RateLimitPostFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter,
-                rateLimitKeyGenerator);
+    public ZuulFilter rateLimiterPreFilter(RateLimiter rateLimiter, RateLimitProperties rateLimitProperties,
+        RouteLocator routeLocator, RateLimitKeyGenerator rateLimitKeyGenerator, RateLimitUtils rateLimitUtils) {
+        return new RateLimitPreFilter(rateLimitProperties, routeLocator, new UrlPathHelper(), rateLimiter,
+                rateLimitKeyGenerator, rateLimitUtils);
+    }
+
+    @Bean
+    public ZuulFilter rateLimiterPostFilter(RateLimiter rateLimiter, RateLimitProperties rateLimitProperties,
+        RouteLocator routeLocator, RateLimitKeyGenerator rateLimitKeyGenerator, RateLimitUtils rateLimitUtils) {
+        return new RateLimitPostFilter(rateLimitProperties, routeLocator, new UrlPathHelper(), rateLimiter,
+                rateLimitKeyGenerator, rateLimitUtils);
     }
 
     @Bean
     @ConditionalOnMissingBean(RateLimitKeyGenerator.class)
-    public RateLimitKeyGenerator ratelimitKeyGenerator(final RateLimitProperties properties) {
-        return new DefaultRateLimitKeyGenerator(properties);
+    public RateLimitKeyGenerator ratelimitKeyGenerator(RateLimitProperties properties, RateLimitUtils rateLimitUtils) {
+        return new DefaultRateLimitKeyGenerator(properties, rateLimitUtils);
     }
 
     @Configuration
@@ -117,13 +126,13 @@ public class RateLimitAutoConfiguration {
     public static class RedisConfiguration {
 
         @Bean("rateLimiterRedisTemplate")
-        public StringRedisTemplate redisTemplate(final RedisConnectionFactory connectionFactory) {
+        public StringRedisTemplate redisTemplate(RedisConnectionFactory connectionFactory) {
             return new StringRedisTemplate(connectionFactory);
         }
 
         @Bean
         public RateLimiter redisRateLimiter(RateLimiterErrorHandler rateLimiterErrorHandler,
-            @Qualifier("rateLimiterRedisTemplate") final RedisTemplate redisTemplate) {
+            @Qualifier("rateLimiterRedisTemplate") RedisTemplate redisTemplate) {
             return new RedisRateLimiter(rateLimiterErrorHandler, redisTemplate);
         }
     }
@@ -135,8 +144,8 @@ public class RateLimitAutoConfiguration {
     public static class ConsulConfiguration {
 
         @Bean
-        public RateLimiter consultRateLimiter(final RateLimiterErrorHandler rateLimiterErrorHandler,
-            final ConsulClient consulClient, final ObjectMapper objectMapper) {
+        public RateLimiter consultRateLimiter(RateLimiterErrorHandler rateLimiterErrorHandler,
+            ConsulClient consulClient, ObjectMapper objectMapper) {
             return new ConsulRateLimiter(rateLimiterErrorHandler, consulClient, objectMapper);
         }
 
@@ -202,8 +211,8 @@ public class RateLimitAutoConfiguration {
     public static class SpringDataConfiguration {
 
         @Bean
-        public RateLimiter springDataRateLimiter(final RateLimiterErrorHandler rateLimiterErrorHandler,
-            final RateLimiterRepository rateLimiterRepository) {
+        public RateLimiter springDataRateLimiter(RateLimiterErrorHandler rateLimiterErrorHandler,
+            RateLimiterRepository rateLimiterRepository) {
             return new JpaRateLimiter(rateLimiterErrorHandler, rateLimiterRepository);
         }
 
@@ -215,7 +224,7 @@ public class RateLimitAutoConfiguration {
     public static class InMemoryConfiguration {
 
         @Bean
-        public RateLimiter inMemoryRateLimiter(final RateLimiterErrorHandler rateLimiterErrorHandler) {
+        public RateLimiter inMemoryRateLimiter(RateLimiterErrorHandler rateLimiterErrorHandler) {
             return new InMemoryRateLimiter(rateLimiterErrorHandler);
         }
     }
