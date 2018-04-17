@@ -18,6 +18,7 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bu
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j.Bucket4jIgniteRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j.Bucket4jInfinispanRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j.Bucket4jJCacheRateLimiter;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.StringToMatchTypeConverter;
 import com.netflix.zuul.ZuulFilter;
 import io.github.bucket4j.grid.GridBucketState;
 import java.util.List;
@@ -64,6 +65,13 @@ public class RateLimitAutoConfigurationTest {
         if (this.context != null) {
             this.context.close();
         }
+    }
+
+    @Test
+    public void testStringToMatchTypeConverter() {
+        this.context.refresh();
+
+        Assert.assertNotNull(this.context.getBean(StringToMatchTypeConverter.class));
     }
 
     @Test
