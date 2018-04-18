@@ -1,17 +1,6 @@
 #!/usr/bin/env bash
 
-#mvn -pl '!spring-cloud-zuul-ratelimit-coverage' clean deploy -Pdeploy-parent -fn
-
-
-
-#mvn deploy:deploy-file \
-#-DgroupId=com.marcosbarbero.cloud \
-#-DartifactId=spring-cloud-zuul-ratelimit-parent \
-#-Dversion=1.6.0.RELEASE -DgeneratePom=false \
-#-Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ \
-#-Dpackaging=pom \
-#-DrepositoryId=ossrh \
-#-Dfile=target/spring-cloud-zuul-ratelimit-parent-1.6.0.RELEASE.pom
-
-# mvn clean deploy -Pdeploy-parent -N
-
+if [[ $TRAVIS_COMMIT_MESSAGE == *"[ci deploy]"* ]]; then
+  mvn --settings ./settings.xml -B -f ../pom.xml clean deploy -Pdeploy-parent -N
+  mvn --settings ./settings.xml -B -f ../pom.xml clean deploy -Pdeploy -N
+fi
