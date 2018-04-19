@@ -1,4 +1,0 @@
-logging:
-  level:
-    com.springframework: error
-    com.marcosbarbero: warn
