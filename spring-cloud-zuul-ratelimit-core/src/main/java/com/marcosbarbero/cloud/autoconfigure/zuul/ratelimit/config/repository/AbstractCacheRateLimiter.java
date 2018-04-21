@@ -43,5 +43,6 @@ public abstract class AbstractCacheRateLimiter implements RateLimiter {
     }
 
     protected abstract void calcRemainingLimit(Long limit, Long refreshInterval, Long requestTime, String key, Rate rate);
+
     protected abstract void calcRemainingQuota(Long quota, Long refreshInterval, Long requestTime, String key, Rate rate);
 }

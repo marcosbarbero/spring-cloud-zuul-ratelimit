@@ -38,7 +38,6 @@ import org.springframework.cloud.netflix.zuul.filters.Route;
 @RequiredArgsConstructor
 public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
 
-
     private final RateLimitProperties properties;
     private final RateLimitUtils rateLimitUtils;
 
