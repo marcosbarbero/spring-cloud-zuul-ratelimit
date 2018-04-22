@@ -68,6 +68,7 @@ zuul:
 
 logging:
   level:
+    org.springframework: error
     com:
-      springframework: error
       marcosbarbero: error
+      netflix: error
