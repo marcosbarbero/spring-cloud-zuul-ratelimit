@@ -15,8 +15,8 @@ install:
  - mvn --settings .ci/settings.xml install -Dmaven.test.skip=true -Dgpg.skip -Dmaven.javadoc.skip=true
 
 before_install:
-  - if [ ! -z "$GPG_SECRET_KEYS" ]; then export GPG_EXECUTABLE="$(echo $GPG_SECRET_KEYS | base64 --decode)"; fi
-  - if [ ! -z "$GPG_OWNERTRUST" ]; then export GPG_EXECUTABLE="$(echo $GPG_OWNERTRUST | base64 --decode)"; fi
+  - if [ ! -z "$GPG_SECRET_KEYS" ]; then echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import; fi
+  - if [ ! -z "$GPG_OWNERTRUST" ]; then echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust; fi
 
 after_success:
  - mvn -pl '!spring-cloud-zuul-ratelimit-dependencies' clean org.jacoco:jacoco-maven-plugin:prepare-agent verify jacoco:report sonar:sonar coveralls:report
