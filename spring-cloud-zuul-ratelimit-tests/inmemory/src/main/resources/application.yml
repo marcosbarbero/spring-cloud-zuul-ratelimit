@@ -40,3 +40,9 @@ zuul:
         type:
           - origin
   strip-prefix: true
+
+logging:
+  level:
+    com:
+      springframework: error
+      marcosbarbero: error
