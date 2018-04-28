@@ -132,7 +132,7 @@ Add the following dependency accordingly to the chosen data storage:
 
 * InMemory
 
-  For `InMemory` implementation there's no need to add any extra dependency other than
+For `InMemory` implementation there's no need to add any extra dependency other than
    `com.marcosbarbero.cloud:spring-cloud-zuul-ratelimit` 
 
 Sample configuration
