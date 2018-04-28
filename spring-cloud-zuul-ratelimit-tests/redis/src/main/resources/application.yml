@@ -41,7 +41,3 @@ zuul:
         type:
           - origin
   strip-prefix: true
-
-logging:
-  level:
-    ROOT: error
