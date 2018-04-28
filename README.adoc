@@ -41,6 +41,7 @@ Add the following dependency accordingly to the chosen data storage:
 
 
 * Redis
+
 [source, xml]
 ----
 <dependency>
@@ -48,7 +49,9 @@ Add the following dependency accordingly to the chosen data storage:
     <artifactId>spring-boot-starter-data-redis</artifactId>
 </dependency>
 ----
+
 * Consul
+
 [source, xml]
 ----
 <dependency>
@@ -56,7 +59,9 @@ Add the following dependency accordingly to the chosen data storage:
    <artifactId>spring-cloud-starter-consul</artifactId>
 </dependency>
 ----
+
 * Spring Data JPA
+
 [source, xml]
 ----
 <dependency>
@@ -64,7 +69,9 @@ Add the following dependency accordingly to the chosen data storage:
    <artifactId>spring-boot-starter-data-jpa</artifactId>
 </dependency>
 ----
+
 * Bucket4j JCache
+
 [source, xml]
 ----
 <dependency>
@@ -80,7 +87,9 @@ Add the following dependency accordingly to the chosen data storage:
      <artifactId>cache-api</artifactId>
 </dependency>
 ----
+
 * Bucket4j Hazelcast (depends on Bucket4j JCache)
+
 [source, xml]
 ----
 <dependency>
@@ -92,7 +101,9 @@ Add the following dependency accordingly to the chosen data storage:
      <artifactId>hazelcast</artifactId>
 </dependency>
 ----
+
 * Bucket4j Infinispan (depends on Bucket4j JCache)
+
 [source, xml]
 ----
 <dependency>
@@ -104,7 +115,9 @@ Add the following dependency accordingly to the chosen data storage:
      <artifactId>infinispan-core</artifactId>
 </dependency>
 ----
+
 * Bucket4j Ignite (depends on Bucket4j JCache)
+
 [source, xml]
 ----
 <dependency>
@@ -116,6 +129,7 @@ Add the following dependency accordingly to the chosen data storage:
      <artifactId>ignite-core</artifactId>
 </dependency>
 ----
+
 * InMemory
 
   For `InMemory` implementation there's no need to add any extra dependency other than
