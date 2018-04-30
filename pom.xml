@@ -50,7 +50,10 @@
             <id>marcosbarbero</id>
             <email>marcos.hgb@gmail.com</email>
             <name>Marcos Barbero</name>
-            <timezone>CET</timezone>
+            <timezone>Europe/Amsterdam</timezone>
+            <roles>
+                <role>Project Lead</role>
+            </roles>
         </developer>
 
         <developer>
@@ -58,6 +61,9 @@
             <email>lchayoun@gmail.com</email>
             <name>Liel Chayoun</name>
             <timezone>CET</timezone>
+            <roles>
+                <role>Project Lead</role>
+            </roles>
         </developer>
 
     </developers>
