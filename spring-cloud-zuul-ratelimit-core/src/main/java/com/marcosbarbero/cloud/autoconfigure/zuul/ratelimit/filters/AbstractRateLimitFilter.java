@@ -42,7 +42,7 @@ import org.springframework.web.util.UrlPathHelper;
 @RequiredArgsConstructor
 public abstract class AbstractRateLimitFilter extends ZuulFilter {
 
-    private final RateLimitProperties properties;
+    protected final RateLimitProperties properties;
     private final RouteLocator routeLocator;
     private final UrlPathHelper urlPathHelper;
     private final RateLimitKeyGenerator rateLimitKeyGenerator;

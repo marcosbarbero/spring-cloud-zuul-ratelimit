@@ -17,16 +17,19 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORM_BODY_WRAPPER_FILTER_ORDER;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_RESPONSE_FILTER_ORDER;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import java.util.List;
-import java.util.Map;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -41,7 +44,7 @@ import org.springframework.validation.annotation.Validated;
 @RefreshScope
 @NoArgsConstructor
 @ConfigurationProperties(RateLimitProperties.PREFIX)
-public class RateLimitProperties {
+public class RateLimitProperties implements InitializingBean {
 
     public static final String PREFIX = "zuul.ratelimit";
 
@@ -64,6 +67,21 @@ public class RateLimitProperties {
     @Valid
     @NotNull
     private Repository repository = Repository.IN_MEMORY;
+    private int postFilterOrder = SEND_RESPONSE_FILTER_ORDER - 10;
+    private int preFilterOrder = FORM_BODY_WRAPPER_FILTER_ORDER;
+
+    @Override
+    public void afterPropertiesSet() {
+        validateFiltersOrder();
+    }
+
+    private void validateFiltersOrder() {
+        if (postFilterOrder <= preFilterOrder) {
+            throw new IllegalArgumentException(
+                    "Value of postFilterOrder must be greater than preFilterOrder. " +
+                            "(postFilterOrder=" + postFilterOrder + ", preFilterOrder=" + preFilterOrder);
+        }
+    }
 
     public enum Repository {
         /**
