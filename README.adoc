@@ -240,8 +240,8 @@ Property namespace: __zuul.ratelimit__
 |policies      |Map of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86[Policy]| -
 |default-policy-list|List of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86[Policy]| -
 |policy-list      |Map of Lists of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86[Policy]| -
-|postFilterOrder|int | $SEND_RESPONSE_FILTER_ORDER - 10
-|preFilterOrder|int | $FORM_BODY_WRAPPER_FILTER_ORDER
+|postFilterOrder|int | FilterConstants.SEND_RESPONSE_FILTER_ORDER - 10
+|preFilterOrder|int | FilterConstants.FORM_BODY_WRAPPER_FILTER_ORDER
 
 |===
 

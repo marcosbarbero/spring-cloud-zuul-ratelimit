@@ -29,10 +29,11 @@ import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
 
 /**
@@ -44,7 +45,7 @@ import org.springframework.validation.annotation.Validated;
 @RefreshScope
 @NoArgsConstructor
 @ConfigurationProperties(RateLimitProperties.PREFIX)
-public class RateLimitProperties implements InitializingBean {
+public class RateLimitProperties implements Validator {
 
     public static final String PREFIX = "zuul.ratelimit";
 
@@ -71,15 +72,20 @@ public class RateLimitProperties implements InitializingBean {
     private int preFilterOrder = FORM_BODY_WRAPPER_FILTER_ORDER;
 
     @Override
-    public void afterPropertiesSet() {
-        validateFiltersOrder();
+    public boolean supports(Class<?> clazz) {
+        return RateLimitProperties.class.isAssignableFrom(clazz);
     }
 
-    private void validateFiltersOrder() {
-        if (postFilterOrder <= preFilterOrder) {
-            throw new IllegalArgumentException(
-                    "Value of postFilterOrder must be greater than preFilterOrder. " +
-                            "(postFilterOrder=" + postFilterOrder + ", preFilterOrder=" + preFilterOrder);
+    @Override
+    public void validate(Object target, Errors errors) {
+        RateLimitProperties resource = (RateLimitProperties) target;
+        validate(resource, errors);
+    }
+
+    private void validate(RateLimitProperties target, Errors errors) {
+        if (target.postFilterOrder <= target.preFilterOrder) {
+            String[] errorArgs = {"postFilterOrder", "preFilterOrder"};
+            errors.reject("filters.order", errorArgs,"Value of postFilterOrder must be greater than preFilterOrder.");
         }
     }
 
