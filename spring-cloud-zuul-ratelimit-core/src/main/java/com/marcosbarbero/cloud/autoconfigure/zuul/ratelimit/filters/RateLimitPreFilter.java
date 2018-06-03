@@ -23,7 +23,6 @@ import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateL
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_RESET;
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.REQUEST_START_TIME;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORM_BODY_WRAPPER_FILTER_ORDER;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 import static org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST;
 
@@ -49,6 +48,7 @@ import org.springframework.web.util.UrlPathHelper;
  */
 public class RateLimitPreFilter extends AbstractRateLimitFilter {
 
+    private final RateLimitProperties properties;
     private final RateLimiter rateLimiter;
     private final RateLimitKeyGenerator rateLimitKeyGenerator;
 
@@ -56,6 +56,7 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
         UrlPathHelper urlPathHelper, RateLimiter rateLimiter, RateLimitKeyGenerator rateLimitKeyGenerator,
         RateLimitUtils rateLimitUtils) {
         super(properties, routeLocator, urlPathHelper, rateLimitKeyGenerator, rateLimitUtils);
+        this.properties = properties;
         this.rateLimiter = rateLimiter;
         this.rateLimitKeyGenerator = rateLimitKeyGenerator;
     }
@@ -67,7 +68,7 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
 
     @Override
     public int filterOrder() {
-        return FORM_BODY_WRAPPER_FILTER_ORDER;
+        return properties.getPreFilterOrder();
     }
 
     @Override
