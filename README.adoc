@@ -270,8 +270,8 @@ implementation adding further qualifiers or something entirely different:
 [source, java]
 ----
   @Bean
-  public RateLimitKeyGenerator rateLimitKeyGenerator(final RateLimitProperties properties) {
-      return new DefaultRateLimitKeyGenerator(properties) {
+  public RateLimitKeyGenerator ratelimitKeyGenerator(RateLimitProperties properties, RateLimitUtils rateLimitUtils) {
+      return new DefaultRateLimitKeyGenerator(properties, rateLimitUtils) {
           @Override
           public String key(HttpServletRequest request, Route route, RateLimitProperties.Policy policy) {
               return super.key(request, route, policy) + ":" + request.getMethod();
