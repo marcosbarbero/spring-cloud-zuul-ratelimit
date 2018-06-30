@@ -60,6 +60,12 @@
             <artifactId>infinispan-core</artifactId>
             <version>9.2.1.Final</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-commons</artifactId>
+            <version>9.2.1.Final</version>
+        </dependency>
     </dependencies>
 
     <build>
