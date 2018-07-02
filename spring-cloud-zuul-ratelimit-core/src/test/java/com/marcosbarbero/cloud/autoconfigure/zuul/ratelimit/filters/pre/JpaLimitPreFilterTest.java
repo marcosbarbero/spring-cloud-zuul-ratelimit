@@ -9,6 +9,7 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.Ra
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata.JpaRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata.RateLimiterRepository;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import org.junit.Before;
 
@@ -28,9 +29,9 @@ public class JpaLimitPreFilterTest extends BaseRateLimitPreFilterTest {
             repository.put(rate.getKey(), rate);
             return rate;
         });
-        when(rateLimiterRepository.findOne(any())).thenAnswer(invocationOnMock -> {
+        when(rateLimiterRepository.findById(any())).thenAnswer(invocationOnMock -> {
             String key = invocationOnMock.getArgument(0);
-            return repository.get(key);
+            return Optional.of(repository.get(key));
         });
         RateLimiterErrorHandler rateLimiterErrorHandler = mock(RateLimiterErrorHandler.class);
         this.setRateLimiter(new JpaRateLimiter(rateLimiterErrorHandler, rateLimiterRepository));
