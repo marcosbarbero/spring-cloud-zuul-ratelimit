@@ -112,6 +112,17 @@ public class DefaultRateLimitKeyGeneratorTest {
     }
 
     @Test
+    public void testKeyOriginBehindProxyWithMultipleXForwardedFor() {
+        Policy policy = new Policy();
+        policy.getType().add(new MatchType(Type.ORIGIN, null));
+        properties.setBehindProxy(true);
+        when(httpServletRequest.getHeader(X_FORWARDED_FOR_HEADER)).thenReturn("1stHeaderAddress, 2ndAddressHeader");
+
+        String key = target.key(httpServletRequest, route, policy);
+        assertThat(key).isEqualTo("key-prefix:id:1stHeaderAddress");
+    }
+
+    @Test
     public void testKeyUserNullPrincipal() {
         Policy policy = new Policy();
         policy.getType().add(new MatchType(Type.USER, null));
