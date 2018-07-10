@@ -18,7 +18,6 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.REQUEST_START_TIME;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
-import static org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
@@ -28,8 +27,6 @@ import com.netflix.zuul.context.RequestContext;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.util.UrlPathHelper;
 
 /**
@@ -45,7 +42,7 @@ public class RateLimitPostFilter extends AbstractRateLimitFilter {
     public RateLimitPostFilter(RateLimitProperties properties, RouteLocator routeLocator,
                                UrlPathHelper urlPathHelper, RateLimiter rateLimiter,
                                RateLimitKeyGenerator rateLimitKeyGenerator, RateLimitUtils rateLimitUtils) {
-        super(properties, routeLocator, urlPathHelper, rateLimitKeyGenerator, rateLimitUtils);
+        super(properties, routeLocator, urlPathHelper, rateLimitUtils);
         this.properties = properties;
         this.rateLimiter = rateLimiter;
         this.rateLimitKeyGenerator = rateLimitKeyGenerator;
@@ -67,8 +64,9 @@ public class RateLimitPostFilter extends AbstractRateLimitFilter {
     }
 
     private Long getRequestStartTime() {
-        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        return (Long) requestAttributes.getAttribute(REQUEST_START_TIME, SCOPE_REQUEST);
+        final RequestContext ctx = RequestContext.getCurrentContext();
+        final HttpServletRequest request = ctx.getRequest();
+        return (Long) request.getAttribute(REQUEST_START_TIME);
     }
 
     @Override

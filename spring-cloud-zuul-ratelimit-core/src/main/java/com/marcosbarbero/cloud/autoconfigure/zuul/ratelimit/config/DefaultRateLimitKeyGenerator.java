@@ -21,11 +21,10 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.MatchType;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.Type;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitUtils;
-import java.util.List;
 import java.util.StringJoiner;
-import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 
 /**
@@ -43,23 +42,31 @@ public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
 
     @Override
     public String key(final HttpServletRequest request, final Route route, final Policy policy) {
-        final List<Type> types = policy.getType().stream().map(MatchType::getType).collect(Collectors.toList());
         final StringJoiner joiner = new StringJoiner(":");
         joiner.add(properties.getKeyPrefix());
         if (route != null) {
             joiner.add(route.getId());
         }
-        if (!types.isEmpty()) {
-            if (types.contains(Type.URL) && route != null) {
+        policy.getType().forEach(matchType -> {
+            if (route != null && Type.URL.equals(matchType.getType())) {
                 joiner.add(route.getPath());
+                addMatcher(joiner, matchType);
             }
-            if (types.contains(Type.ORIGIN)) {
+            if (Type.ORIGIN.equals(matchType.getType())) {
                 joiner.add(rateLimitUtils.getRemoteAddress(request));
+                addMatcher(joiner, matchType);
             }
-            if (types.contains(Type.USER)) {
+            if (Type.USER.equals(matchType.getType())) {
                 joiner.add(rateLimitUtils.getUser(request));
+                addMatcher(joiner, matchType);
             }
-        }
+        });
         return joiner.toString();
+    }
+
+    private void addMatcher(StringJoiner joiner, MatchType matchType) {
+        if (StringUtils.isNotEmpty(matchType.getMatcher())) {
+            joiner.add(matchType.getMatcher());
+        }
     }
 }

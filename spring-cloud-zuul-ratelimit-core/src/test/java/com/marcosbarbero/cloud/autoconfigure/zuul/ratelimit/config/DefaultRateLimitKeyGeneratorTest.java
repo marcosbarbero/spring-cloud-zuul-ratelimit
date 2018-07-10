@@ -64,12 +64,30 @@ public class DefaultRateLimitKeyGeneratorTest {
     }
 
     @Test
+    public void testKeyUrlWithMatcher() {
+        Policy policy = new Policy();
+        policy.getType().add(new MatchType(Type.URL, "matcherURL"));
+
+        String key = target.key(httpServletRequest, route, policy);
+        assertThat(key).isEqualTo("key-prefix:id:/**:matcherURL");
+    }
+
+    @Test
     public void testKeyOrigin() {
         Policy policy = new Policy();
         policy.getType().add(new MatchType(Type.ORIGIN, null));
 
         String key = target.key(httpServletRequest, route, policy);
         assertThat(key).isEqualTo("key-prefix:id:remote");
+    }
+
+    @Test
+    public void testKeyOriginWithMatcher() {
+        Policy policy = new Policy();
+        policy.getType().add(new MatchType(Type.ORIGIN, "matcherOrigin"));
+
+        String key = target.key(httpServletRequest, route, policy);
+        assertThat(key).isEqualTo("key-prefix:id:remote:matcherOrigin");
     }
 
     @Test
@@ -110,5 +128,15 @@ public class DefaultRateLimitKeyGeneratorTest {
 
         String key = target.key(httpServletRequest, route, policy);
         assertThat(key).isEqualTo("key-prefix:id:user");
+    }
+
+    @Test
+    public void testKeyUserWithMatcher() {
+        Policy policy = new Policy();
+        policy.getType().add(new MatchType(Type.USER, "matcherUser"));
+        when(httpServletRequest.getRemoteUser()).thenReturn("user");
+
+        String key = target.key(httpServletRequest, route, policy);
+        assertThat(key).isEqualTo("key-prefix:id:user:matcherUser");
     }
 }
