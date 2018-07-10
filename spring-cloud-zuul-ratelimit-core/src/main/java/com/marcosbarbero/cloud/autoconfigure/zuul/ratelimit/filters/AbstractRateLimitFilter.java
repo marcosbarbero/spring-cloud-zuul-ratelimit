@@ -16,7 +16,6 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.MatchType;
@@ -25,9 +24,7 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitUti
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +42,6 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
     private final RateLimitProperties properties;
     private final RouteLocator routeLocator;
     private final UrlPathHelper urlPathHelper;
-    private final RateLimitKeyGenerator rateLimitKeyGenerator;
     private final RateLimitUtils rateLimitUtils;
 
     @Override
@@ -60,15 +56,15 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
     }
 
     protected List<Policy> policy(Route route, HttpServletRequest request) {
-        Map<String, Policy> policyMap = properties.getDefaultPolicyList().stream()
-            .collect(Collectors.toMap(policy -> rateLimitKeyGenerator.key(request, route, policy), Function.identity()));
-        if (route != null) {
-            properties.getPolicies(route.getId()).forEach(policy ->
-                policyMap.put(rateLimitKeyGenerator.key(request, route, policy), policy));
-        }
-        return policyMap.values().stream()
+        List<Policy> applicablePolicies = properties.getDefaultPolicyList().stream()
             .filter(policy -> applyPolicy(request, route, policy))
             .collect(Collectors.toList());
+        if (route != null) {
+            properties.getPolicies(route.getId()).stream()
+                .filter(policy -> applyPolicy(request, route, policy))
+                .forEach(applicablePolicies::add);
+        }
+        return applicablePolicies;
     }
 
     private boolean applyPolicy(HttpServletRequest request, Route route, Policy policy) {

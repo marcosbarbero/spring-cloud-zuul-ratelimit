@@ -1,8 +1,10 @@
 package com.marcosbarbero.tests;
 
 import io.github.bucket4j.grid.GridBucketState;
+import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
 import org.apache.ignite.Ignition;
+import org.apache.ignite.configuration.IgniteConfiguration;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.cloud.client.SpringCloudApplication;
@@ -12,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.PreDestroy;
 
 /**
  * @author Liel Chayoun
@@ -25,10 +29,18 @@ public class Bucket4jJCacheApplication {
         SpringApplication.run(Bucket4jJCacheApplication.class, args);
     }
 
+    private Ignite ignite;
+
     @Bean
     @Qualifier("RateLimit")
     public IgniteCache<String, GridBucketState> cache() {
-        return Ignition.start().createCache("rateLimit");
+        ignite = Ignition.getOrStart(new IgniteConfiguration());
+        return ignite.getOrCreateCache("rateLimit");
+    }
+
+    @PreDestroy
+    public void destroy() {
+        ignite.destroyCache("rateLimit");
     }
 
     @RestController

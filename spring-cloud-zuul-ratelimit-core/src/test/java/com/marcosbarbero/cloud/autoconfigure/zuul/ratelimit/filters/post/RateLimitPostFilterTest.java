@@ -8,7 +8,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST;
 
 import com.google.common.collect.Lists;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
@@ -95,7 +94,7 @@ public class RateLimitPostFilterTest {
     @Test
     public void testShouldFilter() {
         rateLimitProperties.setEnabled(true);
-        when(requestAttributes.getAttribute(REQUEST_START_TIME, SCOPE_REQUEST)).thenReturn(System.currentTimeMillis());
+        when(httpServletRequest.getAttribute(REQUEST_START_TIME)).thenReturn(System.currentTimeMillis());
         Policy defaultPolicy = new Policy();
         rateLimitProperties.setDefaultPolicyList(Lists.newArrayList(defaultPolicy));
 
@@ -111,7 +110,7 @@ public class RateLimitPostFilterTest {
     @Test
     public void testRun() {
         rateLimitProperties.setEnabled(true);
-        when(requestAttributes.getAttribute(REQUEST_START_TIME, SCOPE_REQUEST)).thenReturn(System.currentTimeMillis());
+        when(httpServletRequest.getAttribute(REQUEST_START_TIME)).thenReturn(System.currentTimeMillis());
         Policy defaultPolicy = new Policy();
         defaultPolicy.setQuota(2L);
         rateLimitProperties.setDefaultPolicyList(Lists.newArrayList(defaultPolicy));

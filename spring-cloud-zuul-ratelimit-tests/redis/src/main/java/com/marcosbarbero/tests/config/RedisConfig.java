@@ -1,17 +1,12 @@
 package com.marcosbarbero.tests.config;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
-
-import java.io.IOException;
-import java.net.Socket;
-
-import javax.annotation.PreDestroy;
-
 import redis.embedded.RedisServer;
 
-import static redis.clients.jedis.Protocol.DEFAULT_PORT;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import java.io.IOException;
+import java.net.Socket;
 
 /**
  * Embedded redis configuration.
@@ -21,6 +16,8 @@ import static redis.clients.jedis.Protocol.DEFAULT_PORT;
  */
 @Configuration
 public class RedisConfig {
+
+    private static final int DEFAULT_PORT = 6379;
 
     private RedisServer redisServer;
 
@@ -32,13 +29,12 @@ public class RedisConfig {
         }
     }
 
-    @Bean
-    public JedisConnectionFactory connectionFactory() throws IOException {
+    @PostConstruct
+    public void setUp() throws IOException {
         this.redisServer = new RedisServer(DEFAULT_PORT);
         if (available(DEFAULT_PORT)) {
             this.redisServer.start();
         }
-        return new JedisConnectionFactory();
     }
 
     @PreDestroy
