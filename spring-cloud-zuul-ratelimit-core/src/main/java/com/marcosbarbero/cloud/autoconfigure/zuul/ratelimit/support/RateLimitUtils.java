@@ -40,7 +40,7 @@ public final class RateLimitUtils {
     public String getRemoteAddress(HttpServletRequest request) {
         String xForwardedFor = request.getHeader(X_FORWARDED_FOR_HEADER);
         if (properties.isBehindProxy() && xForwardedFor != null) {
-            return xForwardedFor.split(",")[0];
+            return xForwardedFor.split(",")[0].trim();
         }
         return request.getRemoteAddr();
     }
