@@ -25,6 +25,7 @@ import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -56,15 +57,10 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
     }
 
     protected List<Policy> policy(Route route, HttpServletRequest request) {
-        List<Policy> applicablePolicies = properties.getDefaultPolicyList().stream()
+        String routeId = Optional.ofNullable(route).map(Route::getId).orElse(null);
+        return properties.getPolicies(routeId).stream()
             .filter(policy -> applyPolicy(request, route, policy))
             .collect(Collectors.toList());
-        if (route != null) {
-            properties.getPolicies(route.getId()).stream()
-                .filter(policy -> applyPolicy(request, route, policy))
-                .forEach(applicablePolicies::add);
-        }
-        return applicablePolicies;
     }
 
     private boolean applyPolicy(HttpServletRequest request, Route route, Policy policy) {
