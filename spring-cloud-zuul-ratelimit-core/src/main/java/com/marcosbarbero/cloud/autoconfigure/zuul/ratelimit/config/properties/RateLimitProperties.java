@@ -29,6 +29,7 @@ import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -132,6 +133,9 @@ public class RateLimitProperties implements Validator {
     }
 
     public List<Policy> getPolicies(String key) {
+        if (StringUtils.isEmpty(key)) {
+            return defaultPolicyList;
+        }
         return policyList.getOrDefault(key, defaultPolicyList);
     }
 
