@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config;
+package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support;
 
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.MatchType;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.Type;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitUtils;
 import java.util.StringJoiner;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

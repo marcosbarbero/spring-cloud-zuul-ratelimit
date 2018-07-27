@@ -8,7 +8,8 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.MatchType;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.Type;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitUtils;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitKeyGenerator;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitUtils;
 import java.util.Collections;
 import javax.servlet.http.HttpServletRequest;
 import org.junit.Before;
@@ -33,7 +34,7 @@ public class DefaultRateLimitKeyGeneratorTest {
         when(httpServletRequest.getRemoteAddr()).thenReturn("remote");
         properties = new RateLimitProperties();
         properties.setKeyPrefix("key-prefix");
-        RateLimitUtils rateLimitUtils = new RateLimitUtils(properties);
+        RateLimitUtils rateLimitUtils = new DefaultRateLimitUtils(properties);
         target = new DefaultRateLimitKeyGenerator(properties, rateLimitUtils);
     }
 
