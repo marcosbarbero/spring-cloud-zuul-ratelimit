@@ -94,6 +94,7 @@ public class RateLimitAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean(RateLimitUtils.class)
     public RateLimitUtils rateLimitUtils(RateLimitProperties rateLimitProperties) {
         return new RateLimitUtils(rateLimitProperties);
     }

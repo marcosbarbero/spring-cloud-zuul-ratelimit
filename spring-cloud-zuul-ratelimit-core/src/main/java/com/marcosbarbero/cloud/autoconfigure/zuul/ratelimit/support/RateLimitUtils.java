@@ -16,18 +16,17 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support;
 
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
-import lombok.RequiredArgsConstructor;
-
-import javax.servlet.http.HttpServletRequest;
-
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_FOR_HEADER;
+
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
+import javax.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 
 /**
  * @author Liel Chayoun
  */
 @RequiredArgsConstructor
-public final class RateLimitUtils {
+public class RateLimitUtils {
 
     private static final String ANONYMOUS_USER = "anonymous";
 
