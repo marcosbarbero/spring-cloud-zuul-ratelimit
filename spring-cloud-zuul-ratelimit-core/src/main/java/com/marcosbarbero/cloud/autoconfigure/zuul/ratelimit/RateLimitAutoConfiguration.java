@@ -16,8 +16,6 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit;
 
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.PREFIX;
-
 import com.ecwid.consul.v1.ConsulClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
@@ -49,10 +47,6 @@ import io.github.bucket4j.grid.hazelcast.Hazelcast;
 import io.github.bucket4j.grid.ignite.Ignite;
 import io.github.bucket4j.grid.infinispan.Infinispan;
 import io.github.bucket4j.grid.jcache.JCache;
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.PostConstruct;
-import javax.cache.Cache;
 import lombok.RequiredArgsConstructor;
 import org.apache.ignite.IgniteCache;
 import org.infinispan.functional.FunctionalMap.ReadWriteMap;
@@ -72,6 +66,12 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.util.UrlPathHelper;
+
+import javax.annotation.PostConstruct;
+import javax.cache.Cache;
+import java.util.List;
+
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.PREFIX;
 
 /**
  * @author Marcos Barbero
@@ -238,7 +238,7 @@ public class RateLimitAutoConfiguration {
         public void init() {
             Policy defaultPolicy = rateLimitProperties.getDefaultPolicy();
             if (defaultPolicy != null) {
-                ArrayList<Policy> defaultPolicies = Lists.newArrayList(defaultPolicy);
+                List<Policy> defaultPolicies = Lists.newArrayList(defaultPolicy);
                 defaultPolicies.addAll(rateLimitProperties.getDefaultPolicyList());
                 rateLimitProperties.setDefaultPolicyList(defaultPolicies);
             }
