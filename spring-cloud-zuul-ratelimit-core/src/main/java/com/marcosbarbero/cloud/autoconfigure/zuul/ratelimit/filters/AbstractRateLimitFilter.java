@@ -20,11 +20,9 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtil
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.MatchType;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.Type;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
@@ -65,36 +63,6 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
 
     private boolean applyPolicy(HttpServletRequest request, Route route, Policy policy) {
         List<MatchType> types = policy.getType();
-        return types.isEmpty() || (urlApply(types, route) && originApply(types, request) && userApply(types, request));
-    }
-
-    private boolean userApply(List<MatchType> types, HttpServletRequest request) {
-        List<String> users = getConfiguredType(types, Type.USER);
-
-        return users.isEmpty()
-            || users.contains(rateLimitUtils.getUser(request));
-    }
-
-    private boolean originApply(List<MatchType> types, HttpServletRequest request) {
-        List<String> origins = getConfiguredType(types, Type.ORIGIN);
-
-        return origins.isEmpty()
-            || origins.contains(rateLimitUtils.getRemoteAddress(request));
-    }
-
-    private boolean urlApply(List<MatchType> types, Route route) {
-        List<String> urls = getConfiguredType(types, Type.URL);
-
-        return urls.isEmpty()
-            || route == null
-            || urls.stream().anyMatch(url -> route.getPath().startsWith(url));
-    }
-
-    private List<String> getConfiguredType(List<MatchType> types, Type user) {
-        return types.stream()
-            .filter(matchType -> matchType.getType().equals(user))
-            .map(MatchType::getMatcher)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+        return types.isEmpty() || types.stream().allMatch(type -> type.apply(request, route, rateLimitUtils));
     }
 }

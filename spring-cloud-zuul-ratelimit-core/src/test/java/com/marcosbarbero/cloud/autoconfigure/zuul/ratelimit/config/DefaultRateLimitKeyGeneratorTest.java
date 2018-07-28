@@ -7,7 +7,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.MatchType;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.Type;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitType;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitUtils;
 import java.util.Collections;
@@ -49,7 +49,7 @@ public class DefaultRateLimitKeyGeneratorTest {
     @Test
     public void testKeyUrlNullRoute() {
         Policy policy = new Policy();
-        policy.getType().add(new MatchType(Type.URL, null));
+        policy.getType().add(new MatchType(RateLimitType.URL, null));
 
         String key = target.key(httpServletRequest, null, policy);
         assertThat(key).isEqualTo("key-prefix");
@@ -58,7 +58,7 @@ public class DefaultRateLimitKeyGeneratorTest {
     @Test
     public void testKeyUrl() {
         Policy policy = new Policy();
-        policy.getType().add(new MatchType(Type.URL, null));
+        policy.getType().add(new MatchType(RateLimitType.URL, null));
 
         String key = target.key(httpServletRequest, route, policy);
         assertThat(key).isEqualTo("key-prefix:id:/**");
@@ -67,7 +67,7 @@ public class DefaultRateLimitKeyGeneratorTest {
     @Test
     public void testKeyUrlWithMatcher() {
         Policy policy = new Policy();
-        policy.getType().add(new MatchType(Type.URL, "matcherURL"));
+        policy.getType().add(new MatchType(RateLimitType.URL, "matcherURL"));
 
         String key = target.key(httpServletRequest, route, policy);
         assertThat(key).isEqualTo("key-prefix:id:/**:matcherURL");
@@ -76,7 +76,7 @@ public class DefaultRateLimitKeyGeneratorTest {
     @Test
     public void testKeyOrigin() {
         Policy policy = new Policy();
-        policy.getType().add(new MatchType(Type.ORIGIN, null));
+        policy.getType().add(new MatchType(RateLimitType.ORIGIN, null));
 
         String key = target.key(httpServletRequest, route, policy);
         assertThat(key).isEqualTo("key-prefix:id:remote");
@@ -85,7 +85,7 @@ public class DefaultRateLimitKeyGeneratorTest {
     @Test
     public void testKeyOriginWithMatcher() {
         Policy policy = new Policy();
-        policy.getType().add(new MatchType(Type.ORIGIN, "matcherOrigin"));
+        policy.getType().add(new MatchType(RateLimitType.ORIGIN, "matcherOrigin"));
 
         String key = target.key(httpServletRequest, route, policy);
         assertThat(key).isEqualTo("key-prefix:id:remote:matcherOrigin");
@@ -94,7 +94,7 @@ public class DefaultRateLimitKeyGeneratorTest {
     @Test
     public void testKeyOriginBehindProxyNullHeader() {
         Policy policy = new Policy();
-        policy.getType().add(new MatchType(Type.ORIGIN, null));
+        policy.getType().add(new MatchType(RateLimitType.ORIGIN, null));
         properties.setBehindProxy(true);
 
         String key = target.key(httpServletRequest, route, policy);
@@ -104,7 +104,7 @@ public class DefaultRateLimitKeyGeneratorTest {
     @Test
     public void testKeyOriginBehindProxy() {
         Policy policy = new Policy();
-        policy.getType().add(new MatchType(Type.ORIGIN, null));
+        policy.getType().add(new MatchType(RateLimitType.ORIGIN, null));
         properties.setBehindProxy(true);
         when(httpServletRequest.getHeader(X_FORWARDED_FOR_HEADER)).thenReturn("headerAddress");
 
@@ -115,7 +115,7 @@ public class DefaultRateLimitKeyGeneratorTest {
     @Test
     public void testKeyOriginBehindProxyWithMultipleXForwardedFor() {
         Policy policy = new Policy();
-        policy.getType().add(new MatchType(Type.ORIGIN, null));
+        policy.getType().add(new MatchType(RateLimitType.ORIGIN, null));
         properties.setBehindProxy(true);
         when(httpServletRequest.getHeader(X_FORWARDED_FOR_HEADER)).thenReturn("1stHeaderAddress, 2ndAddressHeader");
 
@@ -126,7 +126,7 @@ public class DefaultRateLimitKeyGeneratorTest {
     @Test
     public void testKeyUserNullPrincipal() {
         Policy policy = new Policy();
-        policy.getType().add(new MatchType(Type.USER, null));
+        policy.getType().add(new MatchType(RateLimitType.USER, null));
 
         String key = target.key(httpServletRequest, route, policy);
         assertThat(key).isEqualTo("key-prefix:id:anonymous");
@@ -135,7 +135,7 @@ public class DefaultRateLimitKeyGeneratorTest {
     @Test
     public void testKeyUser() {
         Policy policy = new Policy();
-        policy.getType().add(new MatchType(Type.USER, null));
+        policy.getType().add(new MatchType(RateLimitType.USER, null));
         when(httpServletRequest.getRemoteUser()).thenReturn("user");
 
         String key = target.key(httpServletRequest, route, policy);
@@ -145,7 +145,7 @@ public class DefaultRateLimitKeyGeneratorTest {
     @Test
     public void testKeyUserWithMatcher() {
         Policy policy = new Policy();
-        policy.getType().add(new MatchType(Type.USER, "matcherUser"));
+        policy.getType().add(new MatchType(RateLimitType.USER, "matcherUser"));
         when(httpServletRequest.getRemoteUser()).thenReturn("user");
 
         String key = target.key(httpServletRequest, route, policy);

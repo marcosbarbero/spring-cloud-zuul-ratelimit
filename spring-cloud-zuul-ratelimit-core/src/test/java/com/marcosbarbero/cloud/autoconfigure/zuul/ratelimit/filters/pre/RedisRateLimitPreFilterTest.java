@@ -10,7 +10,6 @@ import static org.mockito.Mockito.when;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RateLimiterErrorHandler;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RedisRateLimiter;
-
 import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,7 +61,7 @@ public class RedisRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
             this.filter.run();
         }
 
-        String key = "null_serviceA_10.0.0.100_serviceA_anonymous";
+        String key = "null_serviceA_10.0.0.100_anonymous";
         String remaining = this.response.getHeader(HEADER_REMAINING + key);
         assertEquals("0", remaining);
 
