@@ -8,15 +8,16 @@ import static org.junit.Assert.assertTrue;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
 import com.google.common.collect.Lists;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.DefaultRateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.MatchType;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.commons.TestRouteLocator;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitUtils;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitKeyGenerator;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitUtils;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.monitoring.CounterFactory;
 import java.util.Collections;
@@ -95,7 +96,7 @@ public abstract class BaseRateLimitPreFilterTest {
         this.request = new MockHttpServletRequest();
         this.response = new MockHttpServletResponse();
         RateLimitProperties properties = this.properties();
-        RateLimitUtils rateLimitUtils = new RateLimitUtils(properties);
+        RateLimitUtils rateLimitUtils = new DefaultRateLimitUtils(properties);
         RateLimitKeyGenerator rateLimitKeyGenerator = new DefaultRateLimitKeyGenerator(properties,
             rateLimitUtils);
         UrlPathHelper urlPathHelper = new UrlPathHelper();
