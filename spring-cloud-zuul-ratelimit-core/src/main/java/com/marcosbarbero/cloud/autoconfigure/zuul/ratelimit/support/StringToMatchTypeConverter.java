@@ -17,7 +17,7 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.MatchType;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.Type;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitType;
 import org.springframework.core.convert.converter.Converter;
 
 /**
@@ -31,8 +31,8 @@ public class StringToMatchTypeConverter implements Converter<String, MatchType> 
     public MatchType convert(String type) {
         if (type.contains(DELIMITER)) {
             String[] matchType = type.split(DELIMITER);
-            return new MatchType(Type.valueOf(matchType[0].toUpperCase()), matchType[1]);
+            return new MatchType(RateLimitType.valueOf(matchType[0].toUpperCase()), matchType[1]);
         }
-        return new MatchType(Type.valueOf(type.toUpperCase()), null);
+        return new MatchType(RateLimitType.valueOf(type.toUpperCase()), null);
     }
 }

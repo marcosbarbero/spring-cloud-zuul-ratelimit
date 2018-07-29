@@ -20,8 +20,6 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyG
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.MatchType;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.Type;
 import java.util.StringJoiner;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -49,25 +47,11 @@ public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
             joiner.add(route.getId());
         }
         policy.getType().forEach(matchType -> {
-            if (route != null && Type.URL.equals(matchType.getType())) {
-                joiner.add(route.getPath());
-                addMatcher(joiner, matchType);
-            }
-            if (Type.ORIGIN.equals(matchType.getType())) {
-                joiner.add(rateLimitUtils.getRemoteAddress(request));
-                addMatcher(joiner, matchType);
-            }
-            if (Type.USER.equals(matchType.getType())) {
-                joiner.add(rateLimitUtils.getUser(request));
-                addMatcher(joiner, matchType);
+            String key = matchType.key(request, route, rateLimitUtils);
+            if (StringUtils.isNotEmpty(key)) {
+                joiner.add(key);
             }
         });
         return joiner.toString();
-    }
-
-    private void addMatcher(StringJoiner joiner, MatchType matchType) {
-        if (StringUtils.isNotEmpty(matchType.getMatcher())) {
-            joiner.add(matchType.getMatcher());
-        }
     }
 }
