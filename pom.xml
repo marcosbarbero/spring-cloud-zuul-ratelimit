@@ -158,6 +158,7 @@
                     <excludes>
                         <exclude>**/test/**</exclude>
                         <exclude>**/tests/**</exclude>
+                        <exclude>**/*Constants.*</exclude>
                     </excludes>
                 </configuration>
                 <executions>
