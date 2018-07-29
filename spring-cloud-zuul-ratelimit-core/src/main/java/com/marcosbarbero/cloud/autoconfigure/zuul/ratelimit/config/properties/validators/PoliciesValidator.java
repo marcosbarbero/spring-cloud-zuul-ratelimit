@@ -10,6 +10,7 @@ public class PoliciesValidator implements ConstraintValidator<Policies, Object> 
 
     @Override
     public void initialize(Policies constraintAnnotation) {
+        //Nothing to do here
     }
 
     @Override

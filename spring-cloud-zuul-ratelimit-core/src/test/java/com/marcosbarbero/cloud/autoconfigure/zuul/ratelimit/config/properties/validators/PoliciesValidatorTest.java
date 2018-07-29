@@ -1,9 +1,11 @@
-package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
+package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.validators;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import java.util.Set;
+import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -11,10 +13,15 @@ import javax.validation.ValidatorFactory;
 import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 
-public class RateLimitPropertiesTest {
+public class PoliciesValidatorTest {
 
     private Validator validator;
+    private PoliciesValidator target;
+
+    @Mock
+    private ConstraintValidatorContext constraintValidatorContext;
 
     private static Policy getPolicy(Long limit, Long quota) {
         Policy policy = new Policy();
@@ -25,8 +32,15 @@ public class RateLimitPropertiesTest {
 
     @Before
     public void setUp() {
+        target = new PoliciesValidator();
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
+    }
+
+    @Test
+    public void testInvalidWithNonMatchingObject() {
+        boolean valid = target.isValid(new Object(), constraintValidatorContext);
+        assertThat(valid).isFalse();
     }
 
     @Test
