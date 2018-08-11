@@ -165,15 +165,6 @@ zuul:
           - user
           - origin
           - url
-    policies: #deprecated - please use "policy-list"
-      myServiceId:
-        limit: 10 #optional - request number limit per refresh interval window
-        quota: 1000 #optional - request time limit per refresh interval window (in seconds)
-        refresh-interval: 60 #default value (in seconds)
-        type: #optional
-          - user
-          - origin
-          - url
     policy-list:
       myServiceId:
         - limit: 10 #optional - request number limit per refresh interval window
@@ -237,7 +228,6 @@ Property namespace: __zuul.ratelimit__
 |key-prefix    |String                       |${spring.application.name:rate-limit-application}
 |repository    |CONSUL, REDIS, JPA, BUCKET4J_JCACHE, BUCKET4J_HAZELCAST, BUCKET4J_INFINISPAN, BUCKET4J_IGNITE, IN_MEMORY|IN_MEMORY
 |default-policy|link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86[Policy]| -
-|policies      |Map of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86[Policy]| -
 |default-policy-list|List of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86[Policy]| -
 |policy-list      |Map of Lists of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86[Policy]| -
 |postFilterOrder|int | FilterConstants.SEND_RESPONSE_FILTER_ORDER - 10
