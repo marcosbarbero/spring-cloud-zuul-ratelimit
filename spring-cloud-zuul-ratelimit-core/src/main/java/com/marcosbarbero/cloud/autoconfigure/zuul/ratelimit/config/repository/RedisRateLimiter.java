@@ -37,13 +37,16 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
 
     @Override
     protected void calcRemainingLimit(Long limit, Long refreshInterval,
-                                    Long requestTime, String key, Rate rate) {
+                                      Long requestTime, String key, Rate rate) {
         if (limit != null) {
-            handleExpiration(key, refreshInterval, rate);
             long usage = requestTime == null ? 1L : 0L;
             Long current = 0L;
             try {
-                current = this.redisTemplate.boundValueOps(key).increment(usage);
+                current = redisTemplate.opsForValue().increment(key, usage);
+                // Redis returns 1 when the key is incremented for the first time, and the expiration time is set
+                if (current != null && current.equals(1L)) {
+                    this.redisTemplate.expire(key, refreshInterval, SECONDS);
+                }
             } catch (RuntimeException e) {
                 String msg = "Failed retrieving rate for " + key + ", will return limit";
                 rateLimiterErrorHandler.handleError(msg, e);
@@ -54,11 +57,11 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
 
     @Override
     protected void calcRemainingQuota(Long quota, Long refreshInterval,
-                                    Long requestTime, String key, Rate rate) {
+                                      Long requestTime, String key, Rate rate) {
         if (quota != null) {
             String quotaKey = key + QUOTA_SUFFIX;
             handleExpiration(quotaKey, refreshInterval, rate);
-            Long usage = requestTime != null ? requestTime : 0L;
+            long usage = requestTime != null ? requestTime : 0L;
             Long current = 0L;
             try {
                 current = this.redisTemplate.boundValueOps(quotaKey).increment(usage);
@@ -74,7 +77,7 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
         Long expire = null;
         try {
             expire = this.redisTemplate.getExpire(key);
-            if (expire == null || expire == -1) {
+            if (expire == null || expire.equals(-1L)) {
                 this.redisTemplate.expire(key, refreshInterval, SECONDS);
                 expire = refreshInterval;
             }

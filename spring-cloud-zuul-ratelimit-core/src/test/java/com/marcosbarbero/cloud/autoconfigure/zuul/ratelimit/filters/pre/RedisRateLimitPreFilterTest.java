@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -15,6 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 
 /**
  * @author Marcos Barbero
@@ -37,9 +39,10 @@ public class RedisRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
     @Override
     @SuppressWarnings("unchecked")
     public void testRateLimitExceedCapacity() throws Exception {
-        BoundValueOperations ops = mock(BoundValueOperations.class);
-        when(this.redisTemplate.boundValueOps(anyString())).thenReturn(ops);
-        when(ops.increment(anyLong())).thenReturn(3L);
+        ValueOperations ops = mock(ValueOperations.class);
+        doReturn(ops).when(redisTemplate).opsForValue();
+
+        when(ops.increment(anyString(), anyLong())).thenReturn(3L);
         super.testRateLimitExceedCapacity();
     }
 
@@ -47,9 +50,10 @@ public class RedisRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
     @Override
     @SuppressWarnings("unchecked")
     public void testRateLimit() throws Exception {
-        BoundValueOperations ops = mock(BoundValueOperations.class);
-        when(this.redisTemplate.boundValueOps(anyString())).thenReturn(ops);
-        when(ops.increment(anyLong())).thenReturn(2L);
+        ValueOperations ops = mock(ValueOperations.class);
+        when(ops.increment(anyString(), anyLong())).thenReturn(1L);
+        doReturn(ops).when(redisTemplate).opsForValue();
+        when(ops.increment(anyString(), anyLong())).thenReturn(2L);
 
 
         this.request.setRequestURI("/serviceA");
@@ -67,7 +71,7 @@ public class RedisRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
 
         TimeUnit.SECONDS.sleep(2);
 
-        when(ops.increment(anyLong())).thenReturn(1L);
+        when(ops.increment(anyString(), anyLong())).thenReturn(1L);
         this.filter.run();
         remaining = this.response.getHeader(HEADER_REMAINING + key);
         assertEquals("1", remaining);
