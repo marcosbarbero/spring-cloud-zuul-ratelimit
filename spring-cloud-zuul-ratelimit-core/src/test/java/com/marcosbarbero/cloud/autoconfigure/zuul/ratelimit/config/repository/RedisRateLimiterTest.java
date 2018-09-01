@@ -59,7 +59,9 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
 
     @Test
     public void testConsumeRemainingLimitException() {
-        doThrow(new RuntimeException()).when(redisTemplate).opsForValue();
+        ValueOperations ops = mock(ValueOperations.class);
+        doReturn(ops).when(redisTemplate).opsForValue();
+        doThrow(new RuntimeException()).when(ops).increment(anyString(), anyLong());
         Policy policy = new Policy();
         policy.setLimit(100L);
         target.consume(policy, "key", 0L);
