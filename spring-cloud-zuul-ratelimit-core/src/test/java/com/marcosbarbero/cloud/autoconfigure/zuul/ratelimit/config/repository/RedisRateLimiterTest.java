@@ -78,6 +78,16 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
     }
 
     @Test
+    public void testConsumeGetExpireException() {
+        doThrow(new RuntimeException()).when(redisTemplate).getExpire("key-quota");
+        Policy policy = new Policy();
+        policy.setLimit(100L);
+        policy.setQuota(50L);
+        target.consume(policy, "key", 0L);
+        verify(rateLimiterErrorHandler).handleError(matches(".* key-quota, .*"), any());
+    }
+
+    @Test
     public void testConsumeExpireException() {
         ValueOperations ops = mock(ValueOperations.class);
         when(ops.increment(anyString(), anyLong())).thenReturn(1L);
