@@ -37,13 +37,17 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
 
     @Override
     protected void calcRemainingLimit(Long limit, Long refreshInterval,
-                                    Long requestTime, String key, Rate rate) {
+                                      Long requestTime, String key, Rate rate) {
         if (limit != null) {
-            handleExpiration(key, refreshInterval, rate);
+            // handleExpiration(key, refreshInterval, rate);
             long usage = requestTime == null ? 1L : 0L;
             Long current = 0L;
             try {
-                current = this.redisTemplate.boundValueOps(key).increment(usage);
+                current = redisTemplate.opsForValue().increment(key, usage);
+                // Redis returns 1 when the key is incremented for the first time, and the expiration time is set
+                if (1 == current) {
+                    this.redisTemplate.expire(key, refreshInterval, SECONDS);
+                }
             } catch (RuntimeException e) {
                 String msg = "Failed retrieving rate for " + key + ", will return limit";
                 rateLimiterErrorHandler.handleError(msg, e);
@@ -54,7 +58,7 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
 
     @Override
     protected void calcRemainingQuota(Long quota, Long refreshInterval,
-                                    Long requestTime, String key, Rate rate) {
+                                      Long requestTime, String key, Rate rate) {
         if (quota != null) {
             String quotaKey = key + QUOTA_SUFFIX;
             handleExpiration(quotaKey, refreshInterval, rate);
