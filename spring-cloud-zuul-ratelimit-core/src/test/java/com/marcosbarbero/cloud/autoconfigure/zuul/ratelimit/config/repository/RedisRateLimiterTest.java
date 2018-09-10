@@ -70,7 +70,9 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
 
     @Test
     public void testConsumeRemainingQuotaLimitException() {
-        doThrow(new RuntimeException()).when(redisTemplate).boundValueOps("key-quota");
+        ValueOperations ops = mock(ValueOperations.class);
+        doReturn(ops).when(redisTemplate).opsForValue();
+        doThrow(new RuntimeException()).when(ops).increment(anyString(), anyLong());
         Policy policy = new Policy();
         policy.setQuota(100L);
         target.consume(policy, "key", 0L);
@@ -79,7 +81,9 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
 
     @Test
     public void testConsumeGetExpireException() {
-        doThrow(new RuntimeException()).when(redisTemplate).getExpire("key-quota");
+        ValueOperations ops = mock(ValueOperations.class);
+        doReturn(ops).when(redisTemplate).opsForValue();
+        doThrow(new RuntimeException()).when(ops).increment(anyString(), anyLong());
         Policy policy = new Policy();
         policy.setLimit(100L);
         policy.setQuota(50L);
