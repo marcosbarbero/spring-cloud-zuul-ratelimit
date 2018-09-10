@@ -41,7 +41,8 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
     protected void calcRemainingLimit(Long limit, Long refreshInterval,
                                       Long requestTime, String key, Rate rate) {
         if (Objects.nonNull(limit)) {
-            Long remaining = calcRemaining(limit, refreshInterval, requestTime, key, rate);
+            long usage = requestTime == null ? 1L : 0L;
+            Long remaining = calcRemaining(limit, refreshInterval, usage, key, rate);
             rate.setRemaining(remaining);
         }
     }
@@ -51,14 +52,14 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
                                       Long requestTime, String key, Rate rate) {
         if (Objects.nonNull(quota)) {
             String quotaKey = key + QUOTA_SUFFIX;
-            Long remaining = calcRemaining(quota, refreshInterval, requestTime, quotaKey, rate);
+            long usage = requestTime != null ? requestTime : 0L;
+            Long remaining = calcRemaining(quota, refreshInterval, usage, quotaKey, rate);
             rate.setRemainingQuota(remaining);
         }
     }
 
-    private Long calcRemaining(Long limit, Long refreshInterval, Long requestTime,
+    private Long calcRemaining(Long limit, Long refreshInterval, long usage,
                                String key, Rate rate) {
-        long usage = requestTime == null ? 1L : 0L;
         rate.setReset(SECONDS.toMillis(refreshInterval));
         Long current = 0L;
         try {
