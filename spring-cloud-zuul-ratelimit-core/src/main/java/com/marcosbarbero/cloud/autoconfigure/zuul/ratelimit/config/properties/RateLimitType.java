@@ -69,8 +69,8 @@ public enum RateLimitType {
     },
     ;
 
-    public abstract boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils,
-        String matcher);
+    public abstract boolean apply(HttpServletRequest request, Route route,
+                                  RateLimitUtils rateLimitUtils, String matcher);
 
     public abstract String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils);
 }
