@@ -76,7 +76,7 @@ public class RateLimitPostFilter extends AbstractRateLimitFilter {
         Route route = route(request);
 
         policy(route, request).forEach(policy -> {
-            Long requestTime = System.currentTimeMillis() - getRequestStartTime();
+            long requestTime = System.currentTimeMillis() - getRequestStartTime();
             String key = rateLimitKeyGenerator.key(request, route, policy);
             rateLimiter.consume(policy, key, requestTime > 0 ? requestTime : 1);
         });

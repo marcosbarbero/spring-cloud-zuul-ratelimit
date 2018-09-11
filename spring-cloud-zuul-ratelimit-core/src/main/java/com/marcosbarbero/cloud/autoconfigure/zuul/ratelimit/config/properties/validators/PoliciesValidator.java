@@ -22,6 +22,11 @@ import java.util.Map;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+/**
+ * Validates the rate limit policies.
+ *
+ * @author Liel Chayoun
+ */
 public class PoliciesValidator implements ConstraintValidator<Policies, Object> {
 
     @Override
