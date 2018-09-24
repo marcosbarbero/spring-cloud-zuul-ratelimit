@@ -37,16 +37,16 @@
         <classes.directory.it.consul>${build.directory.it.consul}/classes</classes.directory.it.consul>
         <classes.directory.it.springdata>${build.directory.it.springdata}/classes</classes.directory.it.springdata>
         <classes.directory.it.bucket4j-hazelcast>
-            ../spring-cloud-zuul-ratelimit-tests/bucket4j-hazelcast/classes
+            ${build.directory.it.bucket4j-hazelcast}/classes
         </classes.directory.it.bucket4j-hazelcast>
         <classes.directory.it.bucket4j-ignite>
-            ../spring-cloud-zuul-ratelimit-tests/bucket4j-ignite/classes
+            ${build.directory.it.bucket4j-ignite}/classes
         </classes.directory.it.bucket4j-ignite>
         <classes.directory.it.bucket4j-infinispan>
-            ../spring-cloud-zuul-ratelimit-tests/bucket4j-infinispan/classes
+            ${build.directory.it.bucket4j-infinispan}/classes
         </classes.directory.it.bucket4j-infinispan>
         <classes.directory.it.bucket4j-jcache>
-            ../spring-cloud-zuul-ratelimit-tests/bucket4j-jcache/classes
+            ${build.directory.it.bucket4j-jcache}/classes
         </classes.directory.it.bucket4j-jcache>
 
         <sources.directory.core>../spring-cloud-zuul-ratelimit-core/src/main/java</sources.directory.core>
