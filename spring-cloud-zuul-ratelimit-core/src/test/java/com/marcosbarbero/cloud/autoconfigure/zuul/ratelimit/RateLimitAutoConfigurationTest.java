@@ -11,7 +11,6 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.ConsulRateLimiter;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RedisRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j.Bucket4jHazelcastRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j.Bucket4jIgniteRateLimiter;
@@ -69,6 +68,7 @@ public class RateLimitAutoConfigurationTest {
 
     @Test
     public void testStringToMatchTypeConverter() {
+        System.setProperty(PREFIX + ".repository", "BUCKET4J_JCACHE");
         this.context.refresh();
 
         Assert.assertNotNull(this.context.getBean(StringToMatchTypeConverter.class));
@@ -76,18 +76,12 @@ public class RateLimitAutoConfigurationTest {
 
     @Test
     public void testZuulFilters() {
+        System.setProperty(PREFIX + ".repository", "BUCKET4J_JCACHE");
         this.context.refresh();
 
         Map<String, ZuulFilter> zuulFilterMap = context.getBeansOfType(ZuulFilter.class);
         assertThat(zuulFilterMap.size()).isEqualTo(2);
         assertThat(zuulFilterMap.keySet()).containsExactly("rateLimiterPreFilter", "rateLimiterPostFilter");
-    }
-
-    @Test
-    public void testInMemoryRateLimiterByDefault() {
-        this.context.refresh();
-
-        Assert.assertTrue(this.context.getBean(RateLimiter.class) instanceof InMemoryRateLimiter);
     }
 
     @Test
@@ -140,23 +134,16 @@ public class RateLimitAutoConfigurationTest {
     }
 
     @Test
-    public void testInMemoryRateLimiterByProperty() {
-        System.setProperty(PREFIX + ".repository", "IN_MEMORY");
-        this.context.refresh();
-
-        Assert.assertTrue(this.context.getBean(RateLimiter.class) instanceof InMemoryRateLimiter);
-    }
-
-    @Test
     public void testDefaultRateLimitKeyGenerator() {
+        System.setProperty(PREFIX + ".repository", "BUCKET4J_JCACHE");
         this.context.refresh();
 
-        Assert.assertTrue(this.context.getBean(RateLimiter.class) instanceof InMemoryRateLimiter);
         Assert.assertTrue(this.context.getBean(RateLimitKeyGenerator.class) instanceof DefaultRateLimitKeyGenerator);
     }
 
     @Test
     public void testPolicyAdjuster() {
+        System.setProperty(PREFIX + ".repository", "BUCKET4J_JCACHE");
         System.setProperty(PREFIX + ".defaultPolicy.limit", "3");
         System.setProperty(PREFIX + ".defaultPolicyList[0].limit", "4");
         System.setProperty(PREFIX + ".policies.a.limit", "5");

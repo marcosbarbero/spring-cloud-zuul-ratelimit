@@ -51,9 +51,4 @@ public enum RateLimitRepository {
      * Uses Bucket4j Infinispan as data storage
      */
     BUCKET4J_INFINISPAN,
-
-    /**
-     * Uses a ConcurrentHashMap as data storage
-     */
-    IN_MEMORY,
 }

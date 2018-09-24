@@ -135,11 +135,6 @@ Add the following dependency accordingly to the chosen data storage:
 </dependency>
 ----
 
-* InMemory
-
-For `InMemory` implementation there's no need to add any extra dependency other than
-   `com.marcosbarbero.cloud:spring-cloud-zuul-ratelimit` 
-
 Sample configuration
 [source, yaml]
 ----
@@ -147,7 +142,7 @@ zuul:
   ratelimit:
     key-prefix: your-prefix 
     enabled: true 
-    repository: REDIS 
+    repository: REDIS
     behind-proxy: true
     default-policy: #deprecated - please use "default-policy-list"
       limit: 10 #optional - request number limit per refresh interval window
@@ -188,8 +183,6 @@ There are eight implementations provided:
 |===
 |Implementation        | Data Storage
 
-|InMemoryRateLimiter   | ConcurrentHashMap
-
 |ConsulRateLimiter     | https://www.consul.io/[Consul]
 
 |RedisRateLimiter      | https://redis.io/[Redis]
@@ -208,7 +201,6 @@ There are eight implementations provided:
 
 |===
 
- 
 Bucket4j implementations require the relevant bean with `@Qualifier("RateLimit")`:
 
  * `JCache` - javax.cache.Cache
@@ -226,7 +218,7 @@ Property namespace: __zuul.ratelimit__
 |enabled       |true/false                   |false
 |behind-proxy  |true/false                   |false
 |key-prefix    |String                       |${spring.application.name:rate-limit-application}
-|repository    |CONSUL, REDIS, JPA, BUCKET4J_JCACHE, BUCKET4J_HAZELCAST, BUCKET4J_INFINISPAN, BUCKET4J_IGNITE, IN_MEMORY|IN_MEMORY
+|repository    |CONSUL, REDIS, JPA, BUCKET4J_JCACHE, BUCKET4J_HAZELCAST, BUCKET4J_INFINISPAN, BUCKET4J_IGNITE| -
 |default-policy|link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86[Policy]| -
 |default-policy-list|List of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86[Policy]| -
 |policy-list      |Map of Lists of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86[Policy]| -
