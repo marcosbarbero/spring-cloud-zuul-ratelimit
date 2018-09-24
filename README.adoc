@@ -135,11 +135,6 @@ Add the following dependency accordingly to the chosen data storage:
 </dependency>
 ----
 
-* InMemory
-
-For `InMemory` implementation there's no need to add any extra dependency other than
-   `com.marcosbarbero.cloud:spring-cloud-zuul-ratelimit` 
-
 Sample configuration
 [source, yaml]
 ----
@@ -187,8 +182,6 @@ There are eight implementations provided:
 [cols=2*, options="header"]
 |===
 |Implementation        | Data Storage
-
-|InMemoryRateLimiter   | ConcurrentHashMap
 
 |ConsulRateLimiter     | https://www.consul.io/[Consul]
 

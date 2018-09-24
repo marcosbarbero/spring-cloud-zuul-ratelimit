@@ -16,6 +16,8 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit;
 
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.PREFIX;
+
 import com.ecwid.consul.v1.ConsulClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
@@ -27,7 +29,6 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.ConsulRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.DefaultRateLimiterErrorHandler;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.InMemoryRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RateLimiterErrorHandler;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RedisRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j.Bucket4jHazelcastRateLimiter;
@@ -47,6 +48,9 @@ import io.github.bucket4j.grid.hazelcast.Hazelcast;
 import io.github.bucket4j.grid.ignite.Ignite;
 import io.github.bucket4j.grid.infinispan.Infinispan;
 import io.github.bucket4j.grid.jcache.JCache;
+import java.util.List;
+import javax.annotation.PostConstruct;
+import javax.cache.Cache;
 import lombok.RequiredArgsConstructor;
 import org.apache.ignite.IgniteCache;
 import org.infinispan.functional.FunctionalMap.ReadWriteMap;
@@ -66,12 +70,6 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.util.UrlPathHelper;
-
-import javax.annotation.PostConstruct;
-import javax.cache.Cache;
-import java.util.List;
-
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.PREFIX;
 
 /**
  * @author Marcos Barbero
@@ -215,17 +213,6 @@ public class RateLimitAutoConfiguration {
             return new JpaRateLimiter(rateLimiterErrorHandler, rateLimiterRepository);
         }
 
-    }
-
-    @Configuration
-    @ConditionalOnMissingBean(RateLimiter.class)
-    @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "IN_MEMORY", matchIfMissing = true)
-    public static class InMemoryConfiguration {
-
-        @Bean
-        public RateLimiter inMemoryRateLimiter(RateLimiterErrorHandler rateLimiterErrorHandler) {
-            return new InMemoryRateLimiter(rateLimiterErrorHandler);
-        }
     }
 
     @Configuration

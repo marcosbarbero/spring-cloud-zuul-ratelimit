@@ -74,7 +74,7 @@ public class RateLimitProperties {
     private String keyPrefix;
     @Valid
     @NotNull
-    private RateLimitRepository repository = RateLimitRepository.IN_MEMORY;
+    private RateLimitRepository repository;
     private int postFilterOrder = SEND_RESPONSE_FILTER_ORDER - 10;
     private int preFilterOrder = FORM_BODY_WRAPPER_FILTER_ORDER;
 

@@ -16,29 +16,59 @@
     <properties>
         <main.basedir>${basedir}/..</main.basedir>
         <build.directory.core>../spring-cloud-zuul-ratelimit-core/target</build.directory.core>
-        <build.directory.it.inmemory>../spring-cloud-zuul-ratelimit-tests/inmemory/target</build.directory.it.inmemory>
         <build.directory.it.redis>../spring-cloud-zuul-ratelimit-tests/redis/target</build.directory.it.redis>
         <build.directory.it.consul>../spring-cloud-zuul-ratelimit-tests/consul/target</build.directory.it.consul>
         <build.directory.it.springdata>../spring-cloud-zuul-ratelimit-tests/springdata/target</build.directory.it.springdata>
+        <build.directory.it.bucket4j-hazelcast>
+            ../spring-cloud-zuul-ratelimit-tests/bucket4j-hazelcast/target
+        </build.directory.it.bucket4j-hazelcast>
+        <build.directory.it.bucket4j-ignite>
+            ../spring-cloud-zuul-ratelimit-tests/bucket4j-ignite/target
+        </build.directory.it.bucket4j-ignite>
+        <build.directory.it.bucket4j-infinispan>
+            ../spring-cloud-zuul-ratelimit-tests/bucket4j-infinispan/target
+        </build.directory.it.bucket4j-infinispan>
+        <build.directory.it.bucket4j-jcache>
+            ../spring-cloud-zuul-ratelimit-tests/bucket4j-jcache/target
+        </build.directory.it.bucket4j-jcache>
 
         <classes.directory.core>${build.directory.core}/classes</classes.directory.core>
-        <classes.directory.it.inmemory>${build.directory.it.inmemory}/classes</classes.directory.it.inmemory>
         <classes.directory.it.redis>${build.directory.it.redis}/classes</classes.directory.it.redis>
         <classes.directory.it.consul>${build.directory.it.consul}/classes</classes.directory.it.consul>
         <classes.directory.it.springdata>${build.directory.it.springdata}/classes</classes.directory.it.springdata>
+        <classes.directory.it.bucket4j-hazelcast>
+            ../spring-cloud-zuul-ratelimit-tests/bucket4j-hazelcast/classes
+        </classes.directory.it.bucket4j-hazelcast>
+        <classes.directory.it.bucket4j-ignite>
+            ../spring-cloud-zuul-ratelimit-tests/bucket4j-ignite/classes
+        </classes.directory.it.bucket4j-ignite>
+        <classes.directory.it.bucket4j-infinispan>
+            ../spring-cloud-zuul-ratelimit-tests/bucket4j-infinispan/classes
+        </classes.directory.it.bucket4j-infinispan>
+        <classes.directory.it.bucket4j-jcache>
+            ../spring-cloud-zuul-ratelimit-tests/bucket4j-jcache/classes
+        </classes.directory.it.bucket4j-jcache>
 
         <sources.directory.core>../spring-cloud-zuul-ratelimit-core/src/main/java</sources.directory.core>
-        <sources.directory.it.inmemory>../spring-cloud-zuul-ratelimit-tests/inmemory/src/main/java</sources.directory.it.inmemory>
         <sources.directory.it.redis>../spring-cloud-zuul-ratelimit-tests/redis/src/main/java</sources.directory.it.redis>
         <sources.directory.it.consul>../spring-cloud-zuul-ratelimit-tests/consul/src/main/java</sources.directory.it.consul>
         <sources.directory.it.springdata>../spring-cloud-zuul-ratelimit-tests/springdata/src/main/java</sources.directory.it.springdata>
+        <sources.directory.it.bucket4j-hazelcast>
+            ../spring-cloud-zuul-ratelimit-tests/bucket4j-hazelcast/src/main/java
+        </sources.directory.it.bucket4j-hazelcast>
+        <sources.directory.it.bucket4j-ignite>
+            ../spring-cloud-zuul-ratelimit-tests/bucket4j-ignite/src/main/java
+        </sources.directory.it.bucket4j-ignite>
+        <sources.directory.it.bucket4j-infinispan>
+            ../spring-cloud-zuul-ratelimit-tests/bucket4j-infinispan/src/main/java
+        </sources.directory.it.bucket4j-infinispan>
+        <sources.directory.it.bucket4j-jcache>
+            ../spring-cloud-zuul-ratelimit-tests/bucket4j-jcache/src/main/java
+        </sources.directory.it.bucket4j-jcache>
 
         <generated-sources.directory.core>
             ${build.directory.core}/generated-sources/annotations
         </generated-sources.directory.core>
-        <generated-sources.directory.it.inmemory>
-            ${build.directory.it.inmemory}/target/generated-sources/annotations
-        </generated-sources.directory.it.inmemory>
         <generated-sources.directory.it.redis>
             ${build.directory.it.redis}/target/generated-sources/annotations
         </generated-sources.directory.it.redis>
@@ -48,6 +78,18 @@
         <generated-sources.directory.it.springdata>
             ${build.directory.it.springdata}/target/generated-sources/annotations
         </generated-sources.directory.it.springdata>
+        <generated-sources.directory.it.bucket4j-hazelcast>
+            ${build.directory.it.bucket4j-hazelcast}/target/generated-sources/annotations
+        </generated-sources.directory.it.bucket4j-hazelcast>
+        <generated-sources.directory.it.bucket4j-ignite>
+            ${build.directory.it.bucket4j-ignite}/target/generated-sources/annotations
+        </generated-sources.directory.it.bucket4j-ignite>
+        <generated-sources.directory.it.bucket4j-infinispan>
+            ${build.directory.it.bucket4j-infinispan}/target/generated-sources/annotations
+        </generated-sources.directory.it.bucket4j-infinispan>
+        <generated-sources.directory.it.bucket4j-jcache>
+            ${build.directory.it.bucket4j-jcache}/target/generated-sources/annotations
+        </generated-sources.directory.it.bucket4j-jcache>
     </properties>
 
     <build>
@@ -103,17 +145,31 @@
                                         <group name="jacoco-multi">
                                             <classfiles>
                                                 <fileset dir="${classes.directory.core}"/>
-                                                <fileset dir="${classes.directory.it.inmemory}"/>
                                                 <fileset dir="${classes.directory.it.redis}"/>
                                                 <fileset dir="${classes.directory.it.consul}"/>
                                                 <fileset dir="${classes.directory.it.springdata}"/>
+                                                <fileset
+                                                  dir="${classes.directory.it.bucket4j-hazelcast}"/>
+                                                <fileset
+                                                  dir="${classes.directory.it.bucket4j-ignite}"/>
+                                                <fileset
+                                                  dir="${classes.directory.it.bucket4j-infinispan}"/>
+                                                <fileset
+                                                  dir="${classes.directory.it.bucket4j-jcache}"/>
                                             </classfiles>
                                             <sourcefiles encoding="UTF-8">
                                                 <fileset dir="${sources.directory.core}"/>
-                                                <fileset dir="${sources.directory.it.inmemory}"/>
                                                 <fileset dir="${sources.directory.it.redis}"/>
                                                 <fileset dir="${classes.directory.it.consul}"/>
                                                 <fileset dir="${classes.directory.it.springdata}"/>
+                                                <fileset
+                                                  dir="${classes.directory.it.bucket4j-hazelcast}"/>
+                                                <fileset
+                                                  dir="${classes.directory.it.bucket4j-ignite}"/>
+                                                <fileset
+                                                  dir="${classes.directory.it.bucket4j-infinispan}"/>
+                                                <fileset
+                                                  dir="${classes.directory.it.bucket4j-jcache}"/>
                                             </sourcefiles>
                                         </group>
                                     </structure>

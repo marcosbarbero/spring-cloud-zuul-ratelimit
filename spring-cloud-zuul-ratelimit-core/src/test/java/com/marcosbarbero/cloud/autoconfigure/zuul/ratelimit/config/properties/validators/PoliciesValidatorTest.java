@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitRepository;
 import java.util.Set;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintViolation;
@@ -22,6 +23,7 @@ public class PoliciesValidatorTest {
 
     @Mock
     private ConstraintValidatorContext constraintValidatorContext;
+    private RateLimitProperties properties;
 
     private static Policy getPolicy(Long limit, Long quota) {
         Policy policy = new Policy();
@@ -35,6 +37,8 @@ public class PoliciesValidatorTest {
         target = new PoliciesValidator();
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
+        properties = new RateLimitProperties();
+        properties.setRepository(RateLimitRepository.BUCKET4J_JCACHE);
     }
 
     @Test
@@ -45,7 +49,6 @@ public class PoliciesValidatorTest {
 
     @Test
     public void testValidWithNoPolicies() {
-        RateLimitProperties properties = new RateLimitProperties();
         properties.setKeyPrefix("prefix");
         Set<ConstraintViolation<RateLimitProperties>> violations = validator.validate(properties);
         assertThat(violations).isEmpty();
@@ -53,7 +56,6 @@ public class PoliciesValidatorTest {
 
     @Test
     public void testInvalidOnPolicyWithNoLimitOrQuota() {
-        RateLimitProperties properties = new RateLimitProperties();
         properties.setKeyPrefix("prefix");
         Policy policy = getPolicy(null, null);
         properties.setDefaultPolicy(policy);
@@ -66,7 +68,6 @@ public class PoliciesValidatorTest {
 
     @Test
     public void testValidOnPolicyWithLimitNoQuota() {
-        RateLimitProperties properties = new RateLimitProperties();
         properties.setKeyPrefix("prefix");
         Policy policy = getPolicy(1L, null);
         properties.setDefaultPolicy(policy);
@@ -79,7 +80,6 @@ public class PoliciesValidatorTest {
 
     @Test
     public void testValidOnPolicyWithQuotaNoLimit() {
-        RateLimitProperties properties = new RateLimitProperties();
         properties.setKeyPrefix("prefix");
         Policy policy = getPolicy(null, 1L);
         properties.setDefaultPolicy(policy);
