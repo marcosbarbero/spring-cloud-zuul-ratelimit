@@ -16,28 +16,29 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
 
-import static java.util.concurrent.TimeUnit.MINUTES;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORM_BODY_WRAPPER_FILTER_ORDER;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_RESPONSE_FILTER_ORDER;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.validators.Policies;
-import java.util.List;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.validation.annotation.Validated;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORM_BODY_WRAPPER_FILTER_ORDER;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_RESPONSE_FILTER_ORDER;
 
 /**
  * @author Marcos Barbero
@@ -45,25 +46,14 @@ import org.springframework.validation.annotation.Validated;
  */
 @Data
 @Validated
-@RefreshScope
-@NoArgsConstructor
 @ConfigurationProperties(RateLimitProperties.PREFIX)
 public class RateLimitProperties {
 
     public static final String PREFIX = "zuul.ratelimit";
 
-    @Valid
-    @Policies
-    private Policy defaultPolicy;
-    @Valid
     @NotNull
     @Policies
     private List<Policy> defaultPolicyList = Lists.newArrayList();
-    @Valid
-    @NotNull
-    @Policies
-    private Map<String, Policy> policies = Maps.newHashMap();
-    @Valid
     @NotNull
     @Policies
     private Map<String, List<Policy>> policyList = Maps.newHashMap();
@@ -72,17 +62,39 @@ public class RateLimitProperties {
     @NotNull
     @Value("${spring.application.name:rate-limit-application}")
     private String keyPrefix;
-    @Valid
     @NotNull
     private RateLimitRepository repository;
     private int postFilterOrder = SEND_RESPONSE_FILTER_ORDER - 10;
     private int preFilterOrder = FORM_BODY_WRAPPER_FILTER_ORDER;
+
+    @Deprecated
+    @DeprecatedConfigurationProperty(replacement = PREFIX + ".default-policy-list")
+    public void setDefaultPolicy(Policy defaultPolicy) {
+        List<Policy> defaultPolicies = Lists.newArrayList(defaultPolicy);
+        defaultPolicies.addAll(getDefaultPolicyList());
+        setDefaultPolicyList(defaultPolicies);
+    }
+
+    @Deprecated
+    @DeprecatedConfigurationProperty(replacement = PREFIX + ".policy-list")
+    public void setPolicies(Map<String, Policy> policies) {
+        policies.forEach((route, policy) ->
+                policyList.compute(route, (key, policyList) -> getPolicies(policy, policyList)));
+    }
 
     public List<Policy> getPolicies(String key) {
         if (StringUtils.isEmpty(key)) {
             return defaultPolicyList;
         }
         return policyList.getOrDefault(key, defaultPolicyList);
+    }
+
+    private List<Policy> getPolicies(Policy policy, List<Policy> policies) {
+        List<Policy> combinedPolicies = Lists.newArrayList(policy);
+        if (policies != null) {
+            combinedPolicies.addAll(policies);
+        }
+        return combinedPolicies;
     }
 
     @Data
@@ -116,7 +128,7 @@ public class RateLimitProperties {
 
             public String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils) {
                 return type.key(request, route, rateLimitUtils) +
-                    (StringUtils.isEmpty(matcher) ? StringUtils.EMPTY : (":" + matcher));
+                        (StringUtils.isEmpty(matcher) ? StringUtils.EMPTY : (":" + matcher));
             }
         }
     }

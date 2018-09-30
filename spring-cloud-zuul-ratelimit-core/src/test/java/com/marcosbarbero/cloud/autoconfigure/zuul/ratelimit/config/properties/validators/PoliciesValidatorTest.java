@@ -1,20 +1,21 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.validators;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitRepository;
-import java.util.Set;
+import org.assertj.core.util.Lists;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import org.assertj.core.util.Lists;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class PoliciesValidatorTest {
 
@@ -61,9 +62,8 @@ public class PoliciesValidatorTest {
         properties.setDefaultPolicy(policy);
         properties.getDefaultPolicyList().add(policy);
         properties.getPolicyList().put("key", Lists.newArrayList(policy));
-        properties.getPolicies().put("key", policy);
         Set<ConstraintViolation<RateLimitProperties>> violations = validator.validate(properties);
-        assertThat(violations).hasSize(4);
+        assertThat(violations).hasSize(2);
     }
 
     @Test
@@ -73,7 +73,6 @@ public class PoliciesValidatorTest {
         properties.setDefaultPolicy(policy);
         properties.getDefaultPolicyList().add(policy);
         properties.getPolicyList().put("key", Lists.newArrayList(policy));
-        properties.getPolicies().put("key", policy);
         Set<ConstraintViolation<RateLimitProperties>> violations = validator.validate(properties);
         assertThat(violations).isEmpty();
     }
@@ -85,7 +84,6 @@ public class PoliciesValidatorTest {
         properties.setDefaultPolicy(policy);
         properties.getDefaultPolicyList().add(policy);
         properties.getPolicyList().put("key", Lists.newArrayList(policy));
-        properties.getPolicies().put("key", policy);
         Set<ConstraintViolation<RateLimitProperties>> violations = validator.validate(properties);
         assertThat(violations).isEmpty();
     }

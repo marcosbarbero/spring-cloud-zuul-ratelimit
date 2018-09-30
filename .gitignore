@@ -59,3 +59,5 @@ target/
 *.iml
 .idea/
 *.DS_Store
+
+!.mvn/wrapper/maven-wrapper.jar
