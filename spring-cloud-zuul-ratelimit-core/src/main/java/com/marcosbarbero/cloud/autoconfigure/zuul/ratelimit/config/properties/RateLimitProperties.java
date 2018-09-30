@@ -52,13 +52,13 @@ public class RateLimitProperties {
 
     public static final String PREFIX = "zuul.ratelimit";
 
+    @Valid
     @NotNull
     @Policies
-    @Valid
     private List<Policy> defaultPolicyList = Lists.newArrayList();
+    @Valid
     @NotNull
     @Policies
-    @Valid
     private Map<String, List<Policy>> policyList = Maps.newHashMap();
     private boolean behindProxy;
     private boolean enabled;
