@@ -1,8 +1,5 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit;
 
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.PREFIX;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.ecwid.consul.v1.ConsulClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.IMap;
@@ -20,8 +17,6 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateL
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.StringToMatchTypeConverter;
 import com.netflix.zuul.ZuulFilter;
 import io.github.bucket4j.grid.GridBucketState;
-import java.util.List;
-import java.util.Map;
 import org.apache.ignite.IgniteCache;
 import org.infinispan.functional.FunctionalMap.ReadWriteMap;
 import org.junit.After;
@@ -37,9 +32,14 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
+import java.util.List;
+import java.util.Map;
+
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.PREFIX;
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * @author Marcos Barbero
- * @since 2017-06-28
  */
 public class RateLimitAutoConfigurationTest {
 
@@ -56,11 +56,11 @@ public class RateLimitAutoConfigurationTest {
 
     @After
     public void tearDown() {
+        System.clearProperty(PREFIX + ".enabled");
         System.clearProperty(PREFIX + ".repository");
-    }
+        System.clearProperty(PREFIX + ".defaultPolicyList");
+        System.clearProperty(PREFIX + ".policyList");
 
-    @After
-    public void close() {
         if (this.context != null) {
             this.context.close();
         }
@@ -144,13 +144,14 @@ public class RateLimitAutoConfigurationTest {
     @Test
     public void testPolicyAdjuster() {
         System.setProperty(PREFIX + ".repository", "BUCKET4J_JCACHE");
-        System.setProperty(PREFIX + ".defaultPolicy.limit", "3");
-        System.setProperty(PREFIX + ".defaultPolicyList[0].limit", "4");
-        System.setProperty(PREFIX + ".policies.a.limit", "5");
-        System.setProperty(PREFIX + ".policyList.a[0].limit", "6");
+        System.setProperty(PREFIX + ".defaultPolicyList[0].limit", "3");
+        System.setProperty(PREFIX + ".defaultPolicyList[1].limit", "4");
+        System.setProperty(PREFIX + ".policyList.a[0].limit", "5");
+        System.setProperty(PREFIX + ".policyList.a[1].limit", "6");
         this.context.refresh();
 
         RateLimitProperties rateLimitProperties = this.context.getBean(RateLimitProperties.class);
+
         List<Policy> defaultPolicyList = rateLimitProperties.getDefaultPolicyList();
         assertThat(defaultPolicyList).hasSize(2);
         assertThat(defaultPolicyList.get(0).getLimit()).isEqualTo(3);
@@ -188,18 +189,21 @@ public class RateLimitAutoConfigurationTest {
 
         @Bean
         @Qualifier("RateLimit")
+        @SuppressWarnings("unchecked")
         public IMap<String, GridBucketState> hazelcastMap() {
             return Mockito.mock(IMap.class);
         }
 
         @Bean
         @Qualifier("RateLimit")
+        @SuppressWarnings("unchecked")
         public IgniteCache<String, GridBucketState> igniteCache() {
             return Mockito.mock(IgniteCache.class);
         }
 
         @Bean
         @Qualifier("RateLimit")
+        @SuppressWarnings("unchecked")
         public ReadWriteMap<String, GridBucketState> infinispanMap() {
             return Mockito.mock(ReadWriteMap.class);
         }

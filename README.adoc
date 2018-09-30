@@ -144,14 +144,6 @@ zuul:
     enabled: true 
     repository: REDIS
     behind-proxy: true
-    default-policy: #deprecated - please use "default-policy-list"
-      limit: 10 #optional - request number limit per refresh interval window
-      quota: 1000 #optional - request time limit per refresh interval window (in seconds)
-      refresh-interval: 60 #default value (in seconds)
-      type: #optional
-        - user
-        - origin
-        - url
     default-policy-list: #optional - will apply unless specific policy exists
       - limit: 10 #optional - request number limit per refresh interval window
         quota: 1000 #optional - request time limit per refresh interval window (in seconds)
@@ -215,15 +207,14 @@ Property namespace: __zuul.ratelimit__
 |===
 |Property name| Values |Default Value
 
-|enabled       |true/false                   |false
-|behind-proxy  |true/false                   |false
-|key-prefix    |String                       |${spring.application.name:rate-limit-application}
-|repository    |CONSUL, REDIS, JPA, BUCKET4J_JCACHE, BUCKET4J_HAZELCAST, BUCKET4J_INFINISPAN, BUCKET4J_IGNITE| -
-|default-policy|link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86[Policy]| -
-|default-policy-list|List of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86[Policy]| -
-|policy-list      |Map of Lists of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86[Policy]| -
-|postFilterOrder|int | FilterConstants.SEND_RESPONSE_FILTER_ORDER - 10
-|preFilterOrder|int | FilterConstants.FORM_BODY_WRAPPER_FILTER_ORDER
+|enabled             |true/false                   |false
+|behind-proxy        |true/false                   |false
+|key-prefix          |String                       |${spring.application.name:rate-limit-application}
+|repository          |CONSUL, REDIS, JPA, BUCKET4J_JCACHE, BUCKET4J_HAZELCAST, BUCKET4J_INFINISPAN, BUCKET4J_IGNITE| -
+|default-policy-list |List of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86[Policy]| -
+|policy-list         |Map of Lists of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86[Policy]| -
+|postFilterOrder     |int                          |FilterConstants.SEND_RESPONSE_FILTER_ORDER - 10
+|preFilterOrder      |int                          |FilterConstants.FORM_BODY_WRAPPER_FILTER_ORDER
 
 |===
 

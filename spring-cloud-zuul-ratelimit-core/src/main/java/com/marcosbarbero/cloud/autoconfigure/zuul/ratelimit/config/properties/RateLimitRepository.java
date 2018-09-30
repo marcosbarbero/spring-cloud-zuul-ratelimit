@@ -16,6 +16,12 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
 
+/**
+ * Enum with all the repositories storage supported.
+ *
+ * @author Marcos Barbero
+ * @author Liel Chayoun
+ */
 public enum RateLimitRepository {
     /**
      * Uses Redis as data storage

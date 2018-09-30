@@ -87,7 +87,7 @@ public class RateLimitPostFilterTest {
     public void testShouldFilterOnNullStartTime() {
         rateLimitProperties.setEnabled(true);
         Policy defaultPolicy = new Policy();
-        rateLimitProperties.setDefaultPolicy(defaultPolicy);
+        rateLimitProperties.getDefaultPolicyList().add(defaultPolicy);
 
         assertThat(target.shouldFilter()).isEqualTo(false);
     }

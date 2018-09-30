@@ -16,17 +16,13 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit;
 
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.PREFIX;
-
 import com.ecwid.consul.v1.ConsulClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 import com.hazelcast.core.IMap;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.ConsulRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.DefaultRateLimiterErrorHandler;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RateLimiterErrorHandler;
@@ -48,10 +44,6 @@ import io.github.bucket4j.grid.hazelcast.Hazelcast;
 import io.github.bucket4j.grid.ignite.Ignite;
 import io.github.bucket4j.grid.infinispan.Infinispan;
 import io.github.bucket4j.grid.jcache.JCache;
-import java.util.List;
-import javax.annotation.PostConstruct;
-import javax.cache.Cache;
-import lombok.RequiredArgsConstructor;
 import org.apache.ignite.IgniteCache;
 import org.infinispan.functional.FunctionalMap.ReadWriteMap;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -70,6 +62,10 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.util.UrlPathHelper;
+
+import javax.cache.Cache;
+
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.PREFIX;
 
 /**
  * @author Marcos Barbero
@@ -164,7 +160,7 @@ public class RateLimitAutoConfiguration {
         }
     }
 
-    @Configuration  
+    @Configuration
     @ConditionalOnMissingBean(RateLimiter.class)
     @ConditionalOnClass({Hazelcast.class, IMap.class})
     @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "BUCKET4J_HAZELCAST")
@@ -201,7 +197,7 @@ public class RateLimitAutoConfiguration {
     }
 
     @EntityScan
-    @Configuration  
+    @Configuration
     @EnableJpaRepositories
     @ConditionalOnMissingBean(RateLimiter.class)
     @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "JPA")
@@ -215,30 +211,4 @@ public class RateLimitAutoConfiguration {
 
     }
 
-    @Configuration
-    @RequiredArgsConstructor
-    protected static class RateLimitPropertiesAdjuster {
-
-        private final RateLimitProperties rateLimitProperties;
-
-        @PostConstruct
-        public void init() {
-            Policy defaultPolicy = rateLimitProperties.getDefaultPolicy();
-            if (defaultPolicy != null) {
-                List<Policy> defaultPolicies = Lists.newArrayList(defaultPolicy);
-                defaultPolicies.addAll(rateLimitProperties.getDefaultPolicyList());
-                rateLimitProperties.setDefaultPolicyList(defaultPolicies);
-            }
-            rateLimitProperties.getPolicies().forEach((route, policy) ->
-                rateLimitProperties.getPolicyList().compute(route, (key, policies) -> getPolicies(policy, policies)));
-        }
-
-        private List<Policy> getPolicies(Policy policy, List<Policy> policies) {
-            List<Policy> combinedPolicies = Lists.newArrayList(policy);
-            if (policies != null) {
-                combinedPolicies.addAll(policies);
-            }
-            return combinedPolicies;
-        }
-    }
 }
