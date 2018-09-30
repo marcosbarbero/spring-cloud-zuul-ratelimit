@@ -58,10 +58,8 @@ public class RateLimitAutoConfigurationTest {
     public void tearDown() {
         System.clearProperty(PREFIX + ".enabled");
         System.clearProperty(PREFIX + ".repository");
-        System.clearProperty(PREFIX + ".defaultPolicy.limit");
-        System.clearProperty(PREFIX + ".defaultPolicyList[0].limit");
-        System.clearProperty(PREFIX + ".policies.a.limit");
-        System.clearProperty(PREFIX + ".policyList.a[0].limit");
+        System.clearProperty(PREFIX + ".defaultPolicyList");
+        System.clearProperty(PREFIX + ".policyList");
 
         if (this.context != null) {
             this.context.close();
@@ -146,10 +144,10 @@ public class RateLimitAutoConfigurationTest {
     @Test
     public void testPolicyAdjuster() {
         System.setProperty(PREFIX + ".repository", "BUCKET4J_JCACHE");
-        System.setProperty(PREFIX + ".defaultPolicy.limit", "3");
-        System.setProperty(PREFIX + ".defaultPolicyList[0].limit", "4");
-        System.setProperty(PREFIX + ".policies.a.limit", "5");
-        System.setProperty(PREFIX + ".policyList.a[0].limit", "6");
+        System.setProperty(PREFIX + ".defaultPolicyList[0].limit", "3");
+        System.setProperty(PREFIX + ".defaultPolicyList[1].limit", "4");
+        System.setProperty(PREFIX + ".policyList.a[0].limit", "5");
+        System.setProperty(PREFIX + ".policyList.a[1].limit", "6");
         this.context.refresh();
 
         RateLimitProperties rateLimitProperties = this.context.getBean(RateLimitProperties.class);

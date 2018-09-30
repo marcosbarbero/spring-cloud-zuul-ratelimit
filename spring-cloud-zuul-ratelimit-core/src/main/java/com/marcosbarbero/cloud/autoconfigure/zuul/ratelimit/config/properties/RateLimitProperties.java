@@ -26,7 +26,6 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.validation.annotation.Validated;
 
@@ -53,9 +52,11 @@ public class RateLimitProperties {
 
     @NotNull
     @Policies
+    @Valid
     private List<Policy> defaultPolicyList = Lists.newArrayList();
     @NotNull
     @Policies
+    @Valid
     private Map<String, List<Policy>> policyList = Maps.newHashMap();
     private boolean behindProxy;
     private boolean enabled;
@@ -67,34 +68,11 @@ public class RateLimitProperties {
     private int postFilterOrder = SEND_RESPONSE_FILTER_ORDER - 10;
     private int preFilterOrder = FORM_BODY_WRAPPER_FILTER_ORDER;
 
-    @Deprecated
-    @DeprecatedConfigurationProperty(replacement = PREFIX + ".default-policy-list")
-    public void setDefaultPolicy(Policy defaultPolicy) {
-        List<Policy> defaultPolicies = Lists.newArrayList(defaultPolicy);
-        defaultPolicies.addAll(getDefaultPolicyList());
-        setDefaultPolicyList(defaultPolicies);
-    }
-
-    @Deprecated
-    @DeprecatedConfigurationProperty(replacement = PREFIX + ".policy-list")
-    public void setPolicies(Map<String, Policy> policies) {
-        policies.forEach((route, policy) ->
-                policyList.compute(route, (key, policyList) -> getPolicies(policy, policyList)));
-    }
-
     public List<Policy> getPolicies(String key) {
         if (StringUtils.isEmpty(key)) {
             return defaultPolicyList;
         }
         return policyList.getOrDefault(key, defaultPolicyList);
-    }
-
-    private List<Policy> getPolicies(Policy policy, List<Policy> policies) {
-        List<Policy> combinedPolicies = Lists.newArrayList(policy);
-        if (policies != null) {
-            combinedPolicies.addAll(policies);
-        }
-        return combinedPolicies;
     }
 
     @Data

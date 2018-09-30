@@ -59,7 +59,6 @@ public class PoliciesValidatorTest {
     public void testInvalidOnPolicyWithNoLimitOrQuota() {
         properties.setKeyPrefix("prefix");
         Policy policy = getPolicy(null, null);
-        properties.setDefaultPolicy(policy);
         properties.getDefaultPolicyList().add(policy);
         properties.getPolicyList().put("key", Lists.newArrayList(policy));
         Set<ConstraintViolation<RateLimitProperties>> violations = validator.validate(properties);
@@ -70,7 +69,6 @@ public class PoliciesValidatorTest {
     public void testValidOnPolicyWithLimitNoQuota() {
         properties.setKeyPrefix("prefix");
         Policy policy = getPolicy(1L, null);
-        properties.setDefaultPolicy(policy);
         properties.getDefaultPolicyList().add(policy);
         properties.getPolicyList().put("key", Lists.newArrayList(policy));
         Set<ConstraintViolation<RateLimitProperties>> violations = validator.validate(properties);
@@ -81,7 +79,6 @@ public class PoliciesValidatorTest {
     public void testValidOnPolicyWithQuotaNoLimit() {
         properties.setKeyPrefix("prefix");
         Policy policy = getPolicy(null, 1L);
-        properties.setDefaultPolicy(policy);
         properties.getDefaultPolicyList().add(policy);
         properties.getPolicyList().put("key", Lists.newArrayList(policy));
         Set<ConstraintViolation<RateLimitProperties>> violations = validator.validate(properties);
