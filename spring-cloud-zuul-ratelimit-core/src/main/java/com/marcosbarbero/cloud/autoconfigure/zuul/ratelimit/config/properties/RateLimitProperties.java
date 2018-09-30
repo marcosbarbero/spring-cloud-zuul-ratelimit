@@ -26,6 +26,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.validation.annotation.Validated;
 
@@ -45,6 +46,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
  */
 @Data
 @Validated
+@RefreshScope
 @ConfigurationProperties(RateLimitProperties.PREFIX)
 public class RateLimitProperties {
 
