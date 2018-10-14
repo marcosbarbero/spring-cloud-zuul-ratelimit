@@ -1,6 +1,7 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 import com.netflix.zuul.exception.ZuulException;
 import com.netflix.zuul.monitoring.CounterFactory;
@@ -13,11 +14,9 @@ public class RateLimitExceededExceptionTest {
 
     private RateLimitExceededException target;
 
-    @Mock
-    private CounterFactory counterFactory;
-
     @Before
     public void setUp() {
+        CounterFactory counterFactory = mock(CounterFactory.class);
         MockitoAnnotations.initMocks(this);
         CounterFactory.initialize(counterFactory);
         target = new RateLimitExceededException();
