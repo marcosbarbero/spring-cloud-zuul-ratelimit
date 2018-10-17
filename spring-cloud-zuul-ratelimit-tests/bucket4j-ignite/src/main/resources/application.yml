@@ -19,27 +19,27 @@ zuul:
   ratelimit:
     enabled: true
     repository: BUCKET4J_IGNITE
-    policies:
+    policy-list:
       serviceA:
-        limit: 10
-        refresh-interval: 60
-        type:
-          - origin
+        - limit: 10
+          refresh-interval: 60
+          type:
+            - origin
       serviceB:
-        limit: 2
-        refresh-interval: 2
-        type:
-          - origin
+        - limit: 2
+          refresh-interval: 2
+          type:
+            - origin
       serviceD:
-        limit: 2
-        refresh-interval: 60
-        type:
-          - url
+        - limit: 2
+          refresh-interval: 60
+          type:
+            - url
       serviceE:
-        quota: 1
-        refresh-interval: 60
-        type:
-          - origin
+        - quota: 1
+          refresh-interval: 60
+          type:
+            - origin
   strip-prefix: true
 
 logging:

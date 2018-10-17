@@ -211,8 +211,8 @@ Property namespace: __zuul.ratelimit__
 |behind-proxy        |true/false                   |false
 |key-prefix          |String                       |${spring.application.name:rate-limit-application}
 |repository          |CONSUL, REDIS, JPA, BUCKET4J_JCACHE, BUCKET4J_HAZELCAST, BUCKET4J_INFINISPAN, BUCKET4J_IGNITE| -
-|default-policy-list |List of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86[Policy]| -
-|policy-list         |Map of Lists of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86[Policy]| -
+|default-policy-list |List of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L82[Policy]| -
+|policy-list         |Map of Lists of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L82[Policy]| -
 |postFilterOrder     |int                          |FilterConstants.SEND_RESPONSE_FILTER_ORDER - 10
 |preFilterOrder      |int                          |FilterConstants.FORM_BODY_WRAPPER_FILTER_ORDER
 
