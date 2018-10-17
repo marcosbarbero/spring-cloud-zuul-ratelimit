@@ -38,8 +38,6 @@ public class PoliciesValidator implements ConstraintValidator<Policies, Object> 
     public boolean isValid(Object value, ConstraintValidatorContext context) {
         if (value == null) {
             return true;
-        } else if (value instanceof Policy) {
-            return isValidObject(value);
         } else if (value instanceof Collection) {
             return isValidCollection((Collection<?>) value);
         } else if (value instanceof Map) {

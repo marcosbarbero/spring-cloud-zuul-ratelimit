@@ -93,7 +93,6 @@ public class RateLimitProperties {
         private List<MatchType> type = Lists.newArrayList();
 
         @Data
-        @NoArgsConstructor
         @AllArgsConstructor
         public static class MatchType {
 
