@@ -32,8 +32,8 @@ public class JpaRateLimiter extends AbstractRateLimiter {
 
     private final RateLimiterRepository repository;
 
-    public JpaRateLimiter(RateLimiterErrorHandler rateLimiterErrorHandler,
-        RateLimiterRepository repository) {
+    public JpaRateLimiter(final RateLimiterErrorHandler rateLimiterErrorHandler,
+                          final RateLimiterRepository repository) {
         super(rateLimiterErrorHandler);
         this.repository = repository;
     }

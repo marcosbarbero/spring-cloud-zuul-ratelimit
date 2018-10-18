@@ -38,8 +38,8 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
     private final RedisTemplate redisTemplate;
 
     @Override
-    protected void calcRemainingLimit(Long limit, Long refreshInterval,
-                                      Long requestTime, String key, Rate rate) {
+    protected void calcRemainingLimit(final Long limit, final Long refreshInterval,
+                                      final Long requestTime, final String key, final Rate rate) {
         if (Objects.nonNull(limit)) {
             long usage = requestTime == null ? 1L : 0L;
             Long remaining = calcRemaining(limit, refreshInterval, usage, key, rate);
@@ -48,8 +48,8 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
     }
 
     @Override
-    protected void calcRemainingQuota(Long quota, Long refreshInterval,
-                                      Long requestTime, String key, Rate rate) {
+    protected void calcRemainingQuota(final Long quota, final Long refreshInterval,
+                                      final Long requestTime, final String key, final Rate rate) {
         if (Objects.nonNull(quota)) {
             String quotaKey = key + QUOTA_SUFFIX;
             long usage = requestTime != null ? requestTime : 0L;

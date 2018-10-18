@@ -23,7 +23,19 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface RateLimitUtils {
 
+    /**
+     * Returns the authenticated user from {@link HttpServletRequest}.
+     *
+     * @param request The {@link HttpServletRequest}
+     * @return The authenticated user or annonymous
+     */
     String getUser(HttpServletRequest request);
 
+    /**
+     * Returns the remote IP address from {@link HttpServletRequest}.
+     *
+     * @param request The {@link HttpServletRequest}
+     * @return The remote IP address
+     */
     String getRemoteAddress(HttpServletRequest request);
 }
