@@ -32,7 +32,7 @@ public class Bucket4jJCacheRateLimiter extends AbstractBucket4jRateLimiter<JCach
 
     private final Cache<String, GridBucketState> cache;
 
-    public Bucket4jJCacheRateLimiter(Cache<String, GridBucketState> cache) {
+    public Bucket4jJCacheRateLimiter(final Cache<String, GridBucketState> cache) {
         super(io.github.bucket4j.grid.jcache.JCache.class);
         this.cache = cache;
         super.init();

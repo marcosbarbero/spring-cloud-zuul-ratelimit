@@ -32,7 +32,7 @@ public class Bucket4jInfinispanRateLimiter extends AbstractBucket4jRateLimiter<I
 
     private final ReadWriteMap<String, GridBucketState> readWriteMap;
 
-    public Bucket4jInfinispanRateLimiter(ReadWriteMap<String, GridBucketState> readWriteMap) {
+    public Bucket4jInfinispanRateLimiter(final ReadWriteMap<String, GridBucketState> readWriteMap) {
         super(io.github.bucket4j.grid.infinispan.Infinispan.class);
         this.readWriteMap = readWriteMap;
         super.init();

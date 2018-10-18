@@ -34,12 +34,12 @@ public class DefaultRateLimitUtils implements RateLimitUtils {
     private final RateLimitProperties properties;
 
     @Override
-    public String getUser(HttpServletRequest request) {
+    public String getUser(final HttpServletRequest request) {
         return request.getRemoteUser() != null ? request.getRemoteUser() : ANONYMOUS_USER;
     }
 
     @Override
-    public String getRemoteAddress(HttpServletRequest request) {
+    public String getRemoteAddress(final HttpServletRequest request) {
         String xForwardedFor = request.getHeader(X_FORWARDED_FOR_HEADER);
         if (properties.isBehindProxy() && xForwardedFor != null) {
             return xForwardedFor.split(",")[0].trim();

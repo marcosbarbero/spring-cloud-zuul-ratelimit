@@ -16,18 +16,19 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.REQUEST_START_TIME;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
-
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.netflix.zuul.context.RequestContext;
-import javax.servlet.http.HttpServletRequest;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.web.util.UrlPathHelper;
+
+import javax.servlet.http.HttpServletRequest;
+
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.REQUEST_START_TIME;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
 
 /**
  * @author Marcos Barbero
@@ -39,9 +40,9 @@ public class RateLimitPostFilter extends AbstractRateLimitFilter {
     private final RateLimiter rateLimiter;
     private final RateLimitKeyGenerator rateLimitKeyGenerator;
 
-    public RateLimitPostFilter(RateLimitProperties properties, RouteLocator routeLocator,
-                               UrlPathHelper urlPathHelper, RateLimiter rateLimiter,
-                               RateLimitKeyGenerator rateLimitKeyGenerator, RateLimitUtils rateLimitUtils) {
+    public RateLimitPostFilter(final RateLimitProperties properties, final RouteLocator routeLocator,
+                               final UrlPathHelper urlPathHelper, final RateLimiter rateLimiter,
+                               final RateLimitKeyGenerator rateLimitKeyGenerator, final RateLimitUtils rateLimitUtils) {
         super(properties, routeLocator, urlPathHelper, rateLimitUtils);
         this.properties = properties;
         this.rateLimiter = rateLimiter;

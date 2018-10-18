@@ -38,16 +38,16 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
  * @author Liel Chayoun
  * @since 2018-04-06
  */
-public abstract class AbstractBucket4jRateLimiter<T extends ConfigurationBuilder<T>, E extends Extension<T>> extends AbstractCacheRateLimiter {
+abstract class AbstractBucket4jRateLimiter<T extends ConfigurationBuilder<T>, E extends Extension<T>> extends AbstractCacheRateLimiter {
 
     private final Class<E> extension;
     private ProxyManager<String> buckets;
 
-    public AbstractBucket4jRateLimiter(Class<E> extension) {
+    AbstractBucket4jRateLimiter(final Class<E> extension) {
         this.extension = extension;
     }
 
-    public void init() {
+    void init() {
         buckets = getProxyManager(getExtension());
     }
 
