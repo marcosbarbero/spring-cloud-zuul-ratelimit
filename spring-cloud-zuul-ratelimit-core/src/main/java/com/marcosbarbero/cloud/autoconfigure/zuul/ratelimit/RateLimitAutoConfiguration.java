@@ -76,6 +76,8 @@ import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.proper
 @ConditionalOnProperty(prefix = PREFIX, name = "enabled", havingValue = "true")
 public class RateLimitAutoConfiguration {
 
+    private final UrlPathHelper urlPathHelper = new UrlPathHelper();
+
     @Bean
     @ConfigurationPropertiesBinding
     public StringToMatchTypeConverter stringToMatchTypeConverter() {
@@ -90,29 +92,30 @@ public class RateLimitAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(RateLimitUtils.class)
-    public RateLimitUtils rateLimitUtils(RateLimitProperties rateLimitProperties) {
+    public RateLimitUtils rateLimitUtils(final RateLimitProperties rateLimitProperties) {
         return new DefaultRateLimitUtils(rateLimitProperties);
     }
 
     @Bean
-    public ZuulFilter rateLimiterPreFilter(RateLimiter rateLimiter, RateLimitProperties rateLimitProperties,
-                                           RouteLocator routeLocator, RateLimitKeyGenerator rateLimitKeyGenerator,
-                                           RateLimitUtils rateLimitUtils) {
-        return new RateLimitPreFilter(rateLimitProperties, routeLocator, new UrlPathHelper(), rateLimiter,
+    public ZuulFilter rateLimiterPreFilter(final RateLimiter rateLimiter, final RateLimitProperties rateLimitProperties,
+                                           final RouteLocator routeLocator, final RateLimitKeyGenerator rateLimitKeyGenerator,
+                                           final RateLimitUtils rateLimitUtils) {
+        return new RateLimitPreFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter,
                 rateLimitKeyGenerator, rateLimitUtils);
     }
 
     @Bean
-    public ZuulFilter rateLimiterPostFilter(RateLimiter rateLimiter, RateLimitProperties rateLimitProperties,
-                                            RouteLocator routeLocator, RateLimitKeyGenerator rateLimitKeyGenerator,
-                                            RateLimitUtils rateLimitUtils) {
-        return new RateLimitPostFilter(rateLimitProperties, routeLocator, new UrlPathHelper(), rateLimiter,
+    public ZuulFilter rateLimiterPostFilter(final RateLimiter rateLimiter, final RateLimitProperties rateLimitProperties,
+                                            final RouteLocator routeLocator, final RateLimitKeyGenerator rateLimitKeyGenerator,
+                                            final RateLimitUtils rateLimitUtils) {
+        return new RateLimitPostFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter,
                 rateLimitKeyGenerator, rateLimitUtils);
     }
 
     @Bean
     @ConditionalOnMissingBean(RateLimitKeyGenerator.class)
-    public RateLimitKeyGenerator ratelimitKeyGenerator(RateLimitProperties properties, RateLimitUtils rateLimitUtils) {
+    public RateLimitKeyGenerator ratelimitKeyGenerator(final RateLimitProperties properties,
+                                                       final RateLimitUtils rateLimitUtils) {
         return new DefaultRateLimitKeyGenerator(properties, rateLimitUtils);
     }
 
@@ -123,13 +126,13 @@ public class RateLimitAutoConfiguration {
     public static class RedisConfiguration {
 
         @Bean("rateLimiterRedisTemplate")
-        public StringRedisTemplate redisTemplate(RedisConnectionFactory connectionFactory) {
+        public StringRedisTemplate redisTemplate(final RedisConnectionFactory connectionFactory) {
             return new StringRedisTemplate(connectionFactory);
         }
 
         @Bean
-        public RateLimiter redisRateLimiter(RateLimiterErrorHandler rateLimiterErrorHandler,
-                                            @Qualifier("rateLimiterRedisTemplate") RedisTemplate redisTemplate) {
+        public RateLimiter redisRateLimiter(final RateLimiterErrorHandler rateLimiterErrorHandler,
+                                            @Qualifier("rateLimiterRedisTemplate") final RedisTemplate redisTemplate) {
             return new RedisRateLimiter(rateLimiterErrorHandler, redisTemplate);
         }
     }
@@ -141,8 +144,8 @@ public class RateLimitAutoConfiguration {
     public static class ConsulConfiguration {
 
         @Bean
-        public RateLimiter consultRateLimiter(RateLimiterErrorHandler rateLimiterErrorHandler,
-                                              ConsulClient consulClient, ObjectMapper objectMapper) {
+        public RateLimiter consultRateLimiter(final RateLimiterErrorHandler rateLimiterErrorHandler,
+                                              final ConsulClient consulClient, final ObjectMapper objectMapper) {
             return new ConsulRateLimiter(rateLimiterErrorHandler, consulClient, objectMapper);
         }
 
@@ -155,7 +158,7 @@ public class RateLimitAutoConfiguration {
     public static class Bucket4jJCacheConfiguration {
 
         @Bean
-        public RateLimiter jCache4jHazelcastRateLimiter(@Qualifier("RateLimit") Cache<String, GridBucketState> cache) {
+        public RateLimiter jCache4jHazelcastRateLimiter(@Qualifier("RateLimit") final Cache<String, GridBucketState> cache) {
             return new Bucket4jJCacheRateLimiter(cache);
         }
     }
@@ -167,7 +170,7 @@ public class RateLimitAutoConfiguration {
     public static class Bucket4jHazelcastConfiguration {
 
         @Bean
-        public RateLimiter bucket4jHazelcastRateLimiter(@Qualifier("RateLimit") IMap<String, GridBucketState> rateLimit) {
+        public RateLimiter bucket4jHazelcastRateLimiter(@Qualifier("RateLimit") final IMap<String, GridBucketState> rateLimit) {
             return new Bucket4jHazelcastRateLimiter(rateLimit);
         }
     }
@@ -179,7 +182,7 @@ public class RateLimitAutoConfiguration {
     public static class Bucket4jIgniteConfiguration {
 
         @Bean
-        public RateLimiter bucket4jIgniteRateLimiter(@Qualifier("RateLimit") IgniteCache<String, GridBucketState> cache) {
+        public RateLimiter bucket4jIgniteRateLimiter(@Qualifier("RateLimit") final IgniteCache<String, GridBucketState> cache) {
             return new Bucket4jIgniteRateLimiter(cache);
         }
     }
@@ -191,7 +194,7 @@ public class RateLimitAutoConfiguration {
     public static class Bucket4jInfinispanConfiguration {
 
         @Bean
-        public RateLimiter bucket4jInfinispanRateLimiter(@Qualifier("RateLimit") ReadWriteMap<String, GridBucketState> readWriteMap) {
+        public RateLimiter bucket4jInfinispanRateLimiter(@Qualifier("RateLimit") final ReadWriteMap<String, GridBucketState> readWriteMap) {
             return new Bucket4jInfinispanRateLimiter(readWriteMap);
         }
     }
@@ -204,8 +207,8 @@ public class RateLimitAutoConfiguration {
     public static class SpringDataConfiguration {
 
         @Bean
-        public RateLimiter springDataRateLimiter(RateLimiterErrorHandler rateLimiterErrorHandler,
-                                                 RateLimiterRepository rateLimiterRepository) {
+        public RateLimiter springDataRateLimiter(final RateLimiterErrorHandler rateLimiterErrorHandler,
+                                                 final RateLimiterRepository rateLimiterRepository) {
             return new JpaRateLimiter(rateLimiterErrorHandler, rateLimiterRepository);
         }
 

@@ -99,7 +99,8 @@ abstract class AbstractBucket4jRateLimiter<T extends ConfigurationBuilder<T>, E 
     }
 
     @Override
-    protected void calcRemainingLimit(Long limit, Long refreshInterval, Long requestTime, String key, Rate rate) {
+    protected void calcRemainingLimit(final Long limit, final Long refreshInterval, final Long requestTime,
+                                      final String key, final Rate rate) {
         if (limit == null) {
             return;
         }
@@ -112,7 +113,8 @@ abstract class AbstractBucket4jRateLimiter<T extends ConfigurationBuilder<T>, E 
     }
 
     @Override
-    protected void calcRemainingQuota(Long quota, Long refreshInterval, Long requestTime, String key, Rate rate) {
+    protected void calcRemainingQuota(final Long quota, final Long refreshInterval, final Long requestTime,
+                                      final String key, final Rate rate) {
         if (quota == null) {
             return;
         }
