@@ -37,6 +37,7 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPos
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitUtils;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.SecuredRateLimitUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.StringToMatchTypeConverter;
 import com.netflix.zuul.ZuulFilter;
 import io.github.bucket4j.grid.GridBucketState;
@@ -49,6 +50,7 @@ import org.infinispan.functional.FunctionalMap.ReadWriteMap;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
@@ -91,12 +93,6 @@ public class RateLimitAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(RateLimitUtils.class)
-    public RateLimitUtils rateLimitUtils(final RateLimitProperties rateLimitProperties) {
-        return new DefaultRateLimitUtils(rateLimitProperties);
-    }
-
-    @Bean
     public ZuulFilter rateLimiterPreFilter(final RateLimiter rateLimiter, final RateLimitProperties rateLimitProperties,
                                            final RouteLocator routeLocator, final RateLimitKeyGenerator rateLimitKeyGenerator,
                                            final RateLimitUtils rateLimitUtils) {
@@ -117,6 +113,23 @@ public class RateLimitAutoConfiguration {
     public RateLimitKeyGenerator ratelimitKeyGenerator(final RateLimitProperties properties,
                                                        final RateLimitUtils rateLimitUtils) {
         return new DefaultRateLimitKeyGenerator(properties, rateLimitUtils);
+    }
+
+    @Configuration
+    @ConditionalOnMissingBean(RateLimitUtils.class)
+    public static class RateLimitUtilsConfiguration {
+
+        @Bean
+        @ConditionalOnClass(name = "org.springframework.security.core.Authentication")
+        public RateLimitUtils securedRateLimitUtils(final RateLimitProperties rateLimitProperties) {
+            return new SecuredRateLimitUtils(rateLimitProperties);
+        }
+
+        @Bean
+        @ConditionalOnMissingClass("org.springframework.security.core.Authentication")
+        public RateLimitUtils rateLimitUtils(final RateLimitProperties rateLimitProperties) {
+            return new DefaultRateLimitUtils(rateLimitProperties);
+        }
     }
 
     @Configuration

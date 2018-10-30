@@ -1,22 +1,23 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_FOR_HEADER;
-
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.MatchType;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitType;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitUtils;
-import java.util.Collections;
-import javax.servlet.http.HttpServletRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.cloud.netflix.zuul.filters.Route;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_FOR_HEADER;
 
 public class DefaultRateLimitKeyGeneratorTest {
 
@@ -150,5 +151,13 @@ public class DefaultRateLimitKeyGeneratorTest {
 
         String key = target.key(httpServletRequest, route, policy);
         assertThat(key).isEqualTo("key-prefix:id:user:matcherUser");
+    }
+
+    @Test
+    public void testKeyUserRoleWithMatcher() {
+        Policy policy = new Policy();
+        policy.getType().add(new MatchType(RateLimitType.ROLE, "user"));
+        String key = target.key(httpServletRequest, route, policy);
+        assertThat(key).isEqualTo("key-prefix:id:role:user");
     }
 }

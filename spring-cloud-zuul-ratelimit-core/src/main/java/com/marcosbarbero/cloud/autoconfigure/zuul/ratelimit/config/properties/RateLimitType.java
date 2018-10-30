@@ -67,6 +67,24 @@ public enum RateLimitType {
             return Optional.ofNullable(route).map(Route::getPath).orElse(StringUtils.EMPTY);
         }
     },
+
+    /**
+     * Rate limit policy considering the authenticated user's role.
+     */
+    ROLE {
+        @Override
+        public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
+            if (matcher == null) {
+                return false;
+            }
+            return rateLimitUtils.getUserRoles().contains(matcher.toLowerCase());
+        }
+
+        @Override
+        public String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils) {
+            return ROLE.name().toLowerCase();
+        }
+    },
     ;
 
     public abstract boolean apply(HttpServletRequest request, Route route,

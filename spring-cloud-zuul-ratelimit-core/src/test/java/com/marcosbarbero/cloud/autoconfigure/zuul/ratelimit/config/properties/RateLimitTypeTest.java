@@ -8,9 +8,14 @@ import java.util.Collections;
 import javax.servlet.http.HttpServletRequest;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.cloud.netflix.zuul.filters.Route;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithSecurityContextTestExecutionListener;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.junit4.SpringRunner;
 
 public class RateLimitTypeTest {
 
@@ -90,5 +95,11 @@ public class RateLimitTypeTest {
     public void keyURL() {
         String key = RateLimitType.URL.key(httpServletRequest, route, rateLimitUtils);
         assertThat(key).isEqualTo("/test");
+    }
+
+    @Test
+    public void doNotApplyRoleWithoutMatcher() {
+        boolean apply = RateLimitType.ROLE.apply(httpServletRequest, route, rateLimitUtils, null);
+        assertThat(apply).isFalse();
     }
 }
