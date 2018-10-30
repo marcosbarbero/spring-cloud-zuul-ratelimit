@@ -68,7 +68,7 @@ public class PoliciesValidator implements ConstraintValidator<Policies, Object> 
     }
 
     private boolean isValidRoles(Policy policy) {
-        return policy.getType().stream()
+        return policy.getType().stream().noneMatch((type -> type.getType().equals(ROLE) && type.getMatcher() == null);
                 .filter(type -> type.getType().equals(ROLE))
                 .filter(type -> type.getMatcher() == null)
                 .collect(toList()).isEmpty();
