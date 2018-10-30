@@ -17,10 +17,13 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.validators;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
-import java.util.Collection;
-import java.util.Map;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.util.Collection;
+import java.util.Map;
+
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitType.ROLE;
 
 /**
  * Validates the rate limit policies.
@@ -49,14 +52,19 @@ public class PoliciesValidator implements ConstraintValidator<Policies, Object> 
 
     private boolean isValidCollection(Collection<?> objects) {
         return objects.isEmpty()
-            || objects.stream().allMatch(this::isValidObject);
+                || objects.stream().allMatch(this::isValidObject);
     }
 
     private boolean isValidObject(Object o) {
         return (o instanceof Policy) && isValidPolicy((Policy) o);
     }
 
-    private boolean isValidPolicy(Policy p) {
-        return p.getLimit() != null || p.getQuota() != null;
+    private boolean isValidPolicy(Policy policy) {
+        return (policy.getLimit() != null || policy.getQuota() != null) && isValidRoles(policy);
+    }
+
+    private boolean isValidRoles(Policy policy) {
+        return policy.getType().stream()
+                .noneMatch(type -> type.getType().equals(ROLE) && type.getMatcher() == null);
     }
 }

@@ -17,6 +17,7 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Set;
 
 /**
  * @author Liel Chayoun
@@ -38,4 +39,12 @@ public interface RateLimitUtils {
      * @return The remote IP address
      */
     String getRemoteAddress(HttpServletRequest request);
+
+    /**
+     * Returns the authenticated user's roles.
+     *
+     * @return The authenticated user's roles or empty
+     */
+    Set<String> getUserRoles();
+
 }

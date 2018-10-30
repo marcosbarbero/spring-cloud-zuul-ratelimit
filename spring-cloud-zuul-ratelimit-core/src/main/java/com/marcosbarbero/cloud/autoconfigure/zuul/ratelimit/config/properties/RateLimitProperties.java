@@ -106,7 +106,7 @@ public class RateLimitProperties {
             }
 
             public String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils) {
-                return type.key(request, route, rateLimitUtils) +
+                return type.key(request, route, rateLimitUtils, matcher) +
                         (StringUtils.isEmpty(matcher) ? StringUtils.EMPTY : (":" + matcher));
             }
         }

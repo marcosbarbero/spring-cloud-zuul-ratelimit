@@ -8,9 +8,14 @@ import java.util.Collections;
 import javax.servlet.http.HttpServletRequest;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.cloud.netflix.zuul.filters.Route;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithSecurityContextTestExecutionListener;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.junit4.SpringRunner;
 
 public class RateLimitTypeTest {
 
@@ -46,7 +51,7 @@ public class RateLimitTypeTest {
     public void keyUser() {
         when(httpServletRequest.getRemoteUser()).thenReturn("testUser");
 
-        String key = RateLimitType.USER.key(httpServletRequest, route, rateLimitUtils);
+        String key = RateLimitType.USER.key(httpServletRequest, route, rateLimitUtils, null);
         assertThat(key).isEqualTo("testUser");
     }
 
@@ -70,7 +75,7 @@ public class RateLimitTypeTest {
     public void keyOrigin() {
         when(httpServletRequest.getRemoteAddr()).thenReturn("testAddr");
 
-        String key = RateLimitType.ORIGIN.key(httpServletRequest, route, rateLimitUtils);
+        String key = RateLimitType.ORIGIN.key(httpServletRequest, route, rateLimitUtils, null);
         assertThat(key).isEqualTo("testAddr");
     }
 
@@ -88,7 +93,12 @@ public class RateLimitTypeTest {
 
     @Test
     public void keyURL() {
-        String key = RateLimitType.URL.key(httpServletRequest, route, rateLimitUtils);
+        String key = RateLimitType.URL.key(httpServletRequest, route, rateLimitUtils, null);
         assertThat(key).isEqualTo("/test");
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void doNotApplyRoleWithoutMatcher() {
+        RateLimitType.ROLE.apply(httpServletRequest, route, rateLimitUtils, null);
     }
 }

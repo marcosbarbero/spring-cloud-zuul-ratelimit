@@ -3,6 +3,7 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.v
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitRepository;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitType;
 import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +27,7 @@ public class PoliciesValidatorTest {
     private ConstraintValidatorContext constraintValidatorContext;
     private RateLimitProperties properties;
 
-    private static Policy getPolicy(Long limit, Long quota) {
+    private Policy getPolicy(Long limit, Long quota) {
         Policy policy = new Policy();
         policy.setLimit(limit);
         policy.setQuota(quota);
@@ -83,5 +84,27 @@ public class PoliciesValidatorTest {
         properties.getPolicyList().put("key", Lists.newArrayList(policy));
         Set<ConstraintViolation<RateLimitProperties>> violations = validator.validate(properties);
         assertThat(violations).isEmpty();
+    }
+
+    @Test
+    public void testValidOnPolicyWithLimitAndRole() {
+        properties.setKeyPrefix("prefix");
+        Policy policy = getPolicy(1L, null);
+        policy.getType().add(new Policy.MatchType(RateLimitType.ROLE, "user"));
+        properties.getDefaultPolicyList().add(policy);
+        properties.getPolicyList().put("key", Lists.newArrayList(policy));
+        Set<ConstraintViolation<RateLimitProperties>> violations = validator.validate(properties);
+        assertThat(violations).isEmpty();
+    }
+
+    @Test
+    public void testValidOnPolicyWithLimitAndRoleWithoutMatcher() {
+        properties.setKeyPrefix("prefix");
+        Policy policy = getPolicy(1L, null);
+        policy.getType().add(new Policy.MatchType(RateLimitType.ROLE, null));
+        properties.getDefaultPolicyList().add(policy);
+        properties.getPolicyList().put("key", Lists.newArrayList(policy));
+        Set<ConstraintViolation<RateLimitProperties>> violations = validator.validate(properties);
+        assertThat(violations).hasSize(2);
     }
 }

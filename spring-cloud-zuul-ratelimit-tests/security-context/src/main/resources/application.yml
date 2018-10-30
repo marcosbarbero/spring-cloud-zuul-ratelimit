@@ -1,0 +1,4 @@
+zuul:
+  ratelimit:
+    enabled: true
+    repository: REDIS

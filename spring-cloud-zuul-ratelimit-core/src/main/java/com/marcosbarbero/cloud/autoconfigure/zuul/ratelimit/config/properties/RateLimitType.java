@@ -17,10 +17,11 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
-import java.util.Optional;
-import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.netflix.zuul.filters.Route;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Optional;
 
 public enum RateLimitType {
     /**
@@ -33,7 +34,7 @@ public enum RateLimitType {
         }
 
         @Override
-        public String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils) {
+        public String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
             return rateLimitUtils.getRemoteAddress(request);
         }
     },
@@ -48,7 +49,7 @@ public enum RateLimitType {
         }
 
         @Override
-        public String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils) {
+        public String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
             return rateLimitUtils.getUser(request);
         }
     },
@@ -63,8 +64,23 @@ public enum RateLimitType {
         }
 
         @Override
-        public String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils) {
+        public String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
             return Optional.ofNullable(route).map(Route::getPath).orElse(StringUtils.EMPTY);
+        }
+    },
+
+    /**
+     * Rate limit policy considering the authenticated user's role.
+     */
+    ROLE {
+        @Override
+        public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
+            return rateLimitUtils.getUserRoles().contains(matcher.toUpperCase());
+        }
+
+        @Override
+        public String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
+            return matcher;
         }
     },
     ;
@@ -72,5 +88,6 @@ public enum RateLimitType {
     public abstract boolean apply(HttpServletRequest request, Route route,
                                   RateLimitUtils rateLimitUtils, String matcher);
 
-    public abstract String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils);
+    public abstract String key(HttpServletRequest request, Route route,
+                               RateLimitUtils rateLimitUtils, String matcher);
 }
