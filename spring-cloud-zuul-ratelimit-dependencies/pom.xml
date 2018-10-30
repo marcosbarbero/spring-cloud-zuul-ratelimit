@@ -7,7 +7,7 @@
 
     <groupId>com.marcosbarbero.cloud</groupId>
     <artifactId>spring-cloud-zuul-ratelimit-dependencies</artifactId>
-    <version>2.2.0.RELEASE</version>
+    <version>2.2.1.RELEASE</version>
     <packaging>pom</packaging>
     <url>https://github.com/marcosbarbero/spring-cloud-zuul-ratelimit</url>
 
