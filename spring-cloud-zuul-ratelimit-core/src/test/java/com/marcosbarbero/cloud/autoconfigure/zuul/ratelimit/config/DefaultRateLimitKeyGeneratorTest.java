@@ -158,6 +158,6 @@ public class DefaultRateLimitKeyGeneratorTest {
         Policy policy = new Policy();
         policy.getType().add(new MatchType(RateLimitType.ROLE, "user"));
         String key = target.key(httpServletRequest, route, policy);
-        assertThat(key).isEqualTo("key-prefix:id:role:user");
+        assertThat(key).isEqualTo("key-prefix:id:user:user");
     }
 }

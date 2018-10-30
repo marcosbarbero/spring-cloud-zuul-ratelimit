@@ -51,7 +51,7 @@ public class RateLimitTypeTest {
     public void keyUser() {
         when(httpServletRequest.getRemoteUser()).thenReturn("testUser");
 
-        String key = RateLimitType.USER.key(httpServletRequest, route, rateLimitUtils);
+        String key = RateLimitType.USER.key(httpServletRequest, route, rateLimitUtils, null);
         assertThat(key).isEqualTo("testUser");
     }
 
@@ -75,7 +75,7 @@ public class RateLimitTypeTest {
     public void keyOrigin() {
         when(httpServletRequest.getRemoteAddr()).thenReturn("testAddr");
 
-        String key = RateLimitType.ORIGIN.key(httpServletRequest, route, rateLimitUtils);
+        String key = RateLimitType.ORIGIN.key(httpServletRequest, route, rateLimitUtils, null);
         assertThat(key).isEqualTo("testAddr");
     }
 
@@ -93,13 +93,12 @@ public class RateLimitTypeTest {
 
     @Test
     public void keyURL() {
-        String key = RateLimitType.URL.key(httpServletRequest, route, rateLimitUtils);
+        String key = RateLimitType.URL.key(httpServletRequest, route, rateLimitUtils, null);
         assertThat(key).isEqualTo("/test");
     }
 
-    @Test
+    @Test(expected = UnsupportedOperationException.class)
     public void doNotApplyRoleWithoutMatcher() {
-        boolean apply = RateLimitType.ROLE.apply(httpServletRequest, route, rateLimitUtils, null);
-        assertThat(apply).isFalse();
+        RateLimitType.ROLE.apply(httpServletRequest, route, rateLimitUtils, null);
     }
 }

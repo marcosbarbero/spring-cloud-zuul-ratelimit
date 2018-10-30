@@ -18,12 +18,12 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Set;
 
 import static java.util.Collections.emptySet;
-import static java.util.stream.Collectors.toSet;
 
 /**
  * @author Marcos Barbero
@@ -40,9 +40,6 @@ public class SecuredRateLimitUtils extends DefaultRateLimitUtils {
         if (authentication == null) {
             return emptySet();
         }
-        return authentication.getAuthorities()
-                .stream()
-                .map(auth -> auth.getAuthority().toLowerCase())
-                .collect(toSet());
+        return AuthorityUtils.authorityListToSet(authentication.getAuthorities());
     }
 }

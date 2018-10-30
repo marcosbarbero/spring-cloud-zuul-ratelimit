@@ -21,8 +21,6 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
 import lombok.RequiredArgsConstructor;
 
 import javax.servlet.http.HttpServletRequest;
-
-import java.util.Collections;
 import java.util.Set;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_FOR_HEADER;
@@ -53,6 +51,6 @@ public class DefaultRateLimitUtils implements RateLimitUtils {
 
     @Override
     public Set<String> getUserRoles() {
-        throw new RuntimeException("Not supported");
+        throw new UnsupportedOperationException("Not supported");
     }
 }
