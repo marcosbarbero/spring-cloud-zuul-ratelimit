@@ -165,6 +165,7 @@ zuul:
             - user=anonymous
             - origin=somemachine.com
             - url=/api #url prefix
+            - role=user
 ----
 
 == Available implementations
@@ -226,7 +227,7 @@ Policy properties:
 |limit           |number of calls      |  -
 |quota           |time of calls        |  -
 |refresh-interval|seconds              | 60
-|type            | [ORIGIN, USER, URL] | []
+|type            | [ORIGIN, USER, URL, ROLE] | []
 
 |===
 
