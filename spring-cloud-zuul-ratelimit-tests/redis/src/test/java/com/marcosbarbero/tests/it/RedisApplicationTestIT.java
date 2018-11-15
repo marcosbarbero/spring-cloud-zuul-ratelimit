@@ -118,8 +118,7 @@ public class RedisApplicationTestIT {
     }
 
     /**
-     * 增加这个方法的目的就是为了证实quota是限制的指定时间内请求总时长，serviceF请求一次耗费500毫秒，两次请求则共耗费1s。
-     * 因此，第三次请求就触发了quota指定的限流规则，从而返回too many request
+     * Confirm that quota is limiting the total duration of requests
      */
     @Test
     public void testExceedingQuotaCapacityRequest2() {
