@@ -50,5 +50,11 @@ public class RedisApplication {
             Thread.sleep(1100);
             return ResponseEntity.ok(RESPONSE_BODY);
         }
+
+        @GetMapping("/serviceF")
+        public ResponseEntity<String> serviceF() throws InterruptedException {
+            Thread.sleep(500);
+            return ResponseEntity.ok(RESPONSE_BODY);
+        }
     }
 }

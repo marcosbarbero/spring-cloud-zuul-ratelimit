@@ -117,6 +117,30 @@ public class RedisApplicationTestIT {
         assertEquals(TOO_MANY_REQUESTS, response.getStatusCode());
     }
 
+    /**
+     * 增加这个方法的目的就是为了证实quota是限制的指定时间内请求总时长，serviceF请求一次耗费500毫秒，两次请求则共耗费1s。
+     * 因此，第三次请求就触发了quota指定的限流规则，从而返回too many request
+     */
+    @Test
+    public void testExceedingQuotaCapacityRequest2() {
+        ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceF", String.class);
+        HttpHeaders headers = response.getHeaders();
+        String key = "rate-limit-application_serviceF_127.0.0.1";
+        assertHeaders(headers, key, false, true);
+        assertEquals(OK, response.getStatusCode());
+
+        response = this.restTemplate.getForEntity("/serviceF", String.class);
+        headers = response.getHeaders();
+        key = "rate-limit-application_serviceF_127.0.0.1";
+        assertHeaders(headers, key, false, true);
+        assertEquals(OK, response.getStatusCode());
+
+        response = this.restTemplate.getForEntity("/serviceF", String.class);
+        headers = response.getHeaders();
+        assertHeaders(headers, key, false, true);
+        assertEquals(TOO_MANY_REQUESTS, response.getStatusCode());
+    }
+
     private void assertHeaders(HttpHeaders headers, String key, boolean nullable, boolean quotaHeaders) {
         String quota = headers.getFirst(HEADER_QUOTA + key);
         String remainingQuota = headers.getFirst(HEADER_REMAINING_QUOTA + key);
