@@ -156,7 +156,7 @@ zuul:
           - user
           - origin
           - url
-          - method
+          - httpmethod
     policy-list:
       myServiceId:
         - limit: 10 #optional - request number limit per refresh interval window
@@ -171,7 +171,7 @@ zuul:
             - origin=somemachine.com
             - url=/api #url prefix
             - role=user
-            - method=get #case insensitive
+            - httpmethod=get #case insensitive
 ----
 
 == Available implementations

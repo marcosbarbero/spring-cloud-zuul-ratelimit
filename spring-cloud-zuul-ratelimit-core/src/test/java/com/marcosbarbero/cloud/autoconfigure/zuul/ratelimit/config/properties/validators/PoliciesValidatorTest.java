@@ -108,7 +108,7 @@ public class PoliciesValidatorTest {
     public void testValidOnPolicyWithLimitAndMethod() {
         properties.setKeyPrefix("prefix");
         Policy policy = getPolicy(1L, null);
-        policy.getType().add(new Policy.MatchType(RateLimitType.METHOD, "GET"));
+        policy.getType().add(new Policy.MatchType(RateLimitType.HTTPMETHOD, "GET"));
         properties.getDefaultPolicyList().add(policy);
         properties.getPolicyList().put("key", Lists.newArrayList(policy));
         Set<ConstraintViolation<RateLimitProperties>> violations = validator.validate(properties);

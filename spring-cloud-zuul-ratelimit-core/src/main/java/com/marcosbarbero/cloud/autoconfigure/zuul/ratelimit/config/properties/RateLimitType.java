@@ -87,7 +87,7 @@ public enum RateLimitType {
     /**
      * Rate limit policy considering the HTTP request method.
      */
-    METHOD {
+    HTTPMETHOD {
         @Override
         public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils,/*not null*/ String matcher) {
             return request.getMethod().equalsIgnoreCase(matcher);
@@ -95,7 +95,7 @@ public enum RateLimitType {
 
         @Override
         public String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
-            return StringUtils.isEmpty(matcher) ? request.getMethod() : "method";
+            return StringUtils.isEmpty(matcher) ? request.getMethod() : "http-method";
         }
     },
     ;

@@ -34,17 +34,17 @@ public class StringToMatchTypeConverterTest {
 
     @Test
     public void testConvertStringTypeMethodOnly() {
-        MatchType matchType = target.convert("method");
+        MatchType matchType = target.convert("httpmethod");
         assertThat(matchType).isNotNull();
-        assertThat(matchType.getType()).isEqualByComparingTo(RateLimitType.METHOD);
+        assertThat(matchType.getType()).isEqualByComparingTo(RateLimitType.HTTPMETHOD);
         assertThat(matchType.getMatcher()).isNull();
     }
 
     @Test
     public void testConvertStringTypeMethodWithMatcher() {
-        MatchType matchType = target.convert("method=get");
+        MatchType matchType = target.convert("httpmethod=get");
         assertThat(matchType).isNotNull();
-        assertThat(matchType.getType()).isEqualByComparingTo(RateLimitType.METHOD);
+        assertThat(matchType.getType()).isEqualByComparingTo(RateLimitType.HTTPMETHOD);
         assertThat(matchType.getMatcher()).isEqualTo("get");
     }
 }
