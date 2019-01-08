@@ -90,7 +90,7 @@ public enum RateLimitType {
     METHOD {
         @Override
         public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils,/*not null*/ String matcher) {
-            return request.getMethod().equals(matcher.toUpperCase());
+            return request.getMethod().equalsIgnoreCase(matcher);
         }
 
         @Override
