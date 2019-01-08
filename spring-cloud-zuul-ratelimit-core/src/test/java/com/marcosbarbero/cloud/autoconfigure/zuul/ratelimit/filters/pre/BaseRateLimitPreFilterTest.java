@@ -74,6 +74,7 @@ public abstract class BaseRateLimitPreFilterTest {
         policy.getType().add(new MatchType(RateLimitType.ORIGIN, null));
         policy.getType().add(new MatchType(RateLimitType.URL, null));
         policy.getType().add(new MatchType(RateLimitType.USER, null));
+        policy.getType().add(new MatchType(RateLimitType.METHOD, null));
 
         policies.put("serviceA", Lists.newArrayList(policy));
         properties.setPolicyList(policies);
@@ -115,6 +116,7 @@ public abstract class BaseRateLimitPreFilterTest {
     public void testRateLimit() throws Exception {
         this.request.setRequestURI("/serviceA");
         this.request.setRemoteAddr("10.0.0.100");
+        this.request.setMethod("GET");
 
         assertTrue(this.filter.shouldFilter());
 
@@ -122,7 +124,7 @@ public abstract class BaseRateLimitPreFilterTest {
             this.filter.run();
         }
 
-        String key = "null_serviceA_10.0.0.100_anonymous";
+        String key = "null_serviceA_10.0.0.100_anonymous_GET";
         String remaining = this.response.getHeader(HEADER_REMAINING + key);
         assertEquals("0", remaining);
 
@@ -138,6 +140,7 @@ public abstract class BaseRateLimitPreFilterTest {
         this.request.setRequestURI("/serviceA");
         this.request.setRemoteAddr("10.0.0.100");
         this.request.addHeader("X-FORWARDED-FOR", "10.0.0.1");
+        this.request.setMethod("GET");
 
         assertTrue(this.filter.shouldFilter());
 
@@ -158,6 +161,7 @@ public abstract class BaseRateLimitPreFilterTest {
     public void testNoRateLimitService() {
         this.request.setRequestURI("/serviceZ");
         this.request.setRemoteAddr("10.0.0.100");
+        this.request.setMethod("GET");
 
         assertFalse(this.filter.shouldFilter());
 
@@ -177,6 +181,7 @@ public abstract class BaseRateLimitPreFilterTest {
     public void testNoRateLimit() {
         this.request.setRequestURI("/serviceB");
         this.request.setRemoteAddr("127.0.0.1");
+        this.request.setMethod("GET");
         assertFalse(this.filter.shouldFilter());
     }
 }
