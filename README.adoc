@@ -16,13 +16,15 @@ There are five built-in rate limit approaches:
  ** Uses the request path of the downstream service
  * ROLE
  ** Uses the authenticated user roles
+ * Request method
+ ** Uses the HTTP request method
  * Global configuration per service:
  ** This one does not validate the request Origin, Authenticated User or URI
  ** To use this approach just don't set param 'type'
 
 [NOTE]
 ====
-It is possible to combine Authenticated User, Request Origin, URL and ROLE just adding
+It is possible to combine Authenticated User, Request Origin, URL, ROLE and Request Method just adding
 multiple values to the list
 ====
 
@@ -154,6 +156,7 @@ zuul:
           - user
           - origin
           - url
+          - httpmethod
     policy-list:
       myServiceId:
         - limit: 10 #optional - request number limit per refresh interval window
@@ -168,6 +171,7 @@ zuul:
             - origin=somemachine.com
             - url=/api #url prefix
             - role=user
+            - httpmethod=get #case insensitive
 ----
 
 == Available implementations

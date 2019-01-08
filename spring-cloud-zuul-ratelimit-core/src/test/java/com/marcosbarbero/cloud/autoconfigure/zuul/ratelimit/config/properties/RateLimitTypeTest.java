@@ -1,21 +1,17 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitUtils;
-import java.util.Collections;
-import javax.servlet.http.HttpServletRequest;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.cloud.netflix.zuul.filters.Route;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.context.support.WithSecurityContextTestExecutionListener;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.SpringRunner;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 public class RateLimitTypeTest {
 
@@ -100,5 +96,32 @@ public class RateLimitTypeTest {
     @Test(expected = UnsupportedOperationException.class)
     public void doNotApplyRoleWithoutMatcher() {
         RateLimitType.ROLE.apply(httpServletRequest, route, rateLimitUtils, null);
+    }
+
+    @Test
+    public void applyMethod() {
+        when(httpServletRequest.getMethod()).thenReturn("GET");
+
+        boolean apply;
+        apply = RateLimitType.HTTPMETHOD.apply(httpServletRequest, route, rateLimitUtils, "get");
+        assertThat(apply).isTrue();
+        apply = RateLimitType.HTTPMETHOD.apply(httpServletRequest, route, rateLimitUtils, "GET");
+        assertThat(apply).isTrue();
+    }
+
+    @Test
+    public void applyMethodNoMatch() {
+        when(httpServletRequest.getMethod()).thenReturn("GET");
+
+        boolean apply = RateLimitType.HTTPMETHOD.apply(httpServletRequest, route, rateLimitUtils, "POST");
+        assertThat(apply).isFalse();
+    }
+
+    @Test
+    public void keyMethod() {
+        when(httpServletRequest.getMethod()).thenReturn("GET");
+
+        String key = RateLimitType.HTTPMETHOD.key(httpServletRequest, route, rateLimitUtils, null);
+        assertThat(key).isEqualTo("GET");
     }
 }

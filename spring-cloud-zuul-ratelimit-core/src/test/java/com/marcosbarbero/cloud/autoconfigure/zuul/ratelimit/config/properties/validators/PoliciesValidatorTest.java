@@ -9,11 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
+import javax.validation.*;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -99,6 +95,28 @@ public class PoliciesValidatorTest {
 
     @Test
     public void testValidOnPolicyWithLimitAndRoleWithoutMatcher() {
+        properties.setKeyPrefix("prefix");
+        Policy policy = getPolicy(1L, null);
+        policy.getType().add(new Policy.MatchType(RateLimitType.ROLE, null));
+        properties.getDefaultPolicyList().add(policy);
+        properties.getPolicyList().put("key", Lists.newArrayList(policy));
+        Set<ConstraintViolation<RateLimitProperties>> violations = validator.validate(properties);
+        assertThat(violations).hasSize(2);
+    }
+
+    @Test
+    public void testValidOnPolicyWithLimitAndMethod() {
+        properties.setKeyPrefix("prefix");
+        Policy policy = getPolicy(1L, null);
+        policy.getType().add(new Policy.MatchType(RateLimitType.HTTPMETHOD, "GET"));
+        properties.getDefaultPolicyList().add(policy);
+        properties.getPolicyList().put("key", Lists.newArrayList(policy));
+        Set<ConstraintViolation<RateLimitProperties>> violations = validator.validate(properties);
+        assertThat(violations).isEmpty();
+    }
+
+    @Test
+    public void testValidOnPolicyWithLimitAndMethodWithoutMatcher() {
         properties.setKeyPrefix("prefix");
         Policy policy = getPolicy(1L, null);
         policy.getType().add(new Policy.MatchType(RateLimitType.ROLE, null));
