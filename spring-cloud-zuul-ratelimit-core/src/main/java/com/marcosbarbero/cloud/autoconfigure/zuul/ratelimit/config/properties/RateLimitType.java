@@ -95,7 +95,7 @@ public enum RateLimitType {
 
         @Override
         public String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
-            return request.getMethod();
+            return StringUtils.isEmpty(matcher) ? request.getMethod() : "method";
         }
     },
     ;

@@ -176,6 +176,6 @@ public class DefaultRateLimitKeyGeneratorTest {
         policy.getType().add(new MatchType(RateLimitType.METHOD, "GET"));
         when(httpServletRequest.getMethod()).thenReturn("GET");
         String key = target.key(httpServletRequest, route, policy);
-        assertThat(key).isEqualTo("key-prefix:id:GET:GET");
+        assertThat(key).isEqualTo("key-prefix:id:method:GET");
     }
 }
