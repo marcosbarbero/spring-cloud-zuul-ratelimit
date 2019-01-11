@@ -40,7 +40,7 @@ public class JpaRateLimiter extends AbstractRateLimiter {
 
     @Override
     protected Rate getRate(String key) {
-        return this.repository.findById(key).orElse(null);
+        return this.repository.findOne(key);
     }
 
     @Override
