@@ -19,7 +19,7 @@
         ]]>
     </description>
     <url>https://github.com/marcosbarbero/spring-cloud-zuul-ratelimit</url>
-    <version>2.2.2.RELEASE</version>
+    <version>1.7.2.RELEASE</version>
 
     <licenses>
         <license>
@@ -83,7 +83,7 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
-                <version>Finchley.RELEASE</version>
+                <version>Edgware.SR5</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
