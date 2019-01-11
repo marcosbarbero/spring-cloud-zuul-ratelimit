@@ -7,7 +7,6 @@ import com.netflix.zuul.exception.ZuulException;
 import com.netflix.zuul.monitoring.CounterFactory;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class RateLimitExceededExceptionTest {

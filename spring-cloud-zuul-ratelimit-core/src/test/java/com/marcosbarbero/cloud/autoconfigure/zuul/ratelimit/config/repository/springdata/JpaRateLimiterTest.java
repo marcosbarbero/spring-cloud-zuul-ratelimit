@@ -1,6 +1,6 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Maps;
@@ -9,7 +9,6 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.Ba
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RateLimiterErrorHandler;
 import java.util.Map;
 import java.util.Optional;
-
 import org.junit.Before;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -30,7 +29,7 @@ public class JpaRateLimiterTest extends BaseRateLimiterTest {
             repository.put(rate.getKey(), rate);
             return rate;
         });
-        when(rateLimiterRepository.findById(any())).thenAnswer(invocationOnMock -> {
+        when(rateLimiterRepository.findOne(any())).thenAnswer(invocationOnMock -> {
             String key = invocationOnMock.getArgument(0);
             return Optional.of(repository.get(key));
         });

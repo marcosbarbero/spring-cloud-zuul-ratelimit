@@ -36,7 +36,7 @@
         <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
         <jacoco.version>0.8.2</jacoco.version>
         <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
-        <mockito-all.version>1.10.19</mockito-all.version>
+        <mockito-core.version>2.23.4</mockito-core.version>
         <jacoco.it.execution.data.file>
             ${project.build.directory}/coverage-reports/jacoco.exec
         </jacoco.it.execution.data.file>
@@ -128,8 +128,8 @@
 
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>${mockito-all.version}</version>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito-core.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

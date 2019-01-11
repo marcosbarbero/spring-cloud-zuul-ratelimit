@@ -1,7 +1,7 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.matches;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.matches;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

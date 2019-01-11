@@ -1,6 +1,6 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.pre;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -29,7 +29,7 @@ public class JpaLimitPreFilterTest extends BaseRateLimitPreFilterTest {
             repository.put(rate.getKey(), rate);
             return rate;
         });
-        when(rateLimiterRepository.findById(any())).thenAnswer(invocationOnMock -> {
+        when(rateLimiterRepository.findOne(any())).thenAnswer(invocationOnMock -> {
             String key = invocationOnMock.getArgument(0);
             return Optional.of(repository.get(key));
         });
