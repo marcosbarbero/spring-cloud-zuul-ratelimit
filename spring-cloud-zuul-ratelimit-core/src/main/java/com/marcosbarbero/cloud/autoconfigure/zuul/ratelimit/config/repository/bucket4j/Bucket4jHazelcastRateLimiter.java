@@ -32,7 +32,7 @@ public class Bucket4jHazelcastRateLimiter extends AbstractBucket4jRateLimiter<Ha
 
     private final IMap<String, GridBucketState> rateLimit;
 
-    public Bucket4jHazelcastRateLimiter(IMap<String, GridBucketState> rateLimit) {
+    public Bucket4jHazelcastRateLimiter(final IMap<String, GridBucketState> rateLimit) {
         super(io.github.bucket4j.grid.hazelcast.Hazelcast.class);
         this.rateLimit = rateLimit;
         super.init();

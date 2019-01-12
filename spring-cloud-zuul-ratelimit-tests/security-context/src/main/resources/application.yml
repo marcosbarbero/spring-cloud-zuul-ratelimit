@@ -18,29 +18,30 @@ zuul:
       url: forward:/
   ratelimit:
     enabled: true
-    policies:
+    repository: REDIS
+    policy-list:
       serviceA:
-        limit: 10
+      - limit: 10
         refresh-interval: 60
         type:
-          - origin
+        - user
       serviceB:
-        limit: 2
+      - limit: 2
         refresh-interval: 2
         type:
-          - origin
+        - origin
       serviceD:
-        limit: 2
+      - limit: 2
         refresh-interval: 60
         type:
-          - url
+        - url
       serviceE:
-        quota: 1
+      - quota: 1
         refresh-interval: 60
         type:
-          - origin
+        - origin
   strip-prefix: true
 
-logging:
-  level:
-    ROOT: error
+spring:
+  redis:
+    port: 6380

@@ -2,21 +2,21 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.post;
 
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.REQUEST_START_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST;
 
 import com.google.common.collect.Lists;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPostFilter;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitUtils;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitUtils;
 import com.netflix.zuul.context.RequestContext;
 import javax.servlet.http.HttpServletRequest;
 import org.junit.Before;
@@ -57,7 +57,7 @@ public class RateLimitPostFilterTest {
         RequestContextHolder.setRequestAttributes(requestAttributes);
         rateLimitProperties = new RateLimitProperties();
         UrlPathHelper urlPathHelper = new UrlPathHelper();
-        RateLimitUtils rateLimitUtils = new RateLimitUtils(rateLimitProperties);
+        RateLimitUtils rateLimitUtils = new DefaultRateLimitUtils(rateLimitProperties);
         target = new RateLimitPostFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter, rateLimitKeyGenerator, rateLimitUtils);
     }
 
@@ -87,7 +87,7 @@ public class RateLimitPostFilterTest {
     public void testShouldFilterOnNullStartTime() {
         rateLimitProperties.setEnabled(true);
         Policy defaultPolicy = new Policy();
-        rateLimitProperties.setDefaultPolicy(defaultPolicy);
+        rateLimitProperties.getDefaultPolicyList().add(defaultPolicy);
 
         assertThat(target.shouldFilter()).isEqualTo(false);
     }
@@ -95,7 +95,7 @@ public class RateLimitPostFilterTest {
     @Test
     public void testShouldFilter() {
         rateLimitProperties.setEnabled(true);
-        when(requestAttributes.getAttribute(REQUEST_START_TIME, SCOPE_REQUEST)).thenReturn(System.currentTimeMillis());
+        when(httpServletRequest.getAttribute(REQUEST_START_TIME)).thenReturn(System.currentTimeMillis());
         Policy defaultPolicy = new Policy();
         rateLimitProperties.setDefaultPolicyList(Lists.newArrayList(defaultPolicy));
 
@@ -111,7 +111,7 @@ public class RateLimitPostFilterTest {
     @Test
     public void testRun() {
         rateLimitProperties.setEnabled(true);
-        when(requestAttributes.getAttribute(REQUEST_START_TIME, SCOPE_REQUEST)).thenReturn(System.currentTimeMillis());
+        when(httpServletRequest.getAttribute(REQUEST_START_TIME)).thenReturn(System.currentTimeMillis());
         Policy defaultPolicy = new Policy();
         defaultPolicy.setQuota(2L);
         rateLimitProperties.setDefaultPolicyList(Lists.newArrayList(defaultPolicy));

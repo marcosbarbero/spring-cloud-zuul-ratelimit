@@ -6,7 +6,7 @@
 == Overview
 Module to enable rate limit per service in Netflix Zuul.
 
-There are four built-in rate limit approaches:
+There are five built-in rate limit approaches:
 
  * Authenticated User
  ** Uses the authenticated username or 'anonymous'
@@ -14,13 +14,17 @@ There are four built-in rate limit approaches:
  ** Uses the user origin request
  * URL
  ** Uses the request path of the downstream service
+ * ROLE
+ ** Uses the authenticated user roles
+ * Request method
+ ** Uses the HTTP request method
  * Global configuration per service:
  ** This one does not validate the request Origin, Authenticated User or URI
  ** To use this approach just don't set param 'type'
 
 [NOTE]
 ====
-It is possible to combine Authenticated User, Request Origin and URL just adding
+It is possible to combine Authenticated User, Request Origin, URL, ROLE and Request Method just adding
 multiple values to the list
 ====
 
@@ -135,11 +139,6 @@ Add the following dependency accordingly to the chosen data storage:
 </dependency>
 ----
 
-* InMemory
-
-For `InMemory` implementation there's no need to add any extra dependency other than
-   `com.marcosbarbero.cloud:spring-cloud-zuul-ratelimit` 
-
 Sample configuration
 [source, yaml]
 ----
@@ -147,16 +146,8 @@ zuul:
   ratelimit:
     key-prefix: your-prefix 
     enabled: true 
-    repository: REDIS 
+    repository: REDIS
     behind-proxy: true
-    default-policy: #deprecated - please use "default-policy-list"
-      limit: 10 #optional - request number limit per refresh interval window
-      quota: 1000 #optional - request time limit per refresh interval window (in seconds)
-      refresh-interval: 60 #default value (in seconds)
-      type: #optional
-        - user
-        - origin
-        - url
     default-policy-list: #optional - will apply unless specific policy exists
       - limit: 10 #optional - request number limit per refresh interval window
         quota: 1000 #optional - request time limit per refresh interval window (in seconds)
@@ -165,15 +156,7 @@ zuul:
           - user
           - origin
           - url
-    policies: #deprecated - please use "policy-list"
-      myServiceId:
-        limit: 10 #optional - request number limit per refresh interval window
-        quota: 1000 #optional - request time limit per refresh interval window (in seconds)
-        refresh-interval: 60 #default value (in seconds)
-        type: #optional
-          - user
-          - origin
-          - url
+          - httpmethod
     policy-list:
       myServiceId:
         - limit: 10 #optional - request number limit per refresh interval window
@@ -187,6 +170,8 @@ zuul:
             - user=anonymous
             - origin=somemachine.com
             - url=/api #url prefix
+            - role=user
+            - httpmethod=get #case insensitive
 ----
 
 == Available implementations
@@ -196,8 +181,6 @@ There are eight implementations provided:
 [cols=2*, options="header"]
 |===
 |Implementation        | Data Storage
-
-|InMemoryRateLimiter   | ConcurrentHashMap
 
 |ConsulRateLimiter     | https://www.consul.io/[Consul]
 
@@ -217,7 +200,6 @@ There are eight implementations provided:
 
 |===
 
- 
 Bucket4j implementations require the relevant bean with `@Qualifier("RateLimit")`:
 
  * `JCache` - javax.cache.Cache
@@ -232,16 +214,14 @@ Property namespace: __zuul.ratelimit__
 |===
 |Property name| Values |Default Value
 
-|enabled       |true/false                   |false
-|behind-proxy  |true/false                   |false
-|key-prefix    |String                       |${spring.application.name:rate-limit-application}
-|repository    |CONSUL, REDIS, JPA, BUCKET4J_JCACHE, BUCKET4J_HAZELCAST, BUCKET4J_INFINISPAN, BUCKET4J_IGNITE, IN_MEMORY|IN_MEMORY
-|default-policy|link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86[Policy]| -
-|policies      |Map of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86[Policy]| -
-|default-policy-list|List of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86[Policy]| -
-|policy-list      |Map of Lists of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L86[Policy]| -
-|postFilterOrder|int | FilterConstants.SEND_RESPONSE_FILTER_ORDER - 10
-|preFilterOrder|int | FilterConstants.FORM_BODY_WRAPPER_FILTER_ORDER
+|enabled             |true/false                   |false
+|behind-proxy        |true/false                   |false
+|key-prefix          |String                       |${spring.application.name:rate-limit-application}
+|repository          |CONSUL, REDIS, JPA, BUCKET4J_JCACHE, BUCKET4J_HAZELCAST, BUCKET4J_INFINISPAN, BUCKET4J_IGNITE| -
+|default-policy-list |List of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L82[Policy]| -
+|policy-list         |Map of Lists of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L82[Policy]| -
+|postFilterOrder     |int                          |FilterConstants.SEND_RESPONSE_FILTER_ORDER - 10
+|preFilterOrder      |int                          |FilterConstants.FORM_BODY_WRAPPER_FILTER_ORDER
 
 |===
 
@@ -253,7 +233,7 @@ Policy properties:
 |limit           |number of calls      |  -
 |quota           |time of calls        |  -
 |refresh-interval|seconds              | 60
-|type            | [ORIGIN, USER, URL] | []
+|type            | [ORIGIN, USER, URL, ROLE] | []
 
 |===
 

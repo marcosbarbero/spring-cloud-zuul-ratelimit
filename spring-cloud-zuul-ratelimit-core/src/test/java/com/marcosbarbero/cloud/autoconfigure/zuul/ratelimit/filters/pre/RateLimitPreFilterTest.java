@@ -5,18 +5,23 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Lists;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.MatchType;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitType;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitUtils;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.commons.TestRouteLocator;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitUtils;
 import com.netflix.zuul.context.RequestContext;
+import java.util.Collections;
 import javax.servlet.http.HttpServletRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
+import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -26,8 +31,6 @@ public class RateLimitPreFilterTest {
 
     private RateLimitPreFilter target;
 
-    @Mock
-    private RouteLocator routeLocator;
     @Mock
     private RateLimiter rateLimiter;
     @Mock
@@ -42,7 +45,7 @@ public class RateLimitPreFilterTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        when(httpServletRequest.getContextPath()).thenReturn("/servicea/test");
+        when(httpServletRequest.getContextPath()).thenReturn("");
         when(httpServletRequest.getRequestURI()).thenReturn("/servicea/test");
         RequestContext requestContext = new RequestContext();
         requestContext.setRequest(httpServletRequest);
@@ -50,7 +53,9 @@ public class RateLimitPreFilterTest {
         RequestContextHolder.setRequestAttributes(requestAttributes);
         rateLimitProperties = new RateLimitProperties();
         UrlPathHelper urlPathHelper = new UrlPathHelper();
-        RateLimitUtils rateLimitUtils = new RateLimitUtils(rateLimitProperties);
+        RateLimitUtils rateLimitUtils = new DefaultRateLimitUtils(rateLimitProperties);
+        Route route = new Route("servicea", "/test", "servicea", "/servicea", null, Collections.emptySet());
+        TestRouteLocator routeLocator = new TestRouteLocator(Collections.emptyList(), Lists.newArrayList(route));
         target = new RateLimitPreFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter, rateLimitKeyGenerator, rateLimitUtils);
     }
 
@@ -72,6 +77,17 @@ public class RateLimitPreFilterTest {
     @Test
     public void testShouldFilterOnNoPolicy() {
         rateLimitProperties.setEnabled(true);
+
+        assertThat(target.shouldFilter()).isEqualTo(false);
+    }
+
+    @Test
+    public void testShouldFilterOnNonMatchingPolicyType() {
+        rateLimitProperties.setEnabled(true);
+        Policy servicebPolicy = new Policy();
+        MatchType matchType = new MatchType(RateLimitType.URL, "other");
+        servicebPolicy.getType().add(matchType);
+        rateLimitProperties.getPolicyList().put("servicea", Lists.newArrayList(servicebPolicy));
 
         assertThat(target.shouldFilter()).isEqualTo(false);
     }

@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config;
+package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support;
 
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.MatchType;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.Type;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitUtils;
-import java.util.List;
 import java.util.StringJoiner;
-import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 
 /**
@@ -43,23 +41,17 @@ public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
 
     @Override
     public String key(final HttpServletRequest request, final Route route, final Policy policy) {
-        final List<Type> types = policy.getType().stream().map(MatchType::getType).collect(Collectors.toList());
         final StringJoiner joiner = new StringJoiner(":");
         joiner.add(properties.getKeyPrefix());
         if (route != null) {
             joiner.add(route.getId());
         }
-        if (!types.isEmpty()) {
-            if (types.contains(Type.URL) && route != null) {
-                joiner.add(route.getPath());
+        policy.getType().forEach(matchType -> {
+            String key = matchType.key(request, route, rateLimitUtils);
+            if (StringUtils.isNotEmpty(key)) {
+                joiner.add(key);
             }
-            if (types.contains(Type.ORIGIN)) {
-                joiner.add(rateLimitUtils.getRemoteAddress(request));
-            }
-            if (types.contains(Type.USER)) {
-                joiner.add(rateLimitUtils.getUser(request));
-            }
-        }
+        });
         return joiner.toString();
     }
 }

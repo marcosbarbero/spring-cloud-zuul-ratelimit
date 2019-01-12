@@ -8,15 +8,17 @@ import static org.junit.Assert.assertTrue;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
 import com.google.common.collect.Lists;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.DefaultRateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.MatchType;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitType;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.commons.TestRouteLocator;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitUtils;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitKeyGenerator;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitUtils;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.monitoring.CounterFactory;
 import java.util.Collections;
@@ -54,8 +56,8 @@ public abstract class BaseRateLimitPreFilterTest {
     private RequestContext context;
     private RateLimiter rateLimiter;
 
-    private Route createRoute(String id, String path) {
-        return new Route(id, path, null, null, false, Collections.emptySet());
+    private Route createRoute(String id) {
+        return new Route(id, "", id, "/" + id, null, Collections.emptySet());
     }
 
     private RateLimitProperties properties() {
@@ -69,9 +71,10 @@ public abstract class BaseRateLimitPreFilterTest {
         policy.setLimit(2L);
         policy.setQuota(2L);
         policy.setRefreshInterval(2L);
-        policy.getType().add(new MatchType(Policy.Type.ORIGIN, null));
-        policy.getType().add(new MatchType(Policy.Type.URL, null));
-        policy.getType().add(new MatchType(Policy.Type.USER, null));
+        policy.getType().add(new MatchType(RateLimitType.ORIGIN, null));
+        policy.getType().add(new MatchType(RateLimitType.URL, null));
+        policy.getType().add(new MatchType(RateLimitType.USER, null));
+        policy.getType().add(new MatchType(RateLimitType.HTTPMETHOD, null));
 
         policies.put("serviceA", Lists.newArrayList(policy));
         properties.setPolicyList(policies);
@@ -81,7 +84,7 @@ public abstract class BaseRateLimitPreFilterTest {
 
     private RouteLocator routeLocator() {
         return new TestRouteLocator(Collections.singletonList("ignored"),
-                asList(createRoute("serviceA", "/serviceA"), createRoute("serviceB", "/serviceB")));
+            asList(createRoute("serviceA"), createRoute("serviceB")));
     }
 
     void setRateLimiter(RateLimiter rateLimiter) {
@@ -95,7 +98,7 @@ public abstract class BaseRateLimitPreFilterTest {
         this.request = new MockHttpServletRequest();
         this.response = new MockHttpServletResponse();
         RateLimitProperties properties = this.properties();
-        RateLimitUtils rateLimitUtils = new RateLimitUtils(properties);
+        RateLimitUtils rateLimitUtils = new DefaultRateLimitUtils(properties);
         RateLimitKeyGenerator rateLimitKeyGenerator = new DefaultRateLimitKeyGenerator(properties,
             rateLimitUtils);
         UrlPathHelper urlPathHelper = new UrlPathHelper();
@@ -113,6 +116,7 @@ public abstract class BaseRateLimitPreFilterTest {
     public void testRateLimit() throws Exception {
         this.request.setRequestURI("/serviceA");
         this.request.setRemoteAddr("10.0.0.100");
+        this.request.setMethod("GET");
 
         assertTrue(this.filter.shouldFilter());
 
@@ -120,7 +124,7 @@ public abstract class BaseRateLimitPreFilterTest {
             this.filter.run();
         }
 
-        String key = "null_serviceA_serviceA_10.0.0.100_anonymous";
+        String key = "null_serviceA_10.0.0.100_anonymous_GET";
         String remaining = this.response.getHeader(HEADER_REMAINING + key);
         assertEquals("0", remaining);
 
@@ -136,6 +140,7 @@ public abstract class BaseRateLimitPreFilterTest {
         this.request.setRequestURI("/serviceA");
         this.request.setRemoteAddr("10.0.0.100");
         this.request.addHeader("X-FORWARDED-FOR", "10.0.0.1");
+        this.request.setMethod("GET");
 
         assertTrue(this.filter.shouldFilter());
 
@@ -156,6 +161,7 @@ public abstract class BaseRateLimitPreFilterTest {
     public void testNoRateLimitService() {
         this.request.setRequestURI("/serviceZ");
         this.request.setRemoteAddr("10.0.0.100");
+        this.request.setMethod("GET");
 
         assertFalse(this.filter.shouldFilter());
 
@@ -175,6 +181,7 @@ public abstract class BaseRateLimitPreFilterTest {
     public void testNoRateLimit() {
         this.request.setRequestURI("/serviceB");
         this.request.setRemoteAddr("127.0.0.1");
+        this.request.setMethod("GET");
         assertFalse(this.filter.shouldFilter());
     }
 }

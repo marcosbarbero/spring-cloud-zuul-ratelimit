@@ -32,7 +32,7 @@ public class Bucket4jIgniteRateLimiter extends AbstractBucket4jRateLimiter<Ignit
 
     private final IgniteCache<String, GridBucketState> cache;
 
-    public Bucket4jIgniteRateLimiter(IgniteCache<String, GridBucketState> cache) {
+    public Bucket4jIgniteRateLimiter(final IgniteCache<String, GridBucketState> cache) {
         super(io.github.bucket4j.grid.ignite.Ignite.class);
         this.cache = cache;
         super.init();

@@ -16,12 +16,14 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+
+import java.util.Objects;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * @author Marcos Barbero
@@ -36,52 +38,49 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
     private final RedisTemplate redisTemplate;
 
     @Override
-    protected void calcRemainingLimit(Long limit, Long refreshInterval,
-                                    Long requestTime, String key, Rate rate) {
-        if (limit != null) {
-            handleExpiration(key, refreshInterval, rate);
+    protected void calcRemainingLimit(final Long limit, final Long refreshInterval,
+                                      final Long requestTime, final String key, final Rate rate) {
+        if (Objects.nonNull(limit)) {
             long usage = requestTime == null ? 1L : 0L;
-            Long current = 0L;
-            try {
-                current = this.redisTemplate.boundValueOps(key).increment(usage);
-            } catch (RuntimeException e) {
-                String msg = "Failed retrieving rate for " + key + ", will return limit";
-                rateLimiterErrorHandler.handleError(msg, e);
-            }
-            rate.setRemaining(Math.max(-1, limit - current));
+            Long remaining = calcRemaining(limit, refreshInterval, usage, key, rate);
+            rate.setRemaining(remaining);
         }
     }
 
     @Override
-    protected void calcRemainingQuota(Long quota, Long refreshInterval,
-                                    Long requestTime, String key, Rate rate) {
-        if (quota != null) {
+    protected void calcRemainingQuota(final Long quota, final Long refreshInterval,
+                                      final Long requestTime, final String key, final Rate rate) {
+        if (Objects.nonNull(quota)) {
             String quotaKey = key + QUOTA_SUFFIX;
-            handleExpiration(quotaKey, refreshInterval, rate);
-            Long usage = requestTime != null ? requestTime : 0L;
-            Long current = 0L;
-            try {
-                current = this.redisTemplate.boundValueOps(quotaKey).increment(usage);
-            } catch (RuntimeException e) {
-                String msg = "Failed retrieving rate for " + quotaKey + ", will return quota limit";
-                rateLimiterErrorHandler.handleError(msg, e);
-            }
-            rate.setRemainingQuota(Math.max(-1, quota - current));
+            long usage = requestTime != null ? requestTime : 0L;
+            Long remaining = calcRemaining(quota, refreshInterval, usage, quotaKey, rate);
+            rate.setRemainingQuota(remaining);
         }
     }
 
-    private void handleExpiration(String key, Long refreshInterval, Rate rate) {
-        Long expire = null;
+    private Long calcRemaining(Long limit, Long refreshInterval, long usage,
+                               String key, Rate rate) {
+        rate.setReset(SECONDS.toMillis(refreshInterval));
+        Long current = 0L;
         try {
-            expire = this.redisTemplate.getExpire(key);
-            if (expire == null || expire == -1) {
-                this.redisTemplate.expire(key, refreshInterval, SECONDS);
-                expire = refreshInterval;
+            current = redisTemplate.opsForValue().increment(key, usage);
+            // Redis returns 1 when the key is incremented for the first time, and the expiration time is set
+            if (current != null && current.equals(1L)) {
+                handleExpiration(key, refreshInterval);
             }
+        } catch (RuntimeException e) {
+            String msg = "Failed retrieving rate for " + key + ", will return the current value";
+            rateLimiterErrorHandler.handleError(msg, e);
+        }
+        return Math.max(-1, limit - current);
+    }
+
+    private void handleExpiration(String key, Long refreshInterval) {
+        try {
+            this.redisTemplate.expire(key, refreshInterval, SECONDS);
         } catch (RuntimeException e) {
             String msg = "Failed retrieving expiration for " + key + ", will reset now";
             rateLimiterErrorHandler.handleError(msg, e);
         }
-        rate.setReset(SECONDS.toMillis(expire == null ? 0L : expire));
     }
 }

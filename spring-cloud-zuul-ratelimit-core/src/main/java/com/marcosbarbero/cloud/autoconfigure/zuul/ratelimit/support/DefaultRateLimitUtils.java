@@ -16,31 +16,41 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support;
 
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_FOR_HEADER;
-
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
-import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Set;
+
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_FOR_HEADER;
 
 /**
  * @author Liel Chayoun
  */
 @RequiredArgsConstructor
-public final class RateLimitUtils {
+public class DefaultRateLimitUtils implements RateLimitUtils {
 
     private static final String ANONYMOUS_USER = "anonymous";
 
     private final RateLimitProperties properties;
 
-    public String getUser(HttpServletRequest request) {
+    @Override
+    public String getUser(final HttpServletRequest request) {
         return request.getRemoteUser() != null ? request.getRemoteUser() : ANONYMOUS_USER;
     }
 
-    public String getRemoteAddress(HttpServletRequest request) {
+    @Override
+    public String getRemoteAddress(final HttpServletRequest request) {
         String xForwardedFor = request.getHeader(X_FORWARDED_FOR_HEADER);
         if (properties.isBehindProxy() && xForwardedFor != null) {
-            return xForwardedFor;
+            return xForwardedFor.split(",")[0].trim();
         }
         return request.getRemoteAddr();
+    }
+
+    @Override
+    public Set<String> getUserRoles() {
+        throw new UnsupportedOperationException("Not supported");
     }
 }

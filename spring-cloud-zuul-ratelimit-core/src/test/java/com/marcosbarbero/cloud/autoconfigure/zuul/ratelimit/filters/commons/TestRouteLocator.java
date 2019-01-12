@@ -1,12 +1,10 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.commons;
 
-import org.springframework.cloud.netflix.zuul.filters.Route;
-import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
-
 import java.util.Collection;
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.cloud.netflix.zuul.filters.Route;
+import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 
 /**
  * @author Marcos Barbero
@@ -31,7 +29,7 @@ public class TestRouteLocator implements RouteLocator {
     @Override
     public Route getMatchingRoute(String path) {
         for (Route route : this.routes) {
-            if (path.startsWith(route.getPath())) {
+            if (path.startsWith(route.getPrefix())) {
                 return route;
             }
         }

@@ -24,21 +24,19 @@ import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateL
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.REQUEST_START_TIME;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
-import static org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitExceededException;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitUtils;
 import com.netflix.zuul.context.RequestContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.util.UrlPathHelper;
 
 /**
@@ -52,10 +50,10 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
     private final RateLimiter rateLimiter;
     private final RateLimitKeyGenerator rateLimitKeyGenerator;
 
-    public RateLimitPreFilter(RateLimitProperties properties, RouteLocator routeLocator,
-        UrlPathHelper urlPathHelper, RateLimiter rateLimiter, RateLimitKeyGenerator rateLimitKeyGenerator,
-        RateLimitUtils rateLimitUtils) {
-        super(properties, routeLocator, urlPathHelper, rateLimitKeyGenerator, rateLimitUtils);
+    public RateLimitPreFilter(final RateLimitProperties properties, final RouteLocator routeLocator,
+                              final UrlPathHelper urlPathHelper, final RateLimiter rateLimiter,
+                              final RateLimitKeyGenerator rateLimitKeyGenerator, final RateLimitUtils rateLimitUtils) {
+        super(properties, routeLocator, urlPathHelper, rateLimitUtils);
         this.properties = properties;
         this.rateLimiter = rateLimiter;
         this.rateLimitKeyGenerator = rateLimitKeyGenerator;
@@ -93,8 +91,7 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
             final Long quota = policy.getQuota();
             final Long remainingQuota = rate.getRemainingQuota();
             if (quota != null) {
-                RequestContextHolder.getRequestAttributes()
-                    .setAttribute(REQUEST_START_TIME, System.currentTimeMillis(), SCOPE_REQUEST);
+                request.setAttribute(REQUEST_START_TIME, System.currentTimeMillis());
                 response.setHeader(HEADER_QUOTA + httpHeaderKey, String.valueOf(quota));
                 response.setHeader(HEADER_REMAINING_QUOTA + httpHeaderKey,
                     String.valueOf(MILLISECONDS.toSeconds(Math.max(remainingQuota, 0))));

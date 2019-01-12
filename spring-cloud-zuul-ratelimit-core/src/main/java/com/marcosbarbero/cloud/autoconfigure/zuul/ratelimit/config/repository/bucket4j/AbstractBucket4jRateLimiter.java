@@ -16,8 +16,6 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j;
 
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.AbstractCacheRateLimiter;
 import io.github.bucket4j.Bandwidth;
@@ -28,8 +26,11 @@ import io.github.bucket4j.ConfigurationBuilder;
 import io.github.bucket4j.ConsumptionProbe;
 import io.github.bucket4j.Extension;
 import io.github.bucket4j.grid.ProxyManager;
+
 import java.time.Duration;
 import java.util.function.Supplier;
+
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 /**
  * Bucket4j rate limiter configuration.
@@ -37,16 +38,16 @@ import java.util.function.Supplier;
  * @author Liel Chayoun
  * @since 2018-04-06
  */
-public abstract class AbstractBucket4jRateLimiter<T extends ConfigurationBuilder<T>, E extends Extension<T>> extends AbstractCacheRateLimiter {
+abstract class AbstractBucket4jRateLimiter<T extends ConfigurationBuilder<T>, E extends Extension<T>> extends AbstractCacheRateLimiter {
 
     private final Class<E> extension;
     private ProxyManager<String> buckets;
 
-    public AbstractBucket4jRateLimiter(Class<E> extension) {
+    AbstractBucket4jRateLimiter(final Class<E> extension) {
         this.extension = extension;
     }
 
-    public void init() {
+    void init() {
         buckets = getProxyManager(getExtension());
     }
 
@@ -66,49 +67,62 @@ public abstract class AbstractBucket4jRateLimiter<T extends ConfigurationBuilder
 
     private Supplier<BucketConfiguration> getBucketConfiguration(Long capacity, Long period) {
         return () -> getExtension().builder()
-            .addLimit(Bandwidth.simple(capacity, Duration.ofSeconds(period)))
-            .buildConfiguration();
+                .addLimit(Bandwidth.simple(capacity, Duration.ofSeconds(period)))
+                .buildConfiguration();
+    }
+
+    private void setRemaining(Rate rate, long remaining, boolean isQuota) {
+        if (isQuota) {
+            rate.setRemainingQuota(remaining);
+        } else {
+            rate.setRemaining(remaining);
+        }
+    }
+
+    private void calcAndSetRemainingBucket(Long consume, Rate rate, Bucket bucket, boolean isQuota) {
+        ConsumptionProbe consumptionProbe = bucket.tryConsumeAndReturnRemaining(consume);
+        long nanosToWaitForRefill = consumptionProbe.getNanosToWaitForRefill();
+        rate.setReset(NANOSECONDS.toMillis(nanosToWaitForRefill));
+        if (consumptionProbe.isConsumed()) {
+            long remainingTokens = consumptionProbe.getRemainingTokens();
+            setRemaining(rate, remainingTokens, isQuota);
+        } else {
+            setRemaining(rate, -1L, isQuota);
+            bucket.tryConsumeAsMuchAsPossible(consume);
+        }
+    }
+
+    private void calcAndSetRemainingBucket(Bucket bucket, Rate rate, boolean isQuota) {
+        long availableTokens = bucket.getAvailableTokens();
+        long remaining = availableTokens > 0 ? availableTokens : -1;
+        setRemaining(rate, remaining, isQuota);
     }
 
     @Override
-    protected void calcRemainingLimit(Long limit, Long refreshInterval, Long requestTime, String key, Rate rate) {
-        if (limit != null) {
-            Bucket limitBucket = getLimitBucket(key, limit, refreshInterval);
-            if (requestTime == null) {
-                ConsumptionProbe limitConsumptionProbe = limitBucket.tryConsumeAndReturnRemaining(1);
-                long nanosToWaitForRefill = limitConsumptionProbe.getNanosToWaitForRefill();
-                rate.setReset(NANOSECONDS.toMillis(nanosToWaitForRefill));
-                if (limitConsumptionProbe.isConsumed()) {
-                    rate.setRemaining(limitConsumptionProbe.getRemainingTokens());
-                } else {
-                    rate.setRemaining(-1L);
-                    limitBucket.tryConsumeAsMuchAsPossible(1);
-                }
-            } else {
-                long availableTokens = limitBucket.getAvailableTokens();
-                rate.setRemaining(availableTokens > 0 ? availableTokens : -1);
-            }
+    protected void calcRemainingLimit(final Long limit, final Long refreshInterval, final Long requestTime,
+                                      final String key, final Rate rate) {
+        if (limit == null) {
+            return;
+        }
+        Bucket bucket = getLimitBucket(key, limit, refreshInterval);
+        if (requestTime == null) {
+            calcAndSetRemainingBucket(1L, rate, bucket, false);
+        } else {
+            calcAndSetRemainingBucket(bucket, rate, false);
         }
     }
 
     @Override
-    protected void calcRemainingQuota(Long quota, Long refreshInterval, Long requestTime, String key, Rate rate) {
-        if (quota != null) {
-            Bucket quotaBucket = getQuotaBucket(key, quota, refreshInterval);
-            if (requestTime != null) {
-                ConsumptionProbe quotaConsumptionProbe = quotaBucket.tryConsumeAndReturnRemaining(requestTime);
-                long nanosToWaitForRefill = quotaConsumptionProbe.getNanosToWaitForRefill();
-                rate.setReset(NANOSECONDS.toMillis(nanosToWaitForRefill));
-                if (quotaConsumptionProbe.isConsumed()) {
-                    rate.setRemainingQuota(quotaConsumptionProbe.getRemainingTokens());
-                } else {
-                    rate.setRemainingQuota(-1L);
-                    quotaBucket.tryConsumeAsMuchAsPossible(requestTime);
-                }
-            } else {
-                long availableTokens = quotaBucket.getAvailableTokens();
-                rate.setRemainingQuota(availableTokens > 0 ? availableTokens : -1);
-            }
+    protected void calcRemainingQuota(final Long quota, final Long refreshInterval, final Long requestTime,
+                                      final String key, final Rate rate) {
+        if (quota == null) {
+            return;
+        }
+        Bucket bucket = getQuotaBucket(key, quota, refreshInterval);
+        if (requestTime != null) {
+            calcAndSetRemainingBucket(requestTime, rate, bucket, true);
+        } else {
+            calcAndSetRemainingBucket(bucket, rate, true);
         }
     }
 }

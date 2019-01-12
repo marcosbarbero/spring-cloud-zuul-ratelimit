@@ -1,9 +1,12 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.matches;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.matches;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -17,6 +20,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.redis.core.BoundValueOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 
 @SuppressWarnings("unchecked")
 public class RedisRateLimiterTest extends BaseRateLimiterTest {
@@ -40,12 +44,23 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
             });
             return mock;
         });
+        when(redisTemplate.opsForValue()).thenAnswer(invocation -> {
+            ValueOperations mock = mock(ValueOperations.class);
+            when(mock.increment(any(), anyLong())).thenAnswer(invocationOnMock -> {
+                String key = invocationOnMock.getArgument(0);
+                long value = invocationOnMock.getArgument(1);
+                return longMap.compute(key, (k, v) -> ((v != null) ? v : 0L) + value);
+            });
+            return mock;
+        });
         target = new RedisRateLimiter(rateLimiterErrorHandler, redisTemplate);
     }
 
     @Test
     public void testConsumeRemainingLimitException() {
-        doThrow(new RuntimeException()).when(redisTemplate).boundValueOps("key");
+        ValueOperations ops = mock(ValueOperations.class);
+        doReturn(ops).when(redisTemplate).opsForValue();
+        doThrow(new RuntimeException()).when(ops).increment(anyString(), anyLong());
         Policy policy = new Policy();
         policy.setLimit(100L);
         target.consume(policy, "key", 0L);
@@ -54,7 +69,9 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
 
     @Test
     public void testConsumeRemainingQuotaLimitException() {
-        doThrow(new RuntimeException()).when(redisTemplate).boundValueOps("key-quota");
+        ValueOperations ops = mock(ValueOperations.class);
+        doReturn(ops).when(redisTemplate).opsForValue();
+        doThrow(new RuntimeException()).when(ops).increment(anyString(), anyLong());
         Policy policy = new Policy();
         policy.setQuota(100L);
         target.consume(policy, "key", 0L);
@@ -63,17 +80,24 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
 
     @Test
     public void testConsumeGetExpireException() {
-        doThrow(new RuntimeException()).when(redisTemplate).getExpire("key");
+        ValueOperations ops = mock(ValueOperations.class);
+        doReturn(ops).when(redisTemplate).opsForValue();
+        doThrow(new RuntimeException()).when(ops).increment(anyString(), anyLong());
         Policy policy = new Policy();
         policy.setLimit(100L);
+        policy.setQuota(50L);
         target.consume(policy, "key", 0L);
-        verify(rateLimiterErrorHandler).handleError(matches(".* key, .*"), any());
+        verify(rateLimiterErrorHandler).handleError(matches(".* key-quota, .*"), any());
     }
 
     @Test
     public void testConsumeExpireException() {
+        ValueOperations ops = mock(ValueOperations.class);
+        when(ops.increment(anyString(), anyLong())).thenReturn(1L);
+        doReturn(ops).when(redisTemplate).opsForValue();
         when(redisTemplate.getExpire("key")).thenReturn(null);
         doThrow(new RuntimeException()).when(redisTemplate).expire(matches("key"), anyLong(), any());
+
         Policy policy = new Policy();
         policy.setLimit(100L);
         target.consume(policy, "key", 0L);
