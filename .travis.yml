@@ -36,7 +36,7 @@ deploy:
    script: bash .ci/deploy.sh
    skip_cleanup: true
    on:
-     branch: master
+     branch: 1.7.x
      repo: marcosbarbero/spring-cloud-zuul-ratelimit
      jdk: oraclejdk8
 
