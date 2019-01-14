@@ -16,21 +16,20 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j;
 
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
+
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.AbstractCacheRateLimiter;
+import io.github.bucket4j.AbstractBucketBuilder;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Bucket4j;
 import io.github.bucket4j.BucketConfiguration;
-import io.github.bucket4j.ConfigurationBuilder;
 import io.github.bucket4j.ConsumptionProbe;
 import io.github.bucket4j.Extension;
 import io.github.bucket4j.grid.ProxyManager;
-
 import java.time.Duration;
 import java.util.function.Supplier;
-
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 /**
  * Bucket4j rate limiter configuration.
@@ -38,7 +37,7 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
  * @author Liel Chayoun
  * @since 2018-04-06
  */
-abstract class AbstractBucket4jRateLimiter<T extends ConfigurationBuilder<T>, E extends Extension<T>> extends AbstractCacheRateLimiter {
+abstract class AbstractBucket4jRateLimiter<T extends AbstractBucketBuilder<T>, E extends Extension<T>> extends AbstractCacheRateLimiter {
 
     private final Class<E> extension;
     private ProxyManager<String> buckets;
@@ -66,9 +65,9 @@ abstract class AbstractBucket4jRateLimiter<T extends ConfigurationBuilder<T>, E 
     }
 
     private Supplier<BucketConfiguration> getBucketConfiguration(Long capacity, Long period) {
-        return () -> getExtension().builder()
+        return () -> Bucket4j.configurationBuilder()
                 .addLimit(Bandwidth.simple(capacity, Duration.ofSeconds(period)))
-                .buildConfiguration();
+                .build();
     }
 
     private void setRemaining(Rate rate, long remaining, boolean isQuota) {
