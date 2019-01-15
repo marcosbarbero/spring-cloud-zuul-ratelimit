@@ -21,10 +21,10 @@
 
     <properties>
         <main.basedir>${basedir}/..</main.basedir>
-        <bucket4j.version>3.1.1</bucket4j.version>
-        <hazelcast.version>3.10.5</hazelcast.version>
-        <ignite.version>2.6.0</ignite.version>
-        <infinispan.version>9.3.3.Final</infinispan.version>
+        <bucket4j.version>4.3.0</bucket4j.version>
+        <hazelcast.version>3.11</hazelcast.version>
+        <ignite.version>2.7.0</ignite.version>
+        <infinispan.version>9.4.5.Final</infinispan.version>
     </properties>
 
     <dependencies>
