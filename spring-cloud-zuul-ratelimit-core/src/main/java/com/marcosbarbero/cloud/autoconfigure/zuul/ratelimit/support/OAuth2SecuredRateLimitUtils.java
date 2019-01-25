@@ -18,29 +18,34 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import java.util.Set;
-
-import static java.util.Collections.emptySet;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 
 /**
  * @author Marcos Barbero
  */
-public class SecuredRateLimitUtils extends DefaultRateLimitUtils {
+public class OAuth2SecuredRateLimitUtils extends SecuredRateLimitUtils {
 
-    public SecuredRateLimitUtils(final RateLimitProperties properties) {
+    private static final String EMPTY = "";
+
+    public OAuth2SecuredRateLimitUtils(final RateLimitProperties properties) {
         super(properties);
     }
 
+    /**
+     * Returns the OAuth2 clientId.
+     *
+     * @return The clientId
+     */
     @Override
-    public Set<String> getUserRoles() {
+    public String getClientId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null) {
-            return emptySet();
-        }
-        return AuthorityUtils.authorityListToSet(authentication.getAuthorities());
-    }
 
+        if (authentication instanceof OAuth2Authentication) {
+            return ((OAuth2Authentication) authentication).getOAuth2Request().getClientId();
+        }
+
+        // Avoid NPE
+        return EMPTY;
+    }
 }

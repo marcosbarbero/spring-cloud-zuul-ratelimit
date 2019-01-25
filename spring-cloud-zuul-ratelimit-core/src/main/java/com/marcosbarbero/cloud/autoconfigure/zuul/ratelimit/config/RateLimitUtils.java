@@ -47,4 +47,11 @@ public interface RateLimitUtils {
      */
     Set<String> getUserRoles();
 
+    /**
+     * Returns the OAuth2 clientId.
+     *
+     * @return The clientId
+     */
+    String getClientId();
+
 }

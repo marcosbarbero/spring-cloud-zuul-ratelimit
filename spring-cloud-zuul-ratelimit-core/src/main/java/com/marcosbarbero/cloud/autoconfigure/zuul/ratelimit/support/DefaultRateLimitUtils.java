@@ -53,4 +53,14 @@ public class DefaultRateLimitUtils implements RateLimitUtils {
     public Set<String> getUserRoles() {
         throw new UnsupportedOperationException("Not supported");
     }
+
+    /**
+     * Returns the OAuth2 clientId.
+     *
+     * @return The clientId
+     */
+    @Override
+    public String getClientId() {
+        throw new UnsupportedOperationException("Not supported");
+    }
 }
