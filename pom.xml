@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.2.RELEASE</version>
+        <version>2.0.7.RELEASE</version>
     </parent>
 
     <groupId>com.marcosbarbero.cloud</groupId>
@@ -37,7 +37,6 @@
         <jacoco.version>0.8.2</jacoco.version>
         <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
         <mockito-all.version>1.10.19</mockito-all.version>
-        <spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
         <jacoco.it.execution.data.file>
             ${project.build.directory}/coverage-reports/jacoco.exec
         </jacoco.it.execution.data.file>
@@ -84,7 +83,7 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
+                <version>Finchley.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
