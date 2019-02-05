@@ -9,7 +9,7 @@ import org.springframework.test.context.support.AbstractTestExecutionListener;
  *
  * @author Eric Deandrea December 2018
  */
-public class TestContextTestExecutionListener extends AbstractTestExecutionListener {
+public class WithTokenSecurityContextTestExecutionListener extends AbstractTestExecutionListener {
     @Override
     public void beforeTestMethod(TestContext testContext) {
         TestContextHolder.setContext(testContext);

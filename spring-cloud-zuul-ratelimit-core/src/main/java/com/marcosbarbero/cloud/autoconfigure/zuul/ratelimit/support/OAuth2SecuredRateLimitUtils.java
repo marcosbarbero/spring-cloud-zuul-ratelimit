@@ -20,13 +20,14 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 /**
  * @author Marcos Barbero
  */
 public class OAuth2SecuredRateLimitUtils extends SecuredRateLimitUtils {
 
-    private static final String EMPTY = "";
+    private static final String EMPTY_STRING = "";
 
     public OAuth2SecuredRateLimitUtils(final RateLimitProperties properties) {
         super(properties);
@@ -43,9 +44,11 @@ public class OAuth2SecuredRateLimitUtils extends SecuredRateLimitUtils {
 
         if (authentication instanceof OAuth2Authentication) {
             return ((OAuth2Authentication) authentication).getOAuth2Request().getClientId();
+        } else if (authentication instanceof JwtAuthenticationToken) {
+            return authentication.getName();
         }
 
         // Avoid NPE
-        return EMPTY;
+        return EMPTY_STRING;
     }
 }

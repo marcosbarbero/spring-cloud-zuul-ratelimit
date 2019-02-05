@@ -2,25 +2,21 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.OAuth2SecuredRateLimitUtils;
+import com.marcosbarbero.test.context.WithTokenSecurityContextTestExecutionListener;
 import com.marcosbarbero.test.context.jwt.WithJwtToken;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.PlainJWT;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.cloud.netflix.zuul.filters.Route;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.Nullable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
@@ -32,9 +28,14 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.context.TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = OAuth2SecureContextRateLimitTypeTest.WithJwtTokenSecurityContextFactoryTestsConfig.class)
+@RunWith(SpringRunner.class)
+@TestExecutionListeners(
+        mergeMode = MERGE_WITH_DEFAULTS,
+        listeners = {
+                WithTokenSecurityContextTestExecutionListener.class
+        })
 public class OAuth2SecureContextRateLimitTypeTest {
 
     @Mock
@@ -49,7 +50,6 @@ public class OAuth2SecureContextRateLimitTypeTest {
         rateLimitUtils = new OAuth2SecuredRateLimitUtils(properties);
     }
 
-    @Ignore
     @Test
     @WithJwtToken(tokenProducerMethod = "createToken", authenticationName = "myclientid")
     public void applyRole() {
@@ -98,17 +98,4 @@ public class OAuth2SecureContextRateLimitTypeTest {
         }
     }
 
-    private static class AuthenticationFetcher {
-        public Authentication getAuthentication() {
-            return SecurityContextHolder.getContext().getAuthentication();
-        }
-    }
-
-    @Configuration
-    static class WithJwtTokenSecurityContextFactoryTestsConfig {
-        @Bean
-        public AuthenticationFetcher authenticationFetcher() {
-            return new AuthenticationFetcher();
-        }
-    }
 }
