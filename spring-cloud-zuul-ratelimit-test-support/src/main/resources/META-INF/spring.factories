@@ -1,2 +1,0 @@
-org.springframework.test.context.TestExecutionListener=\
-  com.marcosbarbero.test.context.WithTokenSecurityContextTestExecutionListener

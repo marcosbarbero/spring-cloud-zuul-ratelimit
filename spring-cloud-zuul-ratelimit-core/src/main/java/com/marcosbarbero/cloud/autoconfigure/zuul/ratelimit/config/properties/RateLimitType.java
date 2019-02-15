@@ -98,18 +98,6 @@ public enum RateLimitType {
             return StringUtils.isEmpty(matcher) ? request.getMethod() : "http-method";
         }
     },
-
-    CLIENTID {
-        @Override
-        public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
-            return rateLimitUtils.getClientId().equalsIgnoreCase(matcher);
-        }
-
-        @Override
-        public String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
-            return rateLimitUtils.getClientId();
-        }
-    }
     ;
 
     public abstract boolean apply(HttpServletRequest request, Route route,
