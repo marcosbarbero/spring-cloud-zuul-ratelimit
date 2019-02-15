@@ -16,6 +16,8 @@ There are five built-in rate limit approaches:
  ** Uses the request path of the downstream service
  * ROLE
  ** Uses the authenticated user roles
+ * Client ID
+ ** Uses the OAuth2 clientId
  * Request method
  ** Uses the HTTP request method
  * Global configuration per service:
@@ -172,6 +174,7 @@ zuul:
             - url=/api #url prefix
             - role=user
             - httpmethod=get #case insensitive
+            - clientId=2569e354-ea57-4f2a-b52f-8bf43cc9d70c
 ----
 
 == Available implementations
@@ -233,7 +236,7 @@ Policy properties:
 |limit           |number of calls      |  -
 |quota           |time of calls        |  -
 |refresh-interval|seconds              | 60
-|type            | [ORIGIN, USER, URL, ROLE] | []
+|type            | [ORIGIN, USER, URL, ROLE, HTTPMETHOD, CLIENTID] | []
 
 |===
 

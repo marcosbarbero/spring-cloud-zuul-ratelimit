@@ -42,4 +42,5 @@ public class SecuredRateLimitUtils extends DefaultRateLimitUtils {
         }
         return AuthorityUtils.authorityListToSet(authentication.getAuthorities());
     }
+
 }
