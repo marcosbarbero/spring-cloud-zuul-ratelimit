@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.2.RELEASE</version>
+        <version>2.0.7.RELEASE</version>
     </parent>
 
     <groupId>com.marcosbarbero.cloud</groupId>
@@ -19,7 +19,7 @@
         ]]>
     </description>
     <url>https://github.com/marcosbarbero/spring-cloud-zuul-ratelimit</url>
-    <version>2.3.0.RELEASE</version>
+    <version>2.2.2.RELEASE</version>
 
     <licenses>
         <license>
@@ -83,7 +83,7 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
-                <version>Greenwich.RELEASE</version>
+                <version>Finchley.RELEASE</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -103,7 +103,6 @@
         <module>spring-cloud-zuul-ratelimit-tests/consul</module>
         <module>spring-cloud-zuul-ratelimit-tests/springdata</module>
         <module>spring-cloud-zuul-ratelimit-tests/security-context</module>
-        <module>spring-cloud-zuul-ratelimit-tests/oauth2-security-context</module>
         <module>spring-cloud-zuul-ratelimit-tests/redis</module>
         <module>spring-cloud-zuul-ratelimit-tests/bucket4j-jcache</module>
         <module>spring-cloud-zuul-ratelimit-tests/bucket4j-hazelcast</module>
@@ -112,7 +111,6 @@
         <module>spring-cloud-zuul-ratelimit-coverage</module>
         <module>spring-cloud-zuul-ratelimit-dependencies</module>
         <module>spring-cloud-starter-zuul-ratelimit</module>
-        <module>spring-cloud-zuul-ratelimit-test-support</module>
     </modules>
 
     <dependencies>
@@ -257,13 +255,5 @@
             </build>
         </profile>
     </profiles>
-
-    <repositories>
-        <repository>
-            <id>repository.spring.milestone</id>
-            <name>Spring Milestone Repository</name>
-            <url>http://repo.spring.io/milestone</url>
-        </repository>
-    </repositories>
 
 </project>
