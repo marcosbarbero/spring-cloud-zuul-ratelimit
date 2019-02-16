@@ -34,6 +34,9 @@
         <build.directory.it.security-context>
             ../spring-cloud-zuul-ratelimit-tests/security-context/target
         </build.directory.it.security-context>
+        <build.directory.it.oauth2-security-context>
+            ../spring-cloud-zuul-ratelimit-tests/oauth2-security-context/target
+        </build.directory.it.oauth2-security-context>
 
         <classes.directory.core>${build.directory.core}/classes</classes.directory.core>
         <classes.directory.it.redis>${build.directory.it.redis}/classes</classes.directory.it.redis>
@@ -54,6 +57,9 @@
         <classes.directory.it.security-context>
             ${build.directory.it.security-context}/classes
         </classes.directory.it.security-context>
+        <classes.directory.it.oauth2-security-context>
+            ${build.directory.it.oauth2-security-context}/classes
+        </classes.directory.it.oauth2-security-context>
 
         <sources.directory.core>../spring-cloud-zuul-ratelimit-core/src/main/java</sources.directory.core>
         <sources.directory.it.redis>../spring-cloud-zuul-ratelimit-tests/redis/src/main/java</sources.directory.it.redis>
@@ -74,6 +80,9 @@
         <sources.directory.it.security-context>
             ../spring-cloud-zuul-ratelimit-tests/security-context/src/main/java
         </sources.directory.it.security-context>
+        <sources.directory.it.oauth2-security-context>
+            ../spring-cloud-zuul-ratelimit-tests/oauth2security-context/src/main/java
+        </sources.directory.it.oauth2-security-context>
 
         <generated-sources.directory.core>
             ${build.directory.core}/generated-sources/annotations
@@ -102,7 +111,9 @@
         <generated-sources.directory.it.security-context>
             ${build.directory.it.security-context}/target/generated-sources/annotations
         </generated-sources.directory.it.security-context>
-
+        <generated-sources.directory.it.oauth2-security-context>
+            ${build.directory.it.oauth2-security-context}/target/generated-sources/annotations
+        </generated-sources.directory.it.oauth2-security-context>
 
     </properties>
 
@@ -162,14 +173,10 @@
                                                 <fileset dir="${classes.directory.it.redis}"/>
                                                 <fileset dir="${classes.directory.it.consul}"/>
                                                 <fileset dir="${classes.directory.it.springdata}"/>
-                                                <fileset
-                                                  dir="${classes.directory.it.bucket4j-hazelcast}"/>
-                                                <fileset
-                                                  dir="${classes.directory.it.bucket4j-ignite}"/>
-                                                <fileset
-                                                  dir="${classes.directory.it.bucket4j-infinispan}"/>
-                                                <fileset
-                                                  dir="${classes.directory.it.bucket4j-jcache}"/>
+                                                <fileset dir="${classes.directory.it.bucket4j-hazelcast}"/>
+                                                <fileset dir="${classes.directory.it.bucket4j-ignite}"/>
+                                                <fileset dir="${classes.directory.it.bucket4j-infinispan}"/>
+                                                <fileset dir="${classes.directory.it.bucket4j-jcache}"/>
                                                 <fileset dir="${classes.directory.it.security-context}" />
                                             </classfiles>
                                             <sourcefiles encoding="UTF-8">
@@ -177,15 +184,12 @@
                                                 <fileset dir="${sources.directory.it.redis}"/>
                                                 <fileset dir="${classes.directory.it.consul}"/>
                                                 <fileset dir="${classes.directory.it.springdata}"/>
-                                                <fileset
-                                                  dir="${classes.directory.it.bucket4j-hazelcast}"/>
-                                                <fileset
-                                                  dir="${classes.directory.it.bucket4j-ignite}"/>
-                                                <fileset
-                                                  dir="${classes.directory.it.bucket4j-infinispan}"/>
-                                                <fileset
-                                                  dir="${classes.directory.it.bucket4j-jcache}"/>
+                                                <fileset dir="${classes.directory.it.bucket4j-hazelcast}"/>
+                                                <fileset dir="${classes.directory.it.bucket4j-ignite}"/>
+                                                <fileset dir="${classes.directory.it.bucket4j-infinispan}"/>
+                                                <fileset dir="${classes.directory.it.bucket4j-jcache}"/>
                                                 <fileset dir="${classes.directory.it.security-context}" />
+                                                <fileset dir="${classes.directory.it.oauth2-security-context}" />
                                             </sourcefiles>
                                         </group>
                                     </structure>

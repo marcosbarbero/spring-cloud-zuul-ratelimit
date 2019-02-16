@@ -14,7 +14,7 @@
     <artifactId>spring-cloud-zuul-ratelimit-test-support</artifactId>
 
     <description>
-        Spring Cloud RateLimit - Test Support
+        Spring Cloud Zuul RateLimit - Test Support
     </description>
 
     <dependencies>
