@@ -1,7 +1,24 @@
 package com.marcosbarbero.test.context.jwt;
 
 
-import static org.assertj.core.api.Assertions.*;
+import com.marcosbarbero.test.context.JwtPrincipalAuthenticationToken;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.PlainJWT;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.lang.Nullable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.text.ParseException;
 import java.time.Instant;
@@ -14,33 +31,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.marcosbarbero.test.context.JwtPrincipalAuthenticationToken;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import org.apache.commons.lang3.exception.ExceptionUtils;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.lang.Nullable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-
-import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.PlainJWT;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = WithJwtTokenSecurityContextFactoryTests.WithJwtTokenSecurityContextFactoryTestsConfig.class)
-@ActiveProfiles("WithJwtTokenSecurityContextFactoryTests")
 @WithJwtToken(tokenProducerMethod = "createToken")
 public class WithJwtTokenSecurityContextFactoryTests {
     @Autowired
@@ -74,7 +68,7 @@ public class WithJwtTokenSecurityContextFactoryTests {
         assertAuthentication(JwtAuthenticationToken.class, "user", scopeAuthorities, createToken(scopes));
     }
 
-    @WithJwtToken(tokenProducerMethod = "createTokenWithScopes", scopes = { "a", "b" })
+    @WithJwtToken(tokenProducerMethod = "createTokenWithScopes", scopes = {"a", "b"})
     @Test
     public void withScopesAndExtraScopesDefined() {
         List<String> scopes = Arrays.asList("one", "two");
@@ -138,8 +132,7 @@ public class WithJwtTokenSecurityContextFactoryTests {
                     jwt.getHeader().toJSONObject(),
                     jwt.getJWTClaimsSet().getClaims()
             );
-        }
-        catch (ParseException ex) {
+        } catch (ParseException ex) {
             return ExceptionUtils.rethrow(ex);
         }
     }
@@ -151,7 +144,6 @@ public class WithJwtTokenSecurityContextFactoryTests {
     }
 
     @Configuration
-    @Profile("WithJwtTokenSecurityContextFactoryTests")
     static class WithJwtTokenSecurityContextFactoryTestsConfig {
         @Bean
         public AuthenticationFetcher authenticationFetcher() {

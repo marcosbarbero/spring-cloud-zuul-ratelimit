@@ -16,6 +16,7 @@
     <properties>
         <main.basedir>${basedir}/..</main.basedir>
         <build.directory.core>../spring-cloud-zuul-ratelimit-core/target</build.directory.core>
+        <build.directory.test-support>../spring-cloud-zuul-ratelimit-test-support/target</build.directory.test-support>
         <build.directory.it.redis>../spring-cloud-zuul-ratelimit-tests/redis/target</build.directory.it.redis>
         <build.directory.it.consul>../spring-cloud-zuul-ratelimit-tests/consul/target</build.directory.it.consul>
         <build.directory.it.springdata>../spring-cloud-zuul-ratelimit-tests/springdata/target</build.directory.it.springdata>
@@ -39,6 +40,7 @@
         </build.directory.it.oauth2-security-context>
 
         <classes.directory.core>${build.directory.core}/classes</classes.directory.core>
+        <classes.directory.test-support>${build.directory.test-support}/classes</classes.directory.test-support>
         <classes.directory.it.redis>${build.directory.it.redis}/classes</classes.directory.it.redis>
         <classes.directory.it.consul>${build.directory.it.consul}/classes</classes.directory.it.consul>
         <classes.directory.it.springdata>${build.directory.it.springdata}/classes</classes.directory.it.springdata>
@@ -62,6 +64,7 @@
         </classes.directory.it.oauth2-security-context>
 
         <sources.directory.core>../spring-cloud-zuul-ratelimit-core/src/main/java</sources.directory.core>
+        <sources.directory.test-support>../spring-cloud-zuul-ratelimit-test-support/src/main/java</sources.directory.test-support>
         <sources.directory.it.redis>../spring-cloud-zuul-ratelimit-tests/redis/src/main/java</sources.directory.it.redis>
         <sources.directory.it.consul>../spring-cloud-zuul-ratelimit-tests/consul/src/main/java</sources.directory.it.consul>
         <sources.directory.it.springdata>../spring-cloud-zuul-ratelimit-tests/springdata/src/main/java</sources.directory.it.springdata>
@@ -86,6 +89,9 @@
 
         <generated-sources.directory.core>
             ${build.directory.core}/generated-sources/annotations
+        </generated-sources.directory.core>
+        <generated-sources.directory.core>
+            ${build.directory.test-support}/generated-sources/annotations
         </generated-sources.directory.core>
         <generated-sources.directory.it.redis>
             ${build.directory.it.redis}/target/generated-sources/annotations
@@ -170,6 +176,7 @@
                                         <group name="jacoco-multi">
                                             <classfiles>
                                                 <fileset dir="${classes.directory.core}"/>
+                                                <fileset dir="${classes.directory.test-support}"/>
                                                 <fileset dir="${classes.directory.it.redis}"/>
                                                 <fileset dir="${classes.directory.it.consul}"/>
                                                 <fileset dir="${classes.directory.it.springdata}"/>
@@ -181,6 +188,7 @@
                                             </classfiles>
                                             <sourcefiles encoding="UTF-8">
                                                 <fileset dir="${sources.directory.core}"/>
+                                                <fileset dir="${sources.directory.test-support}"/>
                                                 <fileset dir="${sources.directory.it.redis}"/>
                                                 <fileset dir="${classes.directory.it.consul}"/>
                                                 <fileset dir="${classes.directory.it.springdata}"/>
