@@ -28,6 +28,6 @@ public class RateLimitExceededExceptionTest {
         assertThat(cause).isInstanceOf(ZuulException.class);
 
         ZuulException zuulException = (ZuulException) cause;
-        assertThat(zuulException.getMessage()).isEqualTo("429");
+        assertThat(zuulException.getMessage()).contains("429");
     }
 }
