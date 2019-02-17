@@ -64,8 +64,8 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
         Long current = 0L;
         try {
             current = redisTemplate.opsForValue().increment(key, usage);
-            // Redis returns 1 when the key is incremented for the first time, and the expiration time is set
-            if (current != null && current.equals(1L)) {
+            // Redis returns the value of key after the increment, check for the first increment, and the expiration time is set
+            if (current != null && current.equals(usage)) {
                 handleExpiration(key, refreshInterval);
             }
         } catch (RuntimeException e) {
