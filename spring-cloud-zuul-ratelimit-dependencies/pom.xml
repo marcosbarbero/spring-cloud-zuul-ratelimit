@@ -44,7 +44,6 @@
         <tag>HEAD</tag>
     </scm>
 
-
     <dependencyManagement>
         <dependencies>
             <dependency>
