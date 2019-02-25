@@ -84,7 +84,7 @@
             ../spring-cloud-zuul-ratelimit-tests/security-context/src/main/java
         </sources.directory.it.security-context>
         <sources.directory.it.oauth2-security-context>
-            ../spring-cloud-zuul-ratelimit-tests/oauth2security-context/src/main/java
+            ../spring-cloud-zuul-ratelimit-tests/oauth2-security-context/src/main/java
         </sources.directory.it.oauth2-security-context>
 
         <generated-sources.directory.core>

@@ -102,7 +102,7 @@
         <module>spring-cloud-zuul-ratelimit-tests/consul</module>
         <module>spring-cloud-zuul-ratelimit-tests/springdata</module>
         <module>spring-cloud-zuul-ratelimit-tests/security-context</module>
-        <!--<module>spring-cloud-zuul-ratelimit-tests/oauth2-security-context</module>-->
+        <module>spring-cloud-zuul-ratelimit-tests/oauth2-security-context</module>
         <module>spring-cloud-zuul-ratelimit-tests/redis</module>
         <module>spring-cloud-zuul-ratelimit-tests/bucket4j-jcache</module>
         <module>spring-cloud-zuul-ratelimit-tests/bucket4j-hazelcast</module>
@@ -111,7 +111,7 @@
         <module>spring-cloud-zuul-ratelimit-coverage</module>
         <module>spring-cloud-zuul-ratelimit-dependencies</module>
         <module>spring-cloud-starter-zuul-ratelimit</module>
-        <!--<module>spring-cloud-zuul-ratelimit-test-support</module>-->
+        <module>spring-cloud-zuul-ratelimit-test-support</module>
     </modules>
 
     <dependencies>
