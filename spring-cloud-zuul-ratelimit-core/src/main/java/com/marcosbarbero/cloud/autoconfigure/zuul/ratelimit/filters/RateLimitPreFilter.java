@@ -88,7 +88,7 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
 
             final Long limit = policy.getLimit();
             final Long remaining = rate.getRemaining();
-            if (properties.isShowHeader() && limit != null) {
+            if (limit != null) {
                 headerMap.put(HEADER_LIMIT + httpHeaderKey, String.valueOf(limit));
                 headerMap.put(HEADER_REMAINING + httpHeaderKey, String.valueOf(Math.max(remaining, 0)));
             }
@@ -99,7 +99,7 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
                 request.setAttribute(REQUEST_START_TIME, System.currentTimeMillis());
                 headerMap.put(HEADER_QUOTA + httpHeaderKey, String.valueOf(quota));
                 headerMap.put(HEADER_REMAINING_QUOTA + httpHeaderKey,
-                        String.valueOf(MILLISECONDS.toSeconds(Math.max(remainingQuota, 0))));
+                    String.valueOf(MILLISECONDS.toSeconds(Math.max(remainingQuota, 0))));
             }
 
             headerMap.put(HEADER_RESET + httpHeaderKey, String.valueOf(rate.getReset()));
