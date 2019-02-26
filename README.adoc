@@ -148,7 +148,7 @@ zuul:
     enabled: true 
     repository: REDIS
     behind-proxy: true
-    show-header: true
+    add-response-headers: true
     default-policy-list: #optional - will apply unless specific policy exists
       - limit: 10 #optional - request number limit per refresh interval window
         quota: 1000 #optional - request time limit per refresh interval window (in seconds)
