@@ -83,7 +83,7 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
 
             final Long limit = policy.getLimit();
             final Long remaining = rate.getRemaining();
-            if (limit != null) {
+            if (properties.isShowHeader() && limit != null) {
                 response.setHeader(HEADER_LIMIT + httpHeaderKey, String.valueOf(limit));
                 response.setHeader(HEADER_REMAINING + httpHeaderKey, String.valueOf(Math.max(remaining, 0)));
             }
@@ -92,12 +92,16 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
             final Long remainingQuota = rate.getRemainingQuota();
             if (quota != null) {
                 request.setAttribute(REQUEST_START_TIME, System.currentTimeMillis());
-                response.setHeader(HEADER_QUOTA + httpHeaderKey, String.valueOf(quota));
-                response.setHeader(HEADER_REMAINING_QUOTA + httpHeaderKey,
-                    String.valueOf(MILLISECONDS.toSeconds(Math.max(remainingQuota, 0))));
+                if (properties.isShowHeader()) {
+                    response.setHeader(HEADER_QUOTA + httpHeaderKey, String.valueOf(quota));
+                    response.setHeader(HEADER_REMAINING_QUOTA + httpHeaderKey,
+                            String.valueOf(MILLISECONDS.toSeconds(Math.max(remainingQuota, 0))));
+                }
             }
 
-            response.setHeader(HEADER_RESET + httpHeaderKey, String.valueOf(rate.getReset()));
+            if (properties.isShowHeader()) {
+                response.setHeader(HEADER_RESET + httpHeaderKey, String.valueOf(rate.getReset()));
+            }
 
             if ((limit != null && remaining < 0) || (quota != null && remainingQuota < 0)) {
                 ctx.setResponseStatusCode(HttpStatus.TOO_MANY_REQUESTS.value());
