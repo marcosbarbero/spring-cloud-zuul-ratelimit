@@ -80,7 +80,7 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
         final Route route = route(request);
 
         policy(route, request).forEach(policy -> {
-            Map<String, String> headerMap = Maps.newHashMap();
+            Map<String, String> responseHeaders = Maps.newHashMap();
 
             final String key = rateLimitKeyGenerator.key(request, route, policy);
             final Rate rate = rateLimiter.consume(policy, key, null);
@@ -89,24 +89,24 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
             final Long limit = policy.getLimit();
             final Long remaining = rate.getRemaining();
             if (limit != null) {
-                headerMap.put(HEADER_LIMIT + httpHeaderKey, String.valueOf(limit));
-                headerMap.put(HEADER_REMAINING + httpHeaderKey, String.valueOf(Math.max(remaining, 0)));
+                responseHeaders.put(HEADER_LIMIT + httpHeaderKey, String.valueOf(limit));
+                responseHeaders.put(HEADER_REMAINING + httpHeaderKey, String.valueOf(Math.max(remaining, 0)));
             }
 
             final Long quota = policy.getQuota();
             final Long remainingQuota = rate.getRemainingQuota();
             if (quota != null) {
                 request.setAttribute(REQUEST_START_TIME, System.currentTimeMillis());
-                headerMap.put(HEADER_QUOTA + httpHeaderKey, String.valueOf(quota));
-                headerMap.put(HEADER_REMAINING_QUOTA + httpHeaderKey,
+                responseHeaders.put(HEADER_QUOTA + httpHeaderKey, String.valueOf(quota));
+                responseHeaders.put(HEADER_REMAINING_QUOTA + httpHeaderKey,
                     String.valueOf(MILLISECONDS.toSeconds(Math.max(remainingQuota, 0))));
             }
 
-            headerMap.put(HEADER_RESET + httpHeaderKey, String.valueOf(rate.getReset()));
+            responseHeaders.put(HEADER_RESET + httpHeaderKey, String.valueOf(rate.getReset()));
 
-            if (properties.isShowHeader()) {
-                for (Map.Entry<String, String> headerEntry : headerMap.entrySet()) {
-                    response.setHeader(headerEntry.getKey(), headerEntry.getValue());
+            if (properties.isAddResponseHeaders()) {
+                for (Map.Entry<String, String> headersEntry : responseHeaders.entrySet()) {
+                    response.setHeader(headersEntry.getKey(), headersEntry.getValue());
                 }
             }
 
