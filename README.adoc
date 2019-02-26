@@ -148,6 +148,7 @@ zuul:
     enabled: true 
     repository: REDIS
     behind-proxy: true
+    add-response-headers: true
     default-policy-list: #optional - will apply unless specific policy exists
       - limit: 10 #optional - request number limit per refresh interval window
         quota: 1000 #optional - request time limit per refresh interval window (in seconds)
@@ -216,6 +217,7 @@ Property namespace: __zuul.ratelimit__
 
 |enabled             |true/false                   |false
 |behind-proxy        |true/false                   |false
+|add-response-headers|true/false                   |true
 |key-prefix          |String                       |${spring.application.name:rate-limit-application}
 |repository          |CONSUL, REDIS, JPA, BUCKET4J_JCACHE, BUCKET4J_HAZELCAST, BUCKET4J_INFINISPAN, BUCKET4J_IGNITE| -
 |default-policy-list |List of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L82[Policy]| -
