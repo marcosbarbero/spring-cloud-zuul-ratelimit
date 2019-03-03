@@ -19,18 +19,16 @@ import com.netflix.zuul.ZuulFilter;
 import io.github.bucket4j.grid.GridBucketState;
 import org.apache.ignite.IgniteCache;
 import org.infinispan.functional.FunctionalMap.ReadWriteMap;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.AutoConfigurations;
+import org.springframework.boot.context.annotation.UserConfigurations;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.mock.web.MockServletContext;
-import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
 import java.util.List;
 import java.util.Map;
@@ -43,125 +41,90 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class RateLimitAutoConfigurationTest {
 
-    private AnnotationConfigWebApplicationContext context;
-
-    @Before
-    public void setUp() {
-        System.setProperty(PREFIX + ".enabled", "true");
-        this.context = new AnnotationConfigWebApplicationContext();
-        this.context.setServletContext(new MockServletContext());
-        this.context.register(Conf.class);
-        this.context.register(RateLimitAutoConfiguration.class);
-    }
-
-    @After
-    public void tearDown() {
-        System.clearProperty(PREFIX + ".enabled");
-        System.clearProperty(PREFIX + ".repository");
-        System.clearProperty(PREFIX + ".defaultPolicyList");
-        System.clearProperty(PREFIX + ".policyList");
-
-        if (this.context != null) {
-            this.context.close();
-        }
-    }
+    private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
+            .withPropertyValues(PREFIX + ".enabled=true")
+            .withConfiguration(UserConfigurations.of(Conf.class))
+            .withConfiguration(AutoConfigurations.of(RateLimitAutoConfiguration.class));
 
     @Test
     public void testStringToMatchTypeConverter() {
-        System.setProperty(PREFIX + ".repository", "BUCKET4J_JCACHE");
-        this.context.refresh();
-
-        Assert.assertNotNull(this.context.getBean(StringToMatchTypeConverter.class));
+        contextRunner.withPropertyValues(PREFIX + ".repository=BUCKET4J_JCACHE")
+                .run((context) -> assertThat(context).hasSingleBean(StringToMatchTypeConverter.class));
     }
 
     @Test
     public void testZuulFilters() {
-        System.setProperty(PREFIX + ".repository", "BUCKET4J_JCACHE");
-        this.context.refresh();
-
-        Map<String, ZuulFilter> zuulFilterMap = context.getBeansOfType(ZuulFilter.class);
-        assertThat(zuulFilterMap.size()).isEqualTo(2);
-        assertThat(zuulFilterMap.keySet()).containsExactly("rateLimiterPreFilter", "rateLimiterPostFilter");
+        contextRunner.withPropertyValues(PREFIX + ".repository=BUCKET4J_JCACHE")
+                .run(context -> {
+                    assertThat(context).getBeanNames(ZuulFilter.class).hasSize(2);
+                    assertThat(context).getBeanNames(ZuulFilter.class)
+                            .containsExactly("rateLimiterPreFilter", "rateLimiterPostFilter");
+                });
     }
 
     @Test
     public void testConsulRateLimiterByProperty() {
-        System.setProperty(PREFIX + ".repository", "CONSUL");
-        System.setProperty("spring.cloud.consul.enabled", "true");
-        this.context.refresh();
-
-        Assert.assertTrue(this.context.getBean(RateLimiter.class) instanceof ConsulRateLimiter);
+        contextRunner.withPropertyValues(PREFIX + ".repository=CONSUL", "spring.cloud.consul.enabled=true")
+                .run(context ->
+                        assertThat(context).getBean(RateLimiter.class).isExactlyInstanceOf(ConsulRateLimiter.class));
     }
 
     @Test
     public void testRedisRateLimiterByProperty() {
-        System.setProperty(PREFIX + ".repository", "REDIS");
-        this.context.refresh();
-
-        Assert.assertTrue(this.context.getBean(RateLimiter.class) instanceof RedisRateLimiter);
+        contextRunner.withPropertyValues(PREFIX + ".repository=REDIS")
+                .run(context -> assertThat(context).getBean(RateLimiter.class).isExactlyInstanceOf(RedisRateLimiter.class));
     }
 
     @Test
     public void testBucket4jJCacheRateLimiterByProperty() {
-        System.setProperty(PREFIX + ".repository", "BUCKET4J_JCACHE");
-        this.context.refresh();
-
-        Assert.assertTrue(this.context.getBean(RateLimiter.class) instanceof Bucket4jJCacheRateLimiter);
+        contextRunner.withPropertyValues(PREFIX + ".repository=BUCKET4J_JCACHE")
+                .run(context -> assertThat(context).getBean(RateLimiter.class).isExactlyInstanceOf(Bucket4jJCacheRateLimiter.class));
     }
 
     @Test
     public void testBucket4jHazelcastRateLimiterByProperty() {
-        System.setProperty(PREFIX + ".repository", "BUCKET4J_HAZELCAST");
-        this.context.refresh();
-
-        Assert.assertTrue(this.context.getBean(RateLimiter.class) instanceof Bucket4jHazelcastRateLimiter);
+        contextRunner.withPropertyValues(PREFIX + ".repository=BUCKET4J_HAZELCAST")
+                .run(context -> assertThat(context).getBean(RateLimiter.class).isExactlyInstanceOf(Bucket4jHazelcastRateLimiter.class));
     }
 
     @Test
     public void testBucket4jIgniteRateLimiterByProperty() {
-        System.setProperty(PREFIX + ".repository", "BUCKET4J_IGNITE");
-        this.context.refresh();
-
-        Assert.assertTrue(this.context.getBean(RateLimiter.class) instanceof Bucket4jIgniteRateLimiter);
+        contextRunner.withPropertyValues(PREFIX + ".repository=BUCKET4J_IGNITE")
+                .run(context -> assertThat(context).getBean(RateLimiter.class).isExactlyInstanceOf(Bucket4jIgniteRateLimiter.class));
     }
 
     @Test
     public void testBucket4jInfinispanRateLimiterByProperty() {
-        System.setProperty(PREFIX + ".repository", "BUCKET4J_INFINISPAN");
-        this.context.refresh();
-
-        Assert.assertTrue(this.context.getBean(RateLimiter.class) instanceof Bucket4jInfinispanRateLimiter);
+        contextRunner.withPropertyValues(PREFIX + ".repository=BUCKET4J_INFINISPAN")
+                .run(context -> assertThat(context).getBean(RateLimiter.class).isExactlyInstanceOf(Bucket4jInfinispanRateLimiter.class));
     }
 
     @Test
     public void testDefaultRateLimitKeyGenerator() {
-        System.setProperty(PREFIX + ".repository", "BUCKET4J_JCACHE");
-        this.context.refresh();
-
-        Assert.assertTrue(this.context.getBean(RateLimitKeyGenerator.class) instanceof DefaultRateLimitKeyGenerator);
+        contextRunner.withPropertyValues(PREFIX + ".repository=BUCKET4J_JCACHE")
+                .run(context -> assertThat(context).getBean(RateLimitKeyGenerator.class).isExactlyInstanceOf(DefaultRateLimitKeyGenerator.class));
     }
 
     @Test
     public void testPolicyAdjuster() {
-        System.setProperty(PREFIX + ".repository", "BUCKET4J_JCACHE");
-        System.setProperty(PREFIX + ".defaultPolicyList[0].limit", "3");
-        System.setProperty(PREFIX + ".defaultPolicyList[1].limit", "4");
-        System.setProperty(PREFIX + ".policyList.a[0].limit", "5");
-        System.setProperty(PREFIX + ".policyList.a[1].limit", "6");
-        this.context.refresh();
-
-        RateLimitProperties rateLimitProperties = this.context.getBean(RateLimitProperties.class);
-
-        List<Policy> defaultPolicyList = rateLimitProperties.getDefaultPolicyList();
-        assertThat(defaultPolicyList).hasSize(2);
-        assertThat(defaultPolicyList.get(0).getLimit()).isEqualTo(3);
-        assertThat(defaultPolicyList.get(1).getLimit()).isEqualTo(4);
-        Map<String, List<Policy>> policyList = rateLimitProperties.getPolicyList();
-        assertThat(policyList).hasSize(1);
-        List<Policy> policyA = policyList.get("a");
-        assertThat(policyA).hasSize(2);
-        assertThat(policyA.get(0).getLimit()).isEqualTo(5);
-        assertThat(policyA.get(1).getLimit()).isEqualTo(6);
+        contextRunner.withPropertyValues(PREFIX + ".repository=BUCKET4J_JCACHE",
+                PREFIX + ".defaultPolicyList[0].limit=3",
+                PREFIX + ".defaultPolicyList[1].limit=4",
+                PREFIX + ".policyList.a[0].limit=5",
+                PREFIX + ".policyList.a[1].limit=6")
+                .run(context -> {
+                    RateLimitProperties rateLimitProperties = context.getBean(RateLimitProperties.class);
+                    List<Policy> defaultPolicyList = rateLimitProperties.getDefaultPolicyList();
+                    assertThat(defaultPolicyList).hasSize(2);
+                    assertThat(defaultPolicyList.get(0).getLimit()).isEqualTo(3);
+                    assertThat(defaultPolicyList.get(1).getLimit()).isEqualTo(4);
+                    Map<String, List<Policy>> policyList = rateLimitProperties.getPolicyList();
+                    assertThat(policyList).hasSize(1);
+                    List<Policy> policyA = policyList.get("a");
+                    assertThat(policyA).hasSize(2);
+                    assertThat(policyA.get(0).getLimit()).isEqualTo(5);
+                    assertThat(policyA.get(1).getLimit()).isEqualTo(6);
+                });
     }
 
     @Configuration
