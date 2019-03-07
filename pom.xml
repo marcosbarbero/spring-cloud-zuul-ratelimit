@@ -100,12 +100,7 @@
 
     <modules>
         <module>spring-cloud-zuul-ratelimit-core</module>
-        <module>spring-cloud-zuul-ratelimit-tests/consul</module>
-        <module>spring-cloud-zuul-ratelimit-tests/springdata</module>
         <module>spring-cloud-zuul-ratelimit-tests/security-context</module>
-        <module>spring-cloud-zuul-ratelimit-tests/redis</module>
-        <module>spring-cloud-zuul-ratelimit-tests/bucket4j-jcache</module>
-        <module>spring-cloud-zuul-ratelimit-tests/bucket4j-hazelcast</module>
         <module>spring-cloud-zuul-ratelimit-tests/bucket4j-ignite</module>
         <module>spring-cloud-zuul-ratelimit-tests/bucket4j-infinispan</module>
         <module>spring-cloud-zuul-ratelimit-coverage</module>
