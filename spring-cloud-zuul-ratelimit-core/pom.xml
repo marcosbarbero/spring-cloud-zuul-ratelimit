@@ -21,10 +21,11 @@
 
     <properties>
         <main.basedir>${basedir}/..</main.basedir>
-        <bucket4j.version>4.3.0</bucket4j.version>
-        <hazelcast.version>3.11</hazelcast.version>
+        <bucket4j.version>4.4.0</bucket4j.version>
+        <hazelcast.version>3.12</hazelcast.version>
         <ignite.version>2.7.0</ignite.version>
-        <infinispan.version>9.4.5.Final</infinispan.version>
+        <infinispan.version>9.4.12.Final</infinispan.version>
+        <jcache.version>1.1.0</jcache.version>
     </properties>
 
     <dependencies>
@@ -113,7 +114,7 @@
             <artifactId>cache-api</artifactId>
             <scope>provided</scope>
             <optional>true</optional>
-            <version>1.1.0</version>
+            <version>${jcache.version}</version>
         </dependency>
 
         <dependency>
