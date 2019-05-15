@@ -35,6 +35,14 @@ multiple values to the list
 Latest version: image:https://maven-badges.herokuapp.com/maven-central/com.marcosbarbero.cloud/spring-cloud-zuul-ratelimit/badge.svg["Maven Central", link="https://maven-badges.herokuapp.com/maven-central/com.marcosbarbero.cloud/spring-cloud-zuul-ratelimit"]
 ====
 
+[NOTE]
+====
+If you are using Spring Boot version `1.5.x` you *MUST* use Spring Cloud Zuul RateLimit version `1.7.x`.
+Please take a look at the 
+link:https://mvnrepository.com/artifact/com.marcosbarbero.cloud/spring-cloud-zuul-ratelimit[Maven Central] and pick the 
+latest artifact in this version line.
+====
+
 Add the dependency on pom.xml
 
 [source, xml]
