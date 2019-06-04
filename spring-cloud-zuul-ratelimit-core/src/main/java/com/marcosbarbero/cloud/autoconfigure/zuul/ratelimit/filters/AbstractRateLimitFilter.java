@@ -43,6 +43,8 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
     private final UrlPathHelper urlPathHelper;
     private final RateLimitUtils rateLimitUtils;
 
+    private boolean alreadyLimited;
+
     @Override
     public boolean shouldFilter() {
         HttpServletRequest request = RequestContext.getCurrentContext().getRequest();
@@ -56,13 +58,17 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
 
     protected List<Policy> policy(Route route, HttpServletRequest request) {
         String routeId = Optional.ofNullable(route).map(Route::getId).orElse(null);
+        alreadyLimited = false;
         return properties.getPolicies(routeId).stream()
-            .filter(policy -> applyPolicy(request, route, policy))
-            .collect(Collectors.toList());
+                .filter(policy -> applyPolicy(request, route, policy))
+                .collect(Collectors.toList());
     }
 
     private boolean applyPolicy(HttpServletRequest request, Route route, Policy policy) {
         List<MatchType> types = policy.getType();
-        return types.isEmpty() || types.stream().allMatch(type -> type.apply(request, route, rateLimitUtils));
+        boolean tmp = alreadyLimited;
+        if(types.stream().allMatch(type -> type.apply(request, route, rateLimitUtils)))
+            alreadyLimited = true;
+        return (types.isEmpty() || types.stream().allMatch(type -> type.apply(request, route, rateLimitUtils))) && !tmp;
     }
 }
