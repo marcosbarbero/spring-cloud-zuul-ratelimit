@@ -89,6 +89,9 @@ public class RateLimitProperties {
 
         private Long quota;
 
+        @NotNull
+        private boolean breakOnMatch;
+
         @Valid
         @NotNull
         private List<MatchType> type = Lists.newArrayList();

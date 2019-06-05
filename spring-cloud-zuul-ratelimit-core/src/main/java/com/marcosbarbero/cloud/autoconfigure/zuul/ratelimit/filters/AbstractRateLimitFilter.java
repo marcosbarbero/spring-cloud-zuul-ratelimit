@@ -67,7 +67,7 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
     private boolean applyPolicy(HttpServletRequest request, Route route, Policy policy) {
         List<MatchType> types = policy.getType();
         boolean tmp = alreadyLimited;
-        if(types.stream().allMatch(type -> type.apply(request, route, rateLimitUtils)))
+        if(policy.isBreakOnMatch() && types.stream().allMatch(type -> type.apply(request, route, rateLimitUtils)))
             alreadyLimited = true;
         return (types.isEmpty() || types.stream().allMatch(type -> type.apply(request, route, rateLimitUtils))) && !tmp;
     }
