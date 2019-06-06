@@ -62,6 +62,7 @@ public class RateLimitProperties {
     private Map<String, List<Policy>> policyList = Maps.newHashMap();
     private boolean behindProxy;
     private boolean enabled;
+    private boolean addResponseHeaders = true;
     @NotNull
     @Value("${spring.application.name:rate-limit-application}")
     private String keyPrefix;

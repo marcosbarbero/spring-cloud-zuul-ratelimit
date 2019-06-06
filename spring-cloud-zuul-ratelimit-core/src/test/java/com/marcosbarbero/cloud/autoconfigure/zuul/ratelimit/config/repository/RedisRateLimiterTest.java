@@ -94,7 +94,7 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
     @Test
     public void testConsumeExpireException() {
         ValueOperations ops = mock(ValueOperations.class);
-        when(ops.increment(anyString(), anyLong())).thenReturn(1L);
+        when(ops.increment(anyString(), anyLong())).thenReturn(0L);
         doReturn(ops).when(redisTemplate).opsForValue();
         when(redisTemplate.getExpire("key")).thenReturn(null);
         doThrow(new RuntimeException()).when(redisTemplate).expire(matches("key"), anyLong(), any());
