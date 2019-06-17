@@ -236,7 +236,6 @@ Policy properties:
 |type            | [ORIGIN, USER, URL, ROLE] | []
 |breakOnMatch    |true/false           |false
 
-
 |===
 
 == Further Customization
