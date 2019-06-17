@@ -234,6 +234,8 @@ Policy properties:
 |quota           |time of calls        |  -
 |refresh-interval|seconds              | 60
 |type            | [ORIGIN, USER, URL, ROLE] | []
+|breakOnMatch    |true/false           |false
+
 
 |===
 

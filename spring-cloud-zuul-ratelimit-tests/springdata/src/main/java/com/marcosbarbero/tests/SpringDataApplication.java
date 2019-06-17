@@ -51,5 +51,15 @@ public class SpringDataApplication {
             Thread.sleep(1100);
             return ResponseEntity.ok(RESPONSE_BODY);
         }
+
+        @GetMapping("/serviceF")
+        public ResponseEntity<String> serviceF() {
+            return ResponseEntity.ok(RESPONSE_BODY);
+        }
+
+        @GetMapping("/serviceG")
+        public ResponseEntity<String> serviceG() {
+            return ResponseEntity.ok(RESPONSE_BODY);
+        }
     }
 }
