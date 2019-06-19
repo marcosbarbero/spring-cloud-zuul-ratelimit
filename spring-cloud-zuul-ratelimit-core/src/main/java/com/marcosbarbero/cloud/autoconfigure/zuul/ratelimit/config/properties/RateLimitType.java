@@ -23,6 +23,8 @@ import org.springframework.cloud.netflix.zuul.filters.Route;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.validators.AddressValidator.addressInNetwork;
+
 public enum RateLimitType {
     /**
      * Rate limit policy considering the user's origin.
@@ -30,6 +32,8 @@ public enum RateLimitType {
     ORIGIN {
         @Override
         public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
+            if(matcher.contains("/"))
+                return addressInNetwork(rateLimitUtils.getRemoteAddress(request), matcher);
             return matcher.equals(rateLimitUtils.getRemoteAddress(request));
         }
 
