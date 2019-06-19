@@ -17,11 +17,13 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.validators.SubnetUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
+
 
 public enum RateLimitType {
     /**
@@ -30,6 +32,10 @@ public enum RateLimitType {
     ORIGIN {
         @Override
         public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
+            if(matcher.contains("/")) {
+               SubnetUtils cidr = new SubnetUtils(matcher);
+                return cidr.getInfo().isInRange(rateLimitUtils.getRemoteAddress(request));
+            }
             return matcher.equals(rateLimitUtils.getRemoteAddress(request));
         }
 
