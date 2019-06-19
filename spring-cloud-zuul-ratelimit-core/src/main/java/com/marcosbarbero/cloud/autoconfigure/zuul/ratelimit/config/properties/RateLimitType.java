@@ -24,7 +24,6 @@ import org.springframework.cloud.netflix.zuul.filters.Route;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
-
 public enum RateLimitType {
     /**
      * Rate limit policy considering the user's origin.
