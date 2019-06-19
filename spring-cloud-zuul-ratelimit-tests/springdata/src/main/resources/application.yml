@@ -100,7 +100,7 @@ zuul:
         - limit: 2
           refresh-interval: 60
           type:
-            - origin=126.255.252.2/22
+            - origin=127.0.0.0/22
           breakOnMatch: true
         - limit: 1
           refresh-interval: 60
@@ -110,7 +110,7 @@ zuul:
         - limit: 2
           refresh-interval: 60
           type:
-            - origin=126.255.252.1/22
+            - origin=127.0.0.1/22
           breakOnMatch: true
         - limit: 1
           refresh-interval: 60
