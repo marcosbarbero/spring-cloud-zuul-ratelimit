@@ -36,7 +36,7 @@ public enum RateLimitType {
                     SubnetUtils subnetUtils = new SubnetUtils(matcher);
                     return subnetUtils.getInfo().isInRange(rateLimitUtils.getRemoteAddress(request));
                 }
-                catch(Error e) {
+                catch(Exception e) {
                     return false;
                 }
             }
