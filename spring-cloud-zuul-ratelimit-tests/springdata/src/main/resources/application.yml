@@ -86,6 +86,7 @@ zuul:
           refresh-interval: 60
           type:
             - origin
+          breakOnMatch: true
       serviceG:
         - limit: 2
           refresh-interval: 60
@@ -96,6 +97,7 @@ zuul:
           refresh-interval: 60
           type:
             - origin
+          breakOnMatch: true
       serviceH:
         - limit: 2
           refresh-interval: 60
@@ -106,16 +108,18 @@ zuul:
           refresh-interval: 60
           type:
             - origin
+          breakOnMatch: true
       serviceI:
         - limit: 2
           refresh-interval: 60
           type:
-            - origin=127.0.0.1/22
+            - origin=126.0.0.0/22
           breakOnMatch: true
         - limit: 1
           refresh-interval: 60
           type:
             - origin
+          breakOnMatch: true
   strip-prefix: true
 
 logging:
