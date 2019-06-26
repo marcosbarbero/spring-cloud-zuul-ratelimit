@@ -17,8 +17,8 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.validators.SubnetUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.net.util.SubnetUtils;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 
 import javax.servlet.http.HttpServletRequest;
