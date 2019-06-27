@@ -125,6 +125,42 @@ public class SpringDataApplicationTestIT {
         assertEquals(TOO_MANY_REQUESTS, response.getStatusCode());
     }
 
+    @Test
+    public void testUsingBreakOnMatchSpecificCase() {
+        ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceF", String.class);
+        assertEquals(OK, response.getStatusCode());
+
+        response = this.restTemplate.getForEntity("/serviceF", String.class);
+        assertEquals(OK, response.getStatusCode());
+    }
+
+    @Test
+    public void testUsingBreakOnMatchSpecificCaseWithCidr() {
+        ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceH", String.class);
+        assertEquals(OK, response.getStatusCode());
+
+        response = this.restTemplate.getForEntity("/serviceH", String.class);
+        assertEquals(OK, response.getStatusCode());
+    }
+
+    @Test
+    public void testUsingBreakOnMatchGeneralCase() {
+        ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceG", String.class);
+        assertEquals(OK, response.getStatusCode());
+
+        response = this.restTemplate.getForEntity("/serviceG", String.class);
+        assertEquals(TOO_MANY_REQUESTS, response.getStatusCode());
+    }
+
+    @Test
+    public void testUsingBreakOnMatchGeneralCaseWithCidr() {
+        ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceI", String.class);
+        assertEquals(OK, response.getStatusCode());
+
+        response = this.restTemplate.getForEntity("/serviceI", String.class);
+        assertEquals(TOO_MANY_REQUESTS, response.getStatusCode());
+    }
+
     private void assertHeaders(HttpHeaders headers, String key, boolean nullable, boolean quotaHeaders) {
         String quota = headers.getFirst(HEADER_QUOTA + key);
         String remainingQuota = headers.getFirst(HEADER_REMAINING_QUOTA + key);
