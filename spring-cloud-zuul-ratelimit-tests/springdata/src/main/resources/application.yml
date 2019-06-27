@@ -40,6 +40,18 @@ zuul:
     serviceE:
       path: /serviceE
       url: forward:/
+    serviceF:
+      path: /serviceF
+      url: forward:/
+    serviceG:
+      path: /serviceG
+      url: forward:/
+    serviceH:
+      path: /serviceH
+      url: forward:/
+    serviceI:
+      path: /serviceI
+      url: forward:/
   ratelimit:
     enabled: true
     repository: JPA
@@ -64,6 +76,51 @@ zuul:
           refresh-interval: 60
           type:
             - origin
+      serviceF:
+        - limit: 2
+          refresh-interval: 60
+          type:
+            - origin=127.0.0.1
+          breakOnMatch: true
+        - limit: 1
+          refresh-interval: 60
+          type:
+            - origin
+          breakOnMatch: true
+        serviceG:
+          - limit: 2
+            refresh-interval: 60
+            type:
+              - origin=128.0.0.1
+            breakOnMatch: true
+          - limit: 1
+            refresh-interval: 60
+            type:
+              - origin
+            breakOnMatch: true
+        serviceH:
+          - limit: 2
+            refresh-interval: 60
+            type:
+              - origin=127.0.0.0/22
+            breakOnMatch: true
+          - limit: 1
+            refresh-interval: 60
+            type:
+              - origin
+            breakOnMatch: true
+        serviceI:
+          - limit: 2
+            refresh-interval: 60
+            type:
+              - origin=126.0.0.0/22
+            breakOnMatch: true
+          - limit: 1
+            refresh-interval: 60
+            type:
+              - origin
+            breakOnMatch: true
+      strip-prefix: true
   strip-prefix: true
 
 logging:
