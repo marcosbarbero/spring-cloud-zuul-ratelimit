@@ -40,6 +40,12 @@ zuul:
     serviceE:
       path: /serviceE
       url: forward:/
+    serviceF:
+      path: /serviceF
+      url: forward:/
+    serviceG:
+      path: /serviceG
+      url: forward:/
   ratelimit:
     enabled: true
     repository: JPA

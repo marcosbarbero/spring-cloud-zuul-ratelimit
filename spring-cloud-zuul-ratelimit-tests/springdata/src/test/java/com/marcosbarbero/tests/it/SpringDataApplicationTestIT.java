@@ -138,6 +138,7 @@ public class SpringDataApplicationTestIT {
         assertHeaders(headers, key, true, false);
         assertEquals(OK, response.getStatusCode());
     }
+
     @Test
     public void testUsingBreakOnMatchGeneralCase() {
         ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceG", String.class);
