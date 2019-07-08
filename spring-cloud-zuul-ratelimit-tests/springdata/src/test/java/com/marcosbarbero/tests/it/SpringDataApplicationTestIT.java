@@ -140,20 +140,6 @@ public class SpringDataApplicationTestIT {
     }
 
     @Test
-    public void testUsingBreakOnMatchSpecificCaseWithCidr() {
-        ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceH", String.class);
-        HttpHeaders headers = response.getHeaders();
-        String key = "rate-limit-application_serviceH_127.0.0.1_127.0.0.0_22";
-        assertHeaders(headers, key, false, false);
-        assertEquals(OK, response.getStatusCode());
-
-        response = this.restTemplate.getForEntity("/serviceH", String.class);
-        headers = response.getHeaders();
-        assertHeaders(headers, key, false, false);
-        assertEquals(OK, response.getStatusCode());
-    }
-
-    @Test
     public void testUsingBreakOnMatchGeneralCase() {
         ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceG", String.class);
         HttpHeaders headers = response.getHeaders();

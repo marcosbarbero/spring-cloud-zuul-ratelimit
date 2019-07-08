@@ -22,10 +22,12 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.MatchType;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
@@ -60,15 +62,16 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
         String routeId = Optional.ofNullable(route).map(Route::getId).orElse(null);
         alreadyLimited = false;
         return properties.getPolicies(routeId).stream()
-            .filter(policy -> applyPolicy(request, route, policy))
-            .collect(Collectors.toList());
+                .filter(policy -> applyPolicy(request, route, policy))
+                .collect(Collectors.toList());
     }
 
     private boolean applyPolicy(HttpServletRequest request, Route route, Policy policy) {
         List<MatchType> types = policy.getType();
         boolean tmp = alreadyLimited;
-        if(policy.isBreakOnMatch() && types.stream().allMatch(type -> type.apply(request, route, rateLimitUtils)))
+        if (policy.isBreakOnMatch() && types.stream().allMatch(type -> type.apply(request, route, rateLimitUtils))) {
             alreadyLimited = true;
+        }
         return (types.isEmpty() || types.stream().allMatch(type -> type.apply(request, route, rateLimitUtils))) && !tmp;
     }
 }
