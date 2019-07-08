@@ -31,14 +31,9 @@ public enum RateLimitType {
     ORIGIN {
         @Override
         public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
-            if(matcher.contains("/")) {
-                try {
-                    SubnetUtils subnetUtils = new SubnetUtils(matcher);
-                    return subnetUtils.getInfo().isInRange(rateLimitUtils.getRemoteAddress(request));
-                }
-                catch(Exception e) {
-                    return false;
-                }
+            if (matcher.contains("/")) {
+                SubnetUtils subnetUtils = new SubnetUtils(matcher);
+                return subnetUtils.getInfo().isInRange(rateLimitUtils.getRemoteAddress(request));
             }
             return matcher.equals(rateLimitUtils.getRemoteAddress(request));
         }

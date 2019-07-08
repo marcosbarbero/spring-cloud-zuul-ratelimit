@@ -60,6 +60,14 @@ public class RateLimitTypeTest {
     }
 
     @Test
+    public void applyOriginInRange() {
+        when(httpServletRequest.getRemoteAddr()).thenReturn("127.0.0.10");
+
+        boolean apply = RateLimitType.ORIGIN.apply(httpServletRequest, route, rateLimitUtils, "127.0.0.8/29");
+        assertThat(apply).isTrue();
+    }
+
+    @Test
     public void applyOriginNoMatch() {
         when(httpServletRequest.getRemoteAddr()).thenReturn("testAddr");
 
