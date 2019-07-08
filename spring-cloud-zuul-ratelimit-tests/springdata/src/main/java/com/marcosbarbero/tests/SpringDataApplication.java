@@ -61,5 +61,15 @@ public class SpringDataApplication {
         public ResponseEntity<String> serviceG() {
             return ResponseEntity.ok(RESPONSE_BODY);
         }
+
+        @GetMapping("/serviceH")
+        public ResponseEntity<String> serviceH() {
+            return ResponseEntity.ok(RESPONSE_BODY);
+        }
+
+        @GetMapping("/serviceI")
+        public ResponseEntity<String> serviceI() {
+            return ResponseEntity.ok(RESPONSE_BODY);
+        }
     }
 }
