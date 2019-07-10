@@ -23,7 +23,7 @@
         <main.basedir>${basedir}/..</main.basedir>
         <bucket4j.version>4.3.0</bucket4j.version>
         <hazelcast.version>3.11</hazelcast.version>
-        <ignite.version>2.7.0</ignite.version>
+        <ignite.version>2.7.5</ignite.version>
         <infinispan.version>9.4.5.Final</infinispan.version>
     </properties>
 
