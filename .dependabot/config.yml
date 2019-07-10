@@ -1,15 +1,12 @@
 version: 1
 update_configs:
-    - package_manager: "maven:java"
+  - package_manager: "java:maven"
     directory: "/"
     update_schedule: "daily"
-
-    # Apply default reviewer and label to created
-    # pull requests
     default_reviewers:
       - "marcosbarbero"
     default_labels:
-      - "dependencies
+      - "dependencies"
     allowed_updates:
       - match:
           update_type: "all"
