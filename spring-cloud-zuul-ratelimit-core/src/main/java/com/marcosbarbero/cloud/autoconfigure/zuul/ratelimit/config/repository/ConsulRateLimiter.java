@@ -16,15 +16,17 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
-import static org.springframework.util.StringUtils.hasText;
-
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.kv.model.GetValue;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
-import lombok.extern.slf4j.Slf4j;
+
+import static org.springframework.util.StringUtils.hasText;
 
 /**
  * Consul rate limiter configuration.
@@ -33,8 +35,9 @@ import lombok.extern.slf4j.Slf4j;
  * @author Marcos Barbero
  * @since 2017-08-15
  */
-@Slf4j
 public class ConsulRateLimiter extends AbstractRateLimiter {
+
+    private static Logger log = LoggerFactory.getLogger(ConsulRateLimiter.class);
 
     private final ConsulClient consulClient;
     private final ObjectMapper objectMapper;

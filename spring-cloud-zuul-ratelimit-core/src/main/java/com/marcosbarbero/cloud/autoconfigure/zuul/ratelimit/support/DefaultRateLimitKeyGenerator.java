@@ -20,11 +20,11 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyG
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
-import java.util.StringJoiner;
-import javax.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cloud.netflix.zuul.filters.Route;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.StringJoiner;
 
 /**
  * Default KeyGenerator implementation.
@@ -33,11 +33,15 @@ import org.springframework.cloud.netflix.zuul.filters.Route;
  * @author Marcos Barbero
  * @author Liel Chayoun
  */
-@RequiredArgsConstructor
 public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
 
     private final RateLimitProperties properties;
     private final RateLimitUtils rateLimitUtils;
+
+    public DefaultRateLimitKeyGenerator(RateLimitProperties properties, RateLimitUtils rateLimitUtils) {
+        this.properties = properties;
+        this.rateLimitUtils = rateLimitUtils;
+    }
 
     @Override
     public String key(final HttpServletRequest request, final Route route, final Policy policy) {

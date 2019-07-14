@@ -309,14 +309,6 @@ Spring Cloud Zuul Rate Limit is released under the non-restrictive Apache 2.0 li
 standard Github development process, using Github tracker for issues and merging pull requests into master. 
 If you want to contribute even something trivial please do not hesitate, but follow the guidelines below.
 
-=== Adding Project Lombok Agent
-This project uses http://projectlombok.org/features/index.html[Project Lombok]
-to generate getters and setters etc. Compiling from the command line this
-shouldn't cause any problems, but in an IDE you need to add an agent
-to the JVM. Full instructions can be found in the Lombok website. The
-sign that you need to do this is a lot of compiler errors to do with
-missing methods and fields.
-
 === Code of Conduct
 This project adheres to the Contributor Covenant 
 https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit/blob/master/docs/code-of-conduct.adoc[code of conduct].
