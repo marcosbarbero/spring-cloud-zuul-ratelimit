@@ -18,15 +18,10 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.Date;
 
 /**
  * Represents a view of rate limit in a giving time for a user. <p> limit - How many requests can be executed by the
@@ -36,10 +31,7 @@ import lombok.NoArgsConstructor;
  * @author Marcos Barbero
  * @author Liel Chayoun
  */
-@Data
 @Entity
-@NoArgsConstructor
-@AllArgsConstructor
 public class Rate {
 
     @Id
@@ -51,4 +43,54 @@ public class Rate {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private Date expiration;
 
+    public Rate() {
+    }
+
+    public Rate(String key, Long remaining, Long remainingQuota, Long reset, Date expiration) {
+        this.key = key;
+        this.remaining = remaining;
+        this.remainingQuota = remainingQuota;
+        this.reset = reset;
+        this.expiration = expiration;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public Long getRemaining() {
+        return remaining;
+    }
+
+    public void setRemaining(Long remaining) {
+        this.remaining = remaining;
+    }
+
+    public Long getRemainingQuota() {
+        return remainingQuota;
+    }
+
+    public void setRemainingQuota(Long remainingQuota) {
+        this.remainingQuota = remainingQuota;
+    }
+
+    public Long getReset() {
+        return reset;
+    }
+
+    public void setReset(Long reset) {
+        this.reset = reset;
+    }
+
+    public Date getExpiration() {
+        return expiration;
+    }
+
+    public void setExpiration(Date expiration) {
+        this.expiration = expiration;
+    }
 }

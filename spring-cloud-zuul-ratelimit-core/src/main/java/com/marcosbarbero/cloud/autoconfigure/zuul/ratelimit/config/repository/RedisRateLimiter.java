@@ -17,8 +17,6 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.Objects;
@@ -29,13 +27,16 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  * @author Marcos Barbero
  * @author Liel Chayoun
  */
-@Slf4j
-@RequiredArgsConstructor
 @SuppressWarnings("unchecked")
 public class RedisRateLimiter extends AbstractCacheRateLimiter {
 
     private final RateLimiterErrorHandler rateLimiterErrorHandler;
     private final RedisTemplate redisTemplate;
+
+    public RedisRateLimiter(RateLimiterErrorHandler rateLimiterErrorHandler, RedisTemplate redisTemplate) {
+        this.rateLimiterErrorHandler = rateLimiterErrorHandler;
+        this.redisTemplate = redisTemplate;
+    }
 
     @Override
     protected void calcRemainingLimit(final Long limit, final Long refreshInterval,

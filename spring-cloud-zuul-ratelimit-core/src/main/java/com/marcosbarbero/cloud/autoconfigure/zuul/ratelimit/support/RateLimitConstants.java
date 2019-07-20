@@ -16,16 +16,15 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-
 /**
  * @author Marcos Barbero
  * @author Liel Chayoun
  * @since 2018-04-05
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RateLimitConstants {
+
+    private RateLimitConstants() {
+    }
 
     public static final String HEADER_QUOTA = "X-RateLimit-Quota-";
     public static final String HEADER_REMAINING_QUOTA = "X-RateLimit-Remaining-Quota-";

@@ -16,14 +16,13 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
+
 import java.util.Date;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * Abstract implementation for {@link RateLimiter}.
@@ -32,13 +31,16 @@ import lombok.extern.slf4j.Slf4j;
  * @author Marcos Barbero
  * @since 2017-08-28
  */
-@Slf4j
-@RequiredArgsConstructor
 public abstract class AbstractRateLimiter implements RateLimiter {
 
     private final RateLimiterErrorHandler rateLimiterErrorHandler;
 
+    protected AbstractRateLimiter(RateLimiterErrorHandler rateLimiterErrorHandler) {
+        this.rateLimiterErrorHandler = rateLimiterErrorHandler;
+    }
+
     protected abstract Rate getRate(String key);
+
     protected abstract void saveRate(Rate rate);
 
     @Override

@@ -22,22 +22,19 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.MatchType;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
-
-import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.web.util.UrlPathHelper;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author Marcos Barbero
  * @author Liel Chayoun
  */
-@RequiredArgsConstructor
 public abstract class AbstractRateLimitFilter extends ZuulFilter {
 
     private final RateLimitProperties properties;
@@ -46,6 +43,13 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
     private final RateLimitUtils rateLimitUtils;
 
     private boolean alreadyLimited;
+
+    AbstractRateLimitFilter(RateLimitProperties properties, RouteLocator routeLocator, UrlPathHelper urlPathHelper, RateLimitUtils rateLimitUtils) {
+        this.properties = properties;
+        this.routeLocator = routeLocator;
+        this.urlPathHelper = urlPathHelper;
+        this.rateLimitUtils = rateLimitUtils;
+    }
 
     @Override
     public boolean shouldFilter() {
