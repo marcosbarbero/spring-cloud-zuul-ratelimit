@@ -62,8 +62,8 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
         String routeId = Optional.ofNullable(route).map(Route::getId).orElse(null);
         alreadyLimited = false;
         return properties.getPolicies(routeId).stream()
-                .filter(policy -> applyPolicy(request, route, policy))
-                .collect(Collectors.toList());
+            .filter(policy -> applyPolicy(request, route, policy))
+            .collect(Collectors.toList());
     }
 
     private boolean applyPolicy(HttpServletRequest request, Route route, Policy policy) {
