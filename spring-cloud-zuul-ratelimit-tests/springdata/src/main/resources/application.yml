@@ -123,5 +123,4 @@ zuul:
   strip-prefix: true
 
 logging:
-  level:
-    ROOT: error
+  level: error
