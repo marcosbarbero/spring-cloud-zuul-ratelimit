@@ -12,7 +12,7 @@ jdk:
  - oraclejdk8
 
 install:
- - mvn --settings .ci/settings.xml install -Dmaven.test.skip=true -Dgpg.skip -Dmaven.javadoc.skip=true
+ - mvn --settings .ci/settings.xml install -Dmaven.test.skip=true -Dgpg.skip -Dmaven.javadoc.skip=true -Dlogging.level.root=ERROR
 
 before_install:
   - if [ ! -z "$GPG_SECRET_KEYS" ]; then echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import; fi
