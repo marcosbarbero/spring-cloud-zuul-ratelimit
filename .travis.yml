@@ -22,7 +22,7 @@ before_install:
   - if [ ! -z "$GPG_OWNERTRUST" ]; then echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust; fi
 
 after_success:
- - mvn -pl '!spring-cloud-zuul-ratelimit-dependencies' clean org.jacoco:jacoco-maven-plugin:prepare-agent verify jacoco:report sonar:sonar coveralls:report -Dgpg.skip -q
+ - ./mvnw -pl '!spring-cloud-zuul-ratelimit-dependencies' clean org.jacoco:jacoco-maven-plugin:prepare-agent verify jacoco:report sonar:sonar coveralls:report -Dgpg.skip -q -Dlogging.level.root=error
 
 cache:
   directories:
