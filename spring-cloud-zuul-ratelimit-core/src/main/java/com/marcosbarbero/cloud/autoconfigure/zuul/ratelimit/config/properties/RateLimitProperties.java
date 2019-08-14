@@ -44,7 +44,6 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
  * @author Marcos Barbero
  * @author Liel Chayoun
  */
-@Data
 @Validated
 @RefreshScope
 @ConfigurationProperties(RateLimitProperties.PREFIX)
@@ -56,19 +55,100 @@ public class RateLimitProperties {
     @NotNull
     @Policies
     private List<Policy> defaultPolicyList = Lists.newArrayList();
+
     @Valid
     @NotNull
     @Policies
     private Map<String, List<Policy>> policyList = Maps.newHashMap();
+
     private boolean behindProxy;
+
     private boolean enabled;
+
+    private boolean addResponseHeaders = true;
+
     @NotNull
     @Value("${spring.application.name:rate-limit-application}")
     private String keyPrefix;
+
     @NotNull
     private RateLimitRepository repository;
+
     private int postFilterOrder = SEND_RESPONSE_FILTER_ORDER - 10;
+
     private int preFilterOrder = FORM_BODY_WRAPPER_FILTER_ORDER;
+
+    public List<Policy> getDefaultPolicyList() {
+        return defaultPolicyList;
+    }
+
+    public void setDefaultPolicyList(List<Policy> defaultPolicyList) {
+        this.defaultPolicyList = defaultPolicyList;
+    }
+
+    public Map<String, List<Policy>> getPolicyList() {
+        return policyList;
+    }
+
+    public void setPolicyList(Map<String, List<Policy>> policyList) {
+        this.policyList = policyList;
+    }
+
+    public boolean isBehindProxy() {
+        return behindProxy;
+    }
+
+    public void setBehindProxy(boolean behindProxy) {
+        this.behindProxy = behindProxy;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public boolean isAddResponseHeaders() {
+        return addResponseHeaders;
+    }
+
+    public void setAddResponseHeaders(boolean addResponseHeaders) {
+        this.addResponseHeaders = addResponseHeaders;
+    }
+
+    public String getKeyPrefix() {
+        return keyPrefix;
+    }
+
+    public void setKeyPrefix(String keyPrefix) {
+        this.keyPrefix = keyPrefix;
+    }
+
+    public RateLimitRepository getRepository() {
+        return repository;
+    }
+
+    public void setRepository(RateLimitRepository repository) {
+        this.repository = repository;
+    }
+
+    public int getPostFilterOrder() {
+        return postFilterOrder;
+    }
+
+    public void setPostFilterOrder(int postFilterOrder) {
+        this.postFilterOrder = postFilterOrder;
+    }
+
+    public int getPreFilterOrder() {
+        return preFilterOrder;
+    }
+
+    public void setPreFilterOrder(int preFilterOrder) {
+        this.preFilterOrder = preFilterOrder;
+    }
 
     public List<Policy> getPolicies(String key) {
         if (StringUtils.isEmpty(key)) {
@@ -77,7 +157,6 @@ public class RateLimitProperties {
         return policyList.getOrDefault(key, defaultPolicyList);
     }
 
-    @Data
     @NoArgsConstructor
     public static class Policy {
 
@@ -95,7 +174,46 @@ public class RateLimitProperties {
         @NotNull
         private List<MatchType> type = Lists.newArrayList();
 
-        @Data
+        public Long getRefreshInterval() {
+            return refreshInterval;
+        }
+
+        public void setRefreshInterval(Long refreshInterval) {
+            this.refreshInterval = refreshInterval;
+        }
+
+        public Long getLimit() {
+            return limit;
+        }
+
+        public void setLimit(Long limit) {
+            this.limit = limit;
+        }
+
+        public Long getQuota() {
+            return quota;
+        }
+
+        public void setQuota(Long quota) {
+            this.quota = quota;
+        }
+
+        public boolean isBreakOnMatch() {
+            return breakOnMatch;
+        }
+
+        public void setBreakOnMatch(boolean breakOnMatch) {
+            this.breakOnMatch = breakOnMatch;
+        }
+
+        public List<MatchType> getType() {
+            return type;
+        }
+
+        public void setType(List<MatchType> type) {
+            this.type = type;
+        }
+
         @AllArgsConstructor
         public static class MatchType {
 
@@ -103,6 +221,22 @@ public class RateLimitProperties {
             @NotNull
             private RateLimitType type;
             private String matcher;
+
+            public RateLimitType getType() {
+                return type;
+            }
+
+            public void setType(RateLimitType type) {
+                this.type = type;
+            }
+
+            public String getMatcher() {
+                return matcher;
+            }
+
+            public void setMatcher(String matcher) {
+                this.matcher = matcher;
+            }
 
             public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils) {
                 return StringUtils.isEmpty(matcher) || type.apply(request, route, rateLimitUtils, matcher);
