@@ -43,7 +43,7 @@ deploy:
    on:
      branch: 1.7.x
      repo: marcosbarbero/spring-cloud-zuul-ratelimit
-     jdk: oraclejdk8
+     jdk: oraclejdk9
 
 env:
   global:
