@@ -35,6 +35,7 @@ zuul:
           refresh-interval: 60
           type:
             - url
+            - url_pattern=/serviceD/[0-9]+
       serviceE:
         - quota: 1
           refresh-interval: 60

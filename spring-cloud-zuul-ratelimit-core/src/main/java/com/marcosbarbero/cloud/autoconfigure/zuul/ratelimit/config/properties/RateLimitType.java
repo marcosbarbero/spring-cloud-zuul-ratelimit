@@ -23,6 +23,8 @@ import org.springframework.cloud.netflix.zuul.filters.Route;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public enum RateLimitType {
     /**
@@ -103,7 +105,28 @@ public enum RateLimitType {
             return StringUtils.isEmpty(matcher) ? request.getMethod() : "http-method";
         }
     },
-    ;
+
+    /**
+     * Rate limit policy considering an
+     */
+    URL_PATTERN {
+        @Override
+        public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
+            if (route == null) {
+                return true;
+            }
+
+            Pattern pattern = Pattern.compile(matcher.toLowerCase());
+            Matcher match = pattern.matcher(request.getRequestURI().toLowerCase());
+
+            return match.matches();
+        }
+
+        @Override
+        public String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
+            return matcher;
+        }
+    };
 
     public abstract boolean apply(HttpServletRequest request, Route route,
                                   RateLimitUtils rateLimitUtils, String matcher);

@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_LIMIT;
@@ -111,6 +112,27 @@ public class Bucket4jJCacheApplicationTestIT {
             assertHeaders(headers, "rate-limit-application_serviceD_serviceD_" + randomPath,false, false);
             assertEquals(OK, response.getStatusCode());
         }
+    }
+
+    @Test
+    public void testMultipleUrlPattern() {
+        int randomInt = randomInt();
+
+        for (int i = 0; i < 12; i++) {
+
+            if (i % 2 == 0) {
+                randomInt = randomInt();
+            }
+
+            ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceD/" + randomInt, String.class);
+            HttpHeaders headers = response.getHeaders();
+            assertHeaders(headers, "rate-limit-application_serviceD_serviceD_" + randomInt,false, false);
+            assertEquals(OK, response.getStatusCode());
+        }
+    }
+
+    private int randomInt() {
+        return ThreadLocalRandom.current().nextInt(0, 5000);
     }
 
     @Test

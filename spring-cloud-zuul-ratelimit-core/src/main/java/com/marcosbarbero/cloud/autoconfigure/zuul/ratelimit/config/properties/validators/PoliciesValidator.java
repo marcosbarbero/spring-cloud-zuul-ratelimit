@@ -17,6 +17,7 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.validators;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitType;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -24,6 +25,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitType.ROLE;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitType.URL_PATTERN;
 
 /**
  * Validates the rate limit policies.
@@ -60,11 +62,19 @@ public class PoliciesValidator implements ConstraintValidator<Policies, Object> 
     }
 
     private boolean isValidPolicy(Policy policy) {
-        return (policy.getLimit() != null || policy.getQuota() != null) && isValidRoles(policy);
+        return (policy.getLimit() != null || policy.getQuota() != null) && isValidRoles(policy) && isValidUrlPattern(policy);
     }
 
     private boolean isValidRoles(Policy policy) {
+        return isValid(policy, ROLE);
+    }
+
+    private boolean isValidUrlPattern(Policy policy) {
+        return isValid(policy, URL_PATTERN);
+    }
+
+    private boolean isValid(Policy policy, RateLimitType rateLimitType) {
         return policy.getType().stream()
-                .noneMatch(type -> type.getType().equals(ROLE) && type.getMatcher() == null);
+                .noneMatch(type -> type.getType().equals(rateLimitType) && type.getMatcher() == null);
     }
 }
