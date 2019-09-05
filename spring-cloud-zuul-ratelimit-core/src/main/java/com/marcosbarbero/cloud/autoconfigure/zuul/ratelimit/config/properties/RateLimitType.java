@@ -112,13 +112,8 @@ public enum RateLimitType {
     URL_PATTERN {
         @Override
         public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
-            if (route == null) {
-                return true;
-            }
-
             Pattern pattern = Pattern.compile(matcher.toLowerCase());
             Matcher match = pattern.matcher(request.getRequestURI().toLowerCase());
-
             return match.matches();
         }
 

@@ -92,7 +92,7 @@ public class RateLimitTypeTest {
 
     @Test
     public void applyPatternURL() {
-        int id = ThreadLocalRandom.current().nextInt(0, 5000);
+        int id = (int) Math.random();
 
         when(httpServletRequest.getRequestURI()).thenReturn("/resource/" + id + "/specific");
 
