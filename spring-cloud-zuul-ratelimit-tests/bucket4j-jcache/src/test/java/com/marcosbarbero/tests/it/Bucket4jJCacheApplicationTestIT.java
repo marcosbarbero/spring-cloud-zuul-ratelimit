@@ -4,7 +4,6 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j.Bucket4jJCacheRateLimiter;
 import com.marcosbarbero.tests.Bucket4jJCacheApplication;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,19 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_LIMIT;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_QUOTA;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING_QUOTA;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_RESET;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.*;
+import static org.junit.Assert.*;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
@@ -62,7 +52,7 @@ public class Bucket4jJCacheApplicationTestIT {
     public void testNotExceedingCapacityRequest() {
         ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceA", String.class);
         HttpHeaders headers = response.getHeaders();
-        assertHeaders(headers, "rate-limit-application_serviceA_127.0.0.1",false, false);
+        assertHeaders(headers, "rate-limit-application_serviceA_127.0.0.1", false, false);
         assertEquals(OK, response.getStatusCode());
     }
 
@@ -85,7 +75,7 @@ public class Bucket4jJCacheApplicationTestIT {
 
         response = this.restTemplate.getForEntity("/serviceB", String.class);
         headers = response.getHeaders();
-        assertHeaders(headers, key,false, false);
+        assertHeaders(headers, key, false, false);
         assertEquals(OK, response.getStatusCode());
     }
 
@@ -93,7 +83,7 @@ public class Bucket4jJCacheApplicationTestIT {
     public void testNoRateLimit() {
         ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceC", String.class);
         HttpHeaders headers = response.getHeaders();
-        assertHeaders(headers, "rate-limit-application_serviceC",true, false);
+        assertHeaders(headers, "rate-limit-application_serviceC", true, false);
         assertEquals(OK, response.getStatusCode());
     }
 
@@ -109,7 +99,7 @@ public class Bucket4jJCacheApplicationTestIT {
 
             ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceD/" + randomPath, String.class);
             HttpHeaders headers = response.getHeaders();
-            assertHeaders(headers, "rate-limit-application_serviceD_serviceD_" + randomPath,false, false);
+            assertHeaders(headers, "rate-limit-application_serviceD_serviceD_" + randomPath, false, false);
             assertEquals(OK, response.getStatusCode());
         }
     }
@@ -126,13 +116,13 @@ public class Bucket4jJCacheApplicationTestIT {
 
             ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceD/" + randomInt, String.class);
             HttpHeaders headers = response.getHeaders();
-            assertHeaders(headers, "rate-limit-application_serviceD_serviceD_" + randomInt,false, false);
+            assertHeaders(headers, "rate-limit-application_serviceD_serviceD_" + randomInt, false, false);
             assertEquals(OK, response.getStatusCode());
         }
     }
 
     private int randomInt() {
-        return ThreadLocalRandom.current().nextInt(0, 5000);
+        return (int) Math.random();
     }
 
     @Test
@@ -140,12 +130,12 @@ public class Bucket4jJCacheApplicationTestIT {
         ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceE", String.class);
         HttpHeaders headers = response.getHeaders();
         String key = "rate-limit-application_serviceE_127.0.0.1";
-        assertHeaders(headers, key,false, true);
+        assertHeaders(headers, key, false, true);
         assertEquals(OK, response.getStatusCode());
 
         response = this.restTemplate.getForEntity("/serviceE", String.class);
         headers = response.getHeaders();
-        assertHeaders(headers, key,false, true);
+        assertHeaders(headers, key, false, true);
         assertEquals(TOO_MANY_REQUESTS, response.getStatusCode());
     }
 
