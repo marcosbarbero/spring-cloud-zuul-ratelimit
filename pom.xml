@@ -30,9 +30,9 @@
     </licenses>
 
     <properties>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.source>1.8</maven.compiler.source>
         <java.version>1.8</java.version>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
         <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
         <jacoco.version>0.8.4</jacoco.version>
         <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
