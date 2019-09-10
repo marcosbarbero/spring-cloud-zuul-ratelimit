@@ -107,7 +107,7 @@ public enum RateLimitType {
     },
 
     /**
-     * Rate limit policy considering an
+     * Rate limit policy considering an URL Pattern
      */
     URL_PATTERN {
         @Override
