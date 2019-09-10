@@ -73,5 +73,10 @@ public class Bucket4jJCacheApplication {
             Thread.sleep(1100);
             return ResponseEntity.ok(RESPONSE_BODY);
         }
+
+        @GetMapping("/serviceF/{paramName}/specific")
+        public ResponseEntity<String> serviceF(@PathVariable Integer paramName) {
+            return ResponseEntity.ok(RESPONSE_BODY + " " + paramName);
+        }
     }
 }
