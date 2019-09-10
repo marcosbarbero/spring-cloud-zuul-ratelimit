@@ -117,7 +117,7 @@ public class Bucket4jJCacheApplicationTestIT {
 
             ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceF/" + randomInt + "/specific", String.class);
             HttpHeaders headers = response.getHeaders();
-            assertHeaders(headers, "rate-limit-application_serviceF_serviceF_" + randomInt, false, false);
+            assertHeaders(headers, "rate-limit-application_serviceF_serviceF_/serviceD/[0-9]+/specific", false, false);
             assertEquals(OK, response.getStatusCode());
         }
     }
