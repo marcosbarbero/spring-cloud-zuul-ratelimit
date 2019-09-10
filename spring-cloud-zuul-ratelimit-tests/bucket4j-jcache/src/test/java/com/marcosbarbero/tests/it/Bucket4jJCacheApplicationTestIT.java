@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.*;
@@ -121,8 +122,8 @@ public class Bucket4jJCacheApplicationTestIT {
         }
     }
 
-    private int randomInt() {
-        return (int) Math.random();
+    private static int randomInt() {
+        return ThreadLocalRandom.current().nextInt(0, 5000);
     }
 
     @Test
