@@ -6,6 +6,8 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bu
 import com.marcosbarbero.tests.Bucket4jJCacheApplication;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +16,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +35,8 @@ import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class Bucket4jJCacheApplicationTestIT {
+
+    static final Logger logger = LoggerFactory.getLogger(Bucket4jJCacheApplicationTestIT.class);
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -117,6 +123,22 @@ public class Bucket4jJCacheApplicationTestIT {
 
             ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceF/" + randomInt + "/specific", String.class);
             HttpHeaders headers = response.getHeaders();
+
+            logger.error("*************************************************************************");
+            logger.error("HTTP HEADERS");
+            logger.error("*************************************************************************");
+
+            for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+                String headerName = entry.getKey();
+                for (String headerValue : entry.getValue()) {
+                    logger.error("HeaderName={}, HeaderValue={}",headerName, headerValue);
+                }
+            }
+
+            logger.error("*************************************************************************");
+            logger.error("*************************************************************************");
+            logger.error("*************************************************************************");
+
             assertHeaders(headers, "rate-limit-application_serviceF_serviceF_/serviceD/[0-9]+/specific", false, false);
             assertEquals(OK, response.getStatusCode());
         }
