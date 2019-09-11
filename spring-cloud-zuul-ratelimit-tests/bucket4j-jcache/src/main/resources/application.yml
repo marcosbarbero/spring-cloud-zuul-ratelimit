@@ -16,6 +16,10 @@ zuul:
     serviceE:
       path: /serviceE
       url: forward:/
+    serviceF:
+      strip-prefix: false
+      path: /serviceF/**
+      url: forward:/
   ratelimit:
     enabled: true
     repository: BUCKET4J_JCACHE
@@ -44,7 +48,7 @@ zuul:
         - limit: 2
           refresh-interval: 60
           type:
-            - url_pattern=/serviceD/[0-9]+/specific
+            - url_pattern=/serviceF/[0-9]+/specific
   strip-prefix: true
 
 logging:

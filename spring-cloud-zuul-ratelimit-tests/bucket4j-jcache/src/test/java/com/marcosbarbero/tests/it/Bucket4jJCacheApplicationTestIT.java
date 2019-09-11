@@ -13,6 +13,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -115,7 +116,7 @@ public class Bucket4jJCacheApplicationTestIT {
     public void testMultipleUrlPattern() {
         int randomInt = randomInt();
 
-        for (int i = 0; i < 12; i++) {
+        for (int i = 0; i < 5; i++) {
 
             if (i % 2 == 0) {
                 randomInt = randomInt();
@@ -124,23 +125,13 @@ public class Bucket4jJCacheApplicationTestIT {
             ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceF/" + randomInt + "/specific", String.class);
             HttpHeaders headers = response.getHeaders();
 
-            logger.error("*************************************************************************");
-            logger.error("HTTP HEADERS");
-            logger.error("*************************************************************************");
+            assertHeaders(headers, "rate-limit-application_serviceF_serviceF_0-9__specific_serviceF_0-9__specific", false, false);
 
-            for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
-                String headerName = entry.getKey();
-                for (String headerValue : entry.getValue()) {
-                    logger.error("HeaderName={}, HeaderValue={}",headerName, headerValue);
-                }
+            HttpStatus httpStatus = OK;
+            if (i > 1) {
+                httpStatus = TOO_MANY_REQUESTS;
             }
-
-            logger.error("*************************************************************************");
-            logger.error("*************************************************************************");
-            logger.error("*************************************************************************");
-
-            assertHeaders(headers, "rate-limit-application_serviceF_serviceF_/serviceD/[0-9]+/specific", false, false);
-            assertEquals(OK, response.getStatusCode());
+            assertEquals(httpStatus, response.getStatusCode());
         }
     }
 
