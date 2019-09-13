@@ -96,13 +96,13 @@ public class RateLimitTypeTest {
 
         when(httpServletRequest.getRequestURI()).thenReturn("/resource/" + id + "/specific");
 
-        boolean apply = RateLimitType.URL_PATTERN.apply(httpServletRequest, route, rateLimitUtils, "/resource/[0-9]+/specific");
+        boolean apply = RateLimitType.URL_PATTERN.apply(httpServletRequest, route, rateLimitUtils, "/resource/*/specific");
         assertThat(apply).isTrue();
     }
 
     @Test
     public void keyPatternURL() {
-        String pattern = "/resource/[0-9]+/specific";
+        String pattern = "/resource/*/specific";
         String key = RateLimitType.URL_PATTERN.key(httpServletRequest, route, rateLimitUtils, pattern);
         assertThat(key).isEqualTo(pattern);
     }
@@ -111,7 +111,7 @@ public class RateLimitTypeTest {
     public void applyPatternURL_withInvalidPattern_shouldNotApply() {
         when(httpServletRequest.getRequestURI()).thenReturn("/resource/abcd/specific");
 
-        boolean apply = RateLimitType.URL_PATTERN.apply(httpServletRequest, route, rateLimitUtils, "/resource/[0-9]+/specific");
+        boolean apply = RateLimitType.URL_PATTERN.apply(httpServletRequest, route, rateLimitUtils, "/resource/??/specific");
         assertThat(apply).isFalse();
     }
 

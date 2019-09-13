@@ -48,7 +48,7 @@ zuul:
         - limit: 2
           refresh-interval: 60
           type:
-            - url_pattern=/serviceF/[0-9]+/specific
+            - url_pattern=/serviceF/*/specific
   strip-prefix: true
 
 logging:
