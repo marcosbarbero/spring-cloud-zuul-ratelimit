@@ -44,7 +44,7 @@ public class Bucket4jJCacheApplication {
     }
 
     @RestController
-    public class ServiceController {
+    public static class ServiceController {
 
         public static final String RESPONSE_BODY = "ResponseBody";
 

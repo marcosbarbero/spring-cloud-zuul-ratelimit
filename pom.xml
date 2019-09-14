@@ -44,7 +44,7 @@
             ${project.build.directory}/coverage-reports/jacoco.exec
         </jacoco.ut.execution.data.file>
         <package.root.path>com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit</package.root.path>
-        <spring-cloud.version>Greenwich.SR2</spring-cloud.version>
+        <spring-cloud.version>Greenwich.SR3</spring-cloud.version>
     </properties>
 
     <developers>
