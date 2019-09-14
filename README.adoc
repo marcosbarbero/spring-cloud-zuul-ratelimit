@@ -15,7 +15,7 @@ There are five built-in rate limit approaches:
  * URL
  ** Uses the request path of the downstream service
  * URL Pattern
- ** Uses the request Ant path to the downstream service
+ ** Uses the request Ant path pattern to the downstream service
  * ROLE
  ** Uses the authenticated user roles
  * Request method
@@ -204,13 +204,15 @@ zuul.ratelimit.default-policy-list[0].type[1]=origin
 zuul.ratelimit.default-policy-list[0].type[2]=url
 zuul.ratelimit.default-policy-list[0].type[3]=httpmethod
 
-# Adding multiple policies for the same service
+# Adding the first rate limit policy to "myServiceId"
 zuul.ratelimit.policy-list.myServiceId[0].limit=10
 zuul.ratelimit.policy-list.myServiceId[0].quota=1000
 zuul.ratelimit.policy-list.myServiceId[0].refresh-interval=60
 zuul.ratelimit.policy-list.myServiceId[0].type[0]=user
 zuul.ratelimit.policy-list.myServiceId[0].type[1]=origin
 zuul.ratelimit.policy-list.myServiceId[0].type[2]=url
+
+# Adding the second rate limit policy to "myServiceId"
 zuul.ratelimit.policy-list.myServiceId[1].type[0]=user=anonymous
 zuul.ratelimit.policy-list.myServiceId[1].type[1]=origin=somemachine.com
 zuul.ratelimit.policy-list.myServiceId[1].type[2]=url_pattern=/api/*/payment
