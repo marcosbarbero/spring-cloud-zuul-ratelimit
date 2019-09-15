@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  * @author Marcos Barbero
  * @author Liel Chayoun
  */
-public abstract class AbstractRateLimitFilter extends ZuulFilter {
+abstract class AbstractRateLimitFilter extends ZuulFilter {
 
     private final RateLimitProperties properties;
     private final RouteLocator routeLocator;

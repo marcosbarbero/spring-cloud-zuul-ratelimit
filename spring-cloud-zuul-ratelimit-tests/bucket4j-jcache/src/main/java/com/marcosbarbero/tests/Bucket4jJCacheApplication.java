@@ -44,7 +44,7 @@ public class Bucket4jJCacheApplication {
     }
 
     @RestController
-    public class ServiceController {
+    public static class ServiceController {
 
         public static final String RESPONSE_BODY = "ResponseBody";
 
@@ -72,6 +72,11 @@ public class Bucket4jJCacheApplication {
         public ResponseEntity<String> serviceE() throws InterruptedException {
             Thread.sleep(1100);
             return ResponseEntity.ok(RESPONSE_BODY);
+        }
+
+        @GetMapping("/serviceF/{paramName}/specific")
+        public ResponseEntity<String> serviceF(@PathVariable Integer paramName) {
+            return ResponseEntity.ok(RESPONSE_BODY + " " + paramName);
         }
     }
 }

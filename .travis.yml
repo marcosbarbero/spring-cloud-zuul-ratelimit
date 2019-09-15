@@ -1,5 +1,7 @@
 language: java
 
+dist: trusty
+
 sudo: false
 
 addons:
@@ -41,7 +43,7 @@ deploy:
    on:
      branch: master
      repo: marcosbarbero/spring-cloud-zuul-ratelimit
-     jdk: oraclejdk8
+     jdk: oraclejdk9
 
 env:
   global:
