@@ -31,11 +31,11 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  * @author Marcos Barbero
  * @since 2017-08-28
  */
-abstract class AbstractRateLimiter implements RateLimiter {
+public abstract class AbstractRateLimiter implements RateLimiter {
 
     private final RateLimiterErrorHandler rateLimiterErrorHandler;
 
-    AbstractRateLimiter(RateLimiterErrorHandler rateLimiterErrorHandler) {
+    protected AbstractRateLimiter(RateLimiterErrorHandler rateLimiterErrorHandler) {
         this.rateLimiterErrorHandler = rateLimiterErrorHandler;
     }
 
