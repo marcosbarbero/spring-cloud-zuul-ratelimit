@@ -23,8 +23,6 @@ import javax.validation.ConstraintValidatorContext;
 import java.util.Collection;
 import java.util.Map;
 
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitType.ROLE;
-
 /**
  * Validates the rate limit policies.
  *
@@ -60,11 +58,11 @@ public class PoliciesValidator implements ConstraintValidator<Policies, Object> 
     }
 
     private boolean isValidPolicy(Policy policy) {
-        return (policy.getLimit() != null || policy.getQuota() != null) && isValidRoles(policy);
+        return (policy.getLimit() != null || policy.getQuota() != null) && isValid(policy);
     }
 
-    private boolean isValidRoles(Policy policy) {
+    private boolean isValid(Policy policy) {
         return policy.getType().stream()
-                .noneMatch(type -> type.getType().equals(ROLE) && type.getMatcher() == null);
+                .allMatch(type -> type.getType().isValid(type.getMatcher()));
     }
 }

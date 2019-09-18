@@ -94,6 +94,17 @@ public class PoliciesValidatorTest {
     }
 
     @Test
+    public void testValidOnPolicyWithLimitAndURLPattern() {
+        properties.setKeyPrefix("prefix");
+        Policy policy = getPolicy(1L, null);
+        policy.getType().add(new Policy.MatchType(RateLimitType.URL_PATTERN, "/user/[0-9]+"));
+        properties.getDefaultPolicyList().add(policy);
+        properties.getPolicyList().put("key", Lists.newArrayList(policy));
+        Set<ConstraintViolation<RateLimitProperties>> violations = validator.validate(properties);
+        assertThat(violations).isEmpty();
+    }
+
+    @Test
     public void testValidOnPolicyWithLimitAndRoleWithoutMatcher() {
         properties.setKeyPrefix("prefix");
         Policy policy = getPolicy(1L, null);

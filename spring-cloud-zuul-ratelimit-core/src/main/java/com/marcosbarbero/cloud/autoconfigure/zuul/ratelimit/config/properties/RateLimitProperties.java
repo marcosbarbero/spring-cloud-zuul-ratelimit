@@ -72,6 +72,7 @@ public class RateLimitProperties {
     private RateLimitRepository repository;
 
     private int postFilterOrder = SEND_RESPONSE_FILTER_ORDER - 10;
+
     private int preFilterOrder = FORM_BODY_WRAPPER_FILTER_ORDER;
 
     public List<Policy> getPolicies(String key) {
