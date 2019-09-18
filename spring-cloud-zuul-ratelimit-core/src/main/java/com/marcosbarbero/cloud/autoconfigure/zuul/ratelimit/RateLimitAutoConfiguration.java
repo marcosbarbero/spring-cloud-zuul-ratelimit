@@ -212,7 +212,7 @@ public class RateLimitAutoConfiguration {
 
     @EntityScan
     @Configuration
-    @EnableJpaRepositories
+    @EnableJpaRepositories(basePackages = "com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata")
     @ConditionalOnMissingBean(RateLimiter.class)
     @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "JPA")
     public static class SpringDataConfiguration {
