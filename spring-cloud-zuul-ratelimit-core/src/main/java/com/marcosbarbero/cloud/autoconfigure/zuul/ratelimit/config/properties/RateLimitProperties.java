@@ -76,9 +76,6 @@ public class RateLimitProperties {
     private int preFilterOrder = FORM_BODY_WRAPPER_FILTER_ORDER;
 
     public List<Policy> getPolicies(String key) {
-        if (StringUtils.isEmpty(key)) {
-            return defaultPolicyList;
-        }
         return policyList.getOrDefault(key, defaultPolicyList);
     }
 
