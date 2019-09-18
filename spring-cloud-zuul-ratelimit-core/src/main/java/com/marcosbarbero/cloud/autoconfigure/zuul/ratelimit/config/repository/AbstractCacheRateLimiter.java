@@ -28,7 +28,7 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
  * @author Liel Chayoun
  * @since 2018-04-06
  */
-abstract class AbstractCacheRateLimiter implements RateLimiter {
+public abstract class AbstractCacheRateLimiter implements RateLimiter {
 
     @Override
     public synchronized Rate consume(Policy policy, String key, Long requestTime) {
