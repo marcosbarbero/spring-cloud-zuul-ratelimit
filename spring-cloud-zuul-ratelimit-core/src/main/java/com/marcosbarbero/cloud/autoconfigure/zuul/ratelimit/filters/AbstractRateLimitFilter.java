@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.REQUEST_POLICY;
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.REQUEST_ROUTE;
 
 /**
@@ -73,12 +74,21 @@ abstract class AbstractRateLimitFilter extends ZuulFilter {
         }).orElse(null);
     }
 
+    @SuppressWarnings("unchecked")
     protected List<Policy> policy(Route route, HttpServletRequest request) {
+        List<Policy> policies = (List<Policy>) RequestContext.getCurrentContext().get(REQUEST_POLICY);
+        if (policies != null) {
+            return policies;
+        }
+
         String routeId = Optional.ofNullable(route).map(Route::getId).orElse(null);
         alreadyLimited = false;
-        return properties.getPolicies(routeId).stream()
+        policies = properties.getPolicies(routeId).stream()
                 .filter(policy -> applyPolicy(request, route, policy))
                 .collect(Collectors.toList());
+        RequestContext.getCurrentContext().put(REQUEST_POLICY, policies);
+
+        return policies;
     }
 
     private boolean applyPolicy(HttpServletRequest request, Route route, Policy policy) {
