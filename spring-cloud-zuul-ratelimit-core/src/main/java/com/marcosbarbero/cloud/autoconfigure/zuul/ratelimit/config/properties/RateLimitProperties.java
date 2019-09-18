@@ -52,18 +52,25 @@ public class RateLimitProperties {
     @NotNull
     @Policies
     private List<Policy> defaultPolicyList = Lists.newArrayList();
+
     @Valid
     @NotNull
     @Policies
     private Map<String, List<Policy>> policyList = Maps.newHashMap();
+
     private boolean behindProxy;
+
     private boolean enabled;
+
     private boolean addResponseHeaders = true;
+
     @NotNull
     @Value("${spring.application.name:rate-limit-application}")
     private String keyPrefix;
+
     @NotNull
     private RateLimitRepository repository;
+
     private int postFilterOrder = SEND_RESPONSE_FILTER_ORDER - 10;
     private int preFilterOrder = FORM_BODY_WRAPPER_FILTER_ORDER;
 
@@ -207,6 +214,7 @@ public class RateLimitProperties {
             @Valid
             @NotNull
             private RateLimitType type;
+
             private String matcher;
 
             public MatchType(@Valid @NotNull RateLimitType type, String matcher) {

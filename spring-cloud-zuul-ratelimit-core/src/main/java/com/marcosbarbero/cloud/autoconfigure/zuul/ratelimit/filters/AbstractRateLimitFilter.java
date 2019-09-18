@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.REQUEST_ROUTE;
+
 /**
  * @author Marcos Barbero
  * @author Liel Chayoun
@@ -58,8 +60,17 @@ public abstract class AbstractRateLimitFilter extends ZuulFilter {
     }
 
     Route route(HttpServletRequest request) {
+        Route route = (Route) RequestContext.getCurrentContext().get(REQUEST_ROUTE);
+        if (route != null) {
+            return route;
+        }
+
         String requestURI = urlPathHelper.getPathWithinApplication(request);
-        return routeLocator.getMatchingRoute(requestURI);
+
+        return Optional.ofNullable(routeLocator.getMatchingRoute(requestURI)).map(matchingRoute -> {
+            RequestContext.getCurrentContext().put(REQUEST_ROUTE, matchingRoute);
+            return matchingRoute;
+        }).orElse(null);
     }
 
     protected List<Policy> policy(Route route, HttpServletRequest request) {

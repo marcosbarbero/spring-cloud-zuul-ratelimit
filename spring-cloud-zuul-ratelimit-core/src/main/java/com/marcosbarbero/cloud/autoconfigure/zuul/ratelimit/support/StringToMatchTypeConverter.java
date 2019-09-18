@@ -24,7 +24,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Liel Chayoun
  */
-public class StringToMatchTypeConverter implements Converter<String, MatchType> {
+public final class StringToMatchTypeConverter implements Converter<String, MatchType> {
 
     private static final String DELIMITER = "=";
 

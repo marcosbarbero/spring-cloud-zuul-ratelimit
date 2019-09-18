@@ -48,10 +48,7 @@ import io.github.bucket4j.grid.jcache.JCache;
 import org.apache.ignite.IgniteCache;
 import org.infinispan.functional.FunctionalMap.ReadWriteMap;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -75,10 +72,11 @@ import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.proper
  */
 @Configuration
 @EnableConfigurationProperties(RateLimitProperties.class)
+@ConditionalOnBean(RouteLocator.class)
 @ConditionalOnProperty(prefix = PREFIX, name = "enabled", havingValue = "true")
 public class RateLimitAutoConfiguration {
 
-    private final UrlPathHelper urlPathHelper = new UrlPathHelper();
+    private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
 
     @Bean
     @ConfigurationPropertiesBinding
@@ -96,7 +94,7 @@ public class RateLimitAutoConfiguration {
     public ZuulFilter rateLimiterPreFilter(final RateLimiter rateLimiter, final RateLimitProperties rateLimitProperties,
                                            final RouteLocator routeLocator, final RateLimitKeyGenerator rateLimitKeyGenerator,
                                            final RateLimitUtils rateLimitUtils) {
-        return new RateLimitPreFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter,
+        return new RateLimitPreFilter(rateLimitProperties, routeLocator, URL_PATH_HELPER, rateLimiter,
                 rateLimitKeyGenerator, rateLimitUtils);
     }
 
@@ -104,7 +102,7 @@ public class RateLimitAutoConfiguration {
     public ZuulFilter rateLimiterPostFilter(final RateLimiter rateLimiter, final RateLimitProperties rateLimitProperties,
                                             final RouteLocator routeLocator, final RateLimitKeyGenerator rateLimitKeyGenerator,
                                             final RateLimitUtils rateLimitUtils) {
-        return new RateLimitPostFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter,
+        return new RateLimitPostFilter(rateLimitProperties, routeLocator, URL_PATH_HELPER, rateLimiter,
                 rateLimitKeyGenerator, rateLimitUtils);
     }
 

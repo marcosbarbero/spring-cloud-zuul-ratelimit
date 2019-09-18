@@ -30,6 +30,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 public class DefaultRateLimitUtils implements RateLimitUtils {
 
     private static final String ANONYMOUS_USER = "anonymous";
+    private static final String X_FORWARDED_FOR_HEADER_DELIMITER = ",";
 
     private final RateLimitProperties properties;
 
@@ -46,7 +47,7 @@ public class DefaultRateLimitUtils implements RateLimitUtils {
     public String getRemoteAddress(final HttpServletRequest request) {
         String xForwardedFor = request.getHeader(X_FORWARDED_FOR_HEADER);
         if (properties.isBehindProxy() && xForwardedFor != null) {
-            return xForwardedFor.split(",")[0].trim();
+            return xForwardedFor.split(X_FORWARDED_FOR_HEADER_DELIMITER)[0].trim();
         }
         return request.getRemoteAddr();
     }
