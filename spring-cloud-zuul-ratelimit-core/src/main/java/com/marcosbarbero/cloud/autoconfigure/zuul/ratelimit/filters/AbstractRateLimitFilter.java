@@ -28,11 +28,10 @@ import org.springframework.web.util.UrlPathHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.REQUEST_POLICY;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.REQUEST_ROUTE;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.CURRENT_REQUEST_POLICY;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.CURRENT_REQUEST_ROUTE;
 
 /**
  * @author Marcos Barbero
@@ -61,34 +60,41 @@ abstract class AbstractRateLimitFilter extends ZuulFilter {
     }
 
     Route route(HttpServletRequest request) {
-        Route route = (Route) RequestContext.getCurrentContext().get(REQUEST_ROUTE);
+        Route route = (Route) RequestContext.getCurrentContext().get(CURRENT_REQUEST_ROUTE);
         if (route != null) {
             return route;
         }
 
         String requestURI = urlPathHelper.getPathWithinApplication(request);
+        route = routeLocator.getMatchingRoute(requestURI);
 
-        return Optional.ofNullable(routeLocator.getMatchingRoute(requestURI)).map(matchingRoute -> {
-            RequestContext.getCurrentContext().put(REQUEST_ROUTE, matchingRoute);
-            return matchingRoute;
-        }).orElse(null);
+        addObjectToRequest(CURRENT_REQUEST_ROUTE, route);
+
+        return route;
     }
 
     @SuppressWarnings("unchecked")
     protected List<Policy> policy(Route route, HttpServletRequest request) {
-        List<Policy> policies = (List<Policy>) RequestContext.getCurrentContext().get(REQUEST_POLICY);
+        List<Policy> policies = (List<Policy>) RequestContext.getCurrentContext().get(CURRENT_REQUEST_POLICY);
         if (policies != null) {
             return policies;
         }
 
-        String routeId = Optional.ofNullable(route).map(Route::getId).orElse(null);
+        String routeId = route != null ? route.getId() : null;
         alreadyLimited = false;
         policies = properties.getPolicies(routeId).stream()
                 .filter(policy -> applyPolicy(request, route, policy))
                 .collect(Collectors.toList());
-        RequestContext.getCurrentContext().put(REQUEST_POLICY, policies);
+
+        addObjectToRequest(CURRENT_REQUEST_POLICY, policies);
 
         return policies;
+    }
+
+    private void addObjectToRequest(String key, Object object) {
+        if (object != null) {
+            RequestContext.getCurrentContext().put(key, object);
+        }
     }
 
     private boolean applyPolicy(HttpServletRequest request, Route route, Policy policy) {
