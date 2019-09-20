@@ -9,6 +9,7 @@ import org.springframework.cloud.netflix.zuul.filters.Route;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -87,6 +88,31 @@ public class RateLimitTypeTest {
     public void applyURL() {
         boolean apply = RateLimitType.URL.apply(httpServletRequest, route, rateLimitUtils, "/test");
         assertThat(apply).isTrue();
+    }
+
+    @Test
+    public void applyPatternURL() {
+        int id = ThreadLocalRandom.current().nextInt(0, 5000);
+
+        when(httpServletRequest.getRequestURI()).thenReturn("/resource/" + id + "/specific");
+
+        boolean apply = RateLimitType.URL_PATTERN.apply(httpServletRequest, route, rateLimitUtils, "/resource/*/specific");
+        assertThat(apply).isTrue();
+    }
+
+    @Test
+    public void keyPatternURL() {
+        String pattern = "/resource/*/specific";
+        String key = RateLimitType.URL_PATTERN.key(httpServletRequest, route, rateLimitUtils, pattern);
+        assertThat(key).isEqualTo(pattern);
+    }
+
+    @Test
+    public void applyPatternURL_withInvalidPattern_shouldNotApply() {
+        when(httpServletRequest.getRequestURI()).thenReturn("/resource/abcd/specific");
+
+        boolean apply = RateLimitType.URL_PATTERN.apply(httpServletRequest, route, rateLimitUtils, "/resource/??/specific");
+        assertThat(apply).isFalse();
     }
 
     @Test

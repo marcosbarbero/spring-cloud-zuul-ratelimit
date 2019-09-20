@@ -20,6 +20,7 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtil
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.util.SubnetUtils;
 import org.springframework.cloud.netflix.zuul.filters.Route;
+import org.springframework.util.AntPathMatcher;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
@@ -87,6 +88,11 @@ public enum RateLimitType {
         public String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
             return matcher;
         }
+
+        @Override
+        public boolean isValid(String matcher) {
+            return StringUtils.isNotEmpty(matcher);
+        }
     },
 
     /**
@@ -103,11 +109,40 @@ public enum RateLimitType {
             return StringUtils.isEmpty(matcher) ? request.getMethod() : "http-method";
         }
     },
-    ;
+
+    /**
+     * Rate limit policy considering an URL Pattern
+     */
+    URL_PATTERN {
+        @Override
+        public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
+            return new AntPathMatcher().match(matcher.toLowerCase(), request.getRequestURI().toLowerCase());
+        }
+
+        @Override
+        public String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
+            return matcher;
+        }
+
+        @Override
+        public boolean isValid(String matcher) {
+            return StringUtils.isNotEmpty(matcher);
+        }
+    };
 
     public abstract boolean apply(HttpServletRequest request, Route route,
                                   RateLimitUtils rateLimitUtils, String matcher);
 
     public abstract String key(HttpServletRequest request, Route route,
                                RateLimitUtils rateLimitUtils, String matcher);
+
+    /**
+     * Helper method to validate specific cases per type.
+     *
+     * @param matcher The type matcher
+     * @return The default behavior will always return true.
+     */
+    public boolean isValid(String matcher) {
+        return true;
+    }
 }
