@@ -16,12 +16,7 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_LIMIT;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_QUOTA;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING_QUOTA;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_RESET;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.REQUEST_START_TIME;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.*;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 
@@ -112,7 +107,7 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
 
             if ((limit != null && remaining < 0) || (quota != null && remainingQuota < 0)) {
                 ctx.setResponseStatusCode(HttpStatus.TOO_MANY_REQUESTS.value());
-                ctx.put("rateLimitExceeded", "true");
+                ctx.put(RATE_LIMIT_EXCEEDED, "true");
                 ctx.setSendZuulResponse(false);
                 throw new RateLimitExceededException();
             }

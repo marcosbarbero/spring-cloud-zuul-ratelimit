@@ -73,7 +73,7 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
             String msg = "Failed retrieving rate for " + key + ", will return the current value";
             rateLimiterErrorHandler.handleError(msg, e);
         }
-        return Math.max(-1, limit - current);
+        return Math.max(-1, limit - (current != null ? current : 0L));
     }
 
     private void handleExpiration(String key, Long refreshInterval) {
