@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.CURRENT_REQUEST_POLICY;
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.CURRENT_REQUEST_ROUTE;
 
+
 /**
  * @author Marcos Barbero
  * @author Liel Chayoun
@@ -46,7 +47,8 @@ abstract class AbstractRateLimitFilter extends ZuulFilter {
 
     private boolean alreadyLimited;
 
-    AbstractRateLimitFilter(RateLimitProperties properties, RouteLocator routeLocator, UrlPathHelper urlPathHelper, RateLimitUtils rateLimitUtils) {
+    AbstractRateLimitFilter(final RateLimitProperties properties, final RouteLocator routeLocator,
+                            final UrlPathHelper urlPathHelper, final RateLimitUtils rateLimitUtils) {
         this.properties = properties;
         this.routeLocator = routeLocator;
         this.urlPathHelper = urlPathHelper;
@@ -68,7 +70,7 @@ abstract class AbstractRateLimitFilter extends ZuulFilter {
         String requestURI = urlPathHelper.getPathWithinApplication(request);
         route = routeLocator.getMatchingRoute(requestURI);
 
-        addObjectToRequest(CURRENT_REQUEST_ROUTE, route);
+        addObjectToCurrentRequestContext(CURRENT_REQUEST_ROUTE, route);
 
         return route;
     }
@@ -86,12 +88,12 @@ abstract class AbstractRateLimitFilter extends ZuulFilter {
                 .filter(policy -> applyPolicy(request, route, policy))
                 .collect(Collectors.toList());
 
-        addObjectToRequest(CURRENT_REQUEST_POLICY, policies);
+        addObjectToCurrentRequestContext(CURRENT_REQUEST_POLICY, policies);
 
         return policies;
     }
 
-    private void addObjectToRequest(String key, Object object) {
+    private void addObjectToCurrentRequestContext(String key, Object object) {
         if (object != null) {
             RequestContext.getCurrentContext().put(key, object);
         }

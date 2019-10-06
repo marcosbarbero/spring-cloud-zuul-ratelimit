@@ -137,9 +137,9 @@ public class RateLimitTypeTest {
         when(httpServletRequest.getMethod()).thenReturn("GET");
 
         boolean apply;
-        apply = RateLimitType.HTTPMETHOD.apply(httpServletRequest, route, rateLimitUtils, "get");
+        apply = RateLimitType.HTTP_METHOD.apply(httpServletRequest, route, rateLimitUtils, "get");
         assertThat(apply).isTrue();
-        apply = RateLimitType.HTTPMETHOD.apply(httpServletRequest, route, rateLimitUtils, "GET");
+        apply = RateLimitType.HTTP_METHOD.apply(httpServletRequest, route, rateLimitUtils, "GET");
         assertThat(apply).isTrue();
     }
 
@@ -147,7 +147,7 @@ public class RateLimitTypeTest {
     public void applyMethodNoMatch() {
         when(httpServletRequest.getMethod()).thenReturn("GET");
 
-        boolean apply = RateLimitType.HTTPMETHOD.apply(httpServletRequest, route, rateLimitUtils, "POST");
+        boolean apply = RateLimitType.HTTP_METHOD.apply(httpServletRequest, route, rateLimitUtils, "POST");
         assertThat(apply).isFalse();
     }
 
@@ -155,7 +155,7 @@ public class RateLimitTypeTest {
     public void keyMethod() {
         when(httpServletRequest.getMethod()).thenReturn("GET");
 
-        String key = RateLimitType.HTTPMETHOD.key(httpServletRequest, route, rateLimitUtils, null);
+        String key = RateLimitType.HTTP_METHOD.key(httpServletRequest, route, rateLimitUtils, null);
         assertThat(key).isEqualTo("GET");
     }
 }
