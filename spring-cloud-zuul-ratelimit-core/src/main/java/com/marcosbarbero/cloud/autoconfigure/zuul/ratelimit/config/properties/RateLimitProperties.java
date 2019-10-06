@@ -23,6 +23,7 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.va
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.validation.annotation.Validated;
@@ -51,11 +52,13 @@ public class RateLimitProperties {
     @Valid
     @NotNull
     @Policies
+    @NestedConfigurationProperty
     private List<Policy> defaultPolicyList = Lists.newArrayList();
 
     @Valid
     @NotNull
     @Policies
+    @NestedConfigurationProperty
     private Map<String, List<Policy>> policyList = Maps.newHashMap();
 
     private boolean behindProxy;
@@ -165,6 +168,7 @@ public class RateLimitProperties {
 
         @Valid
         @NotNull
+        @NestedConfigurationProperty
         private List<MatchType> type = Lists.newArrayList();
 
         public Long getRefreshInterval() {

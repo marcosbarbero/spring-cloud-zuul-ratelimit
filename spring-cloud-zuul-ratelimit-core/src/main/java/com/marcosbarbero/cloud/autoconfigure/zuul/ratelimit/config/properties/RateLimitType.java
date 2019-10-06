@@ -96,11 +96,27 @@ public enum RateLimitType {
     },
 
     /**
-     * Rate limit policy considering the HTTP request method.
+     * @deprecated See {@link #HTTP_METHOD}
      */
+    @Deprecated
     HTTPMETHOD {
         @Override
-        public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils,/*not null*/ String matcher) {
+        public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
+            return HTTP_METHOD.apply(request, route, rateLimitUtils, matcher);
+        }
+
+        @Override
+        public String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
+            return HTTP_METHOD.key(request, route, rateLimitUtils, matcher);
+        }
+    },
+
+    /**
+     * Rate limit policy considering the HTTP request method.
+     */
+    HTTP_METHOD {
+        @Override
+        public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
             return request.getMethod().equalsIgnoreCase(matcher);
         }
 
