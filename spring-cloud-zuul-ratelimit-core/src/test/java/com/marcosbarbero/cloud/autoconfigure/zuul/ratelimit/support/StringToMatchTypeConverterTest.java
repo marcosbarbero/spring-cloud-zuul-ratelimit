@@ -25,6 +25,14 @@ public class StringToMatchTypeConverterTest {
     }
 
     @Test
+    public void testConvertStringTypeUrlPatternWithMatcher() {
+        MatchType matchType = target.convert("url_pattern=/api/*/specific");
+        assertThat(matchType).isNotNull();
+        assertThat(matchType.getType()).isEqualByComparingTo(RateLimitType.URL_PATTERN);
+        assertThat(matchType.getMatcher()).isEqualTo("/api/*/specific");
+    }
+
+    @Test
     public void testConvertStringTypeWithMatcher() {
         MatchType matchType = target.convert("url=/api");
         assertThat(matchType).isNotNull();
@@ -33,6 +41,7 @@ public class StringToMatchTypeConverterTest {
     }
 
     @Test
+    @SuppressWarnings("deprecation")
     public void testConvertStringTypeMethodOnly() {
         MatchType matchType = target.convert("httpmethod");
         assertThat(matchType).isNotNull();
@@ -41,10 +50,27 @@ public class StringToMatchTypeConverterTest {
     }
 
     @Test
+    @SuppressWarnings("deprecation")
     public void testConvertStringTypeMethodWithMatcher() {
         MatchType matchType = target.convert("httpmethod=get");
         assertThat(matchType).isNotNull();
         assertThat(matchType.getType()).isEqualByComparingTo(RateLimitType.HTTPMETHOD);
+        assertThat(matchType.getMatcher()).isEqualTo("get");
+    }
+
+    @Test
+    public void testConvertStringTypeHttpMethodOnly() {
+        MatchType matchType = target.convert("http_method");
+        assertThat(matchType).isNotNull();
+        assertThat(matchType.getType()).isEqualByComparingTo(RateLimitType.HTTP_METHOD);
+        assertThat(matchType.getMatcher()).isNull();
+    }
+
+    @Test
+    public void testConvertStringTypeHttpMethodWithMatcher() {
+        MatchType matchType = target.convert("http_method=get");
+        assertThat(matchType).isNotNull();
+        assertThat(matchType.getType()).isEqualByComparingTo(RateLimitType.HTTP_METHOD);
         assertThat(matchType.getMatcher()).isEqualTo("get");
     }
 }

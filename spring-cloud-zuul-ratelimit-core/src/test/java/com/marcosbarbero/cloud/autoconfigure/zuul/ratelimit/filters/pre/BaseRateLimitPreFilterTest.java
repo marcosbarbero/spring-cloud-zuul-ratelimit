@@ -74,7 +74,7 @@ public abstract class BaseRateLimitPreFilterTest {
         policy.getType().add(new MatchType(RateLimitType.ORIGIN, null));
         policy.getType().add(new MatchType(RateLimitType.URL, null));
         policy.getType().add(new MatchType(RateLimitType.USER, null));
-        policy.getType().add(new MatchType(RateLimitType.HTTPMETHOD, null));
+        policy.getType().add(new MatchType(RateLimitType.HTTP_METHOD, null));
 
         policies.put("serviceA", Lists.newArrayList(policy));
         properties.setPolicyList(policies);
