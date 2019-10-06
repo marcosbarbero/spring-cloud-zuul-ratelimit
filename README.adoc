@@ -183,6 +183,8 @@ zuul:
             - url=/api #url prefix
             - role=user
             - httpmethod=get #case insensitive
+        - type:
+            - url_pattern=/api/*/payment
 ----
 
 Sample Properties configuration
