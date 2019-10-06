@@ -32,7 +32,7 @@ public class SecurityContextApplication {
     }
 
     @RestController
-    public class ServiceController {
+    public static class ServiceController {
 
         static final String RESPONSE_BODY = "ResponseBody";
 
@@ -94,9 +94,11 @@ public class SecurityContextApplication {
 
     @Configuration
     @EnableWebSecurity
-    class SecurityConfig extends WebSecurityConfigurerAdapter {
+    static class SecurityConfig extends WebSecurityConfigurerAdapter {
+
         @Bean
         @Override
+        @SuppressWarnings("deprecation")
         public UserDetailsService userDetailsService() {
             UserDetails user =
                     User.withDefaultPasswordEncoder()
