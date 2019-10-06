@@ -167,7 +167,7 @@ zuul:
           - user
           - origin
           - url
-          - httpmethod
+          - http_method
     policy-list:
       myServiceId:
         - limit: 10 #optional - request number limit per refresh interval window
@@ -182,7 +182,7 @@ zuul:
             - origin=somemachine.com
             - url=/api #url prefix
             - role=user
-            - httpmethod=get #case insensitive
+            - http_method=get #case insensitive
         - type:
             - url_pattern=/api/*/payment
 ----
@@ -204,7 +204,7 @@ zuul.ratelimit.default-policy-list[0].refresh-interval=60
 zuul.ratelimit.default-policy-list[0].type[0]=user
 zuul.ratelimit.default-policy-list[0].type[1]=origin
 zuul.ratelimit.default-policy-list[0].type[2]=url
-zuul.ratelimit.default-policy-list[0].type[3]=httpmethod
+zuul.ratelimit.default-policy-list[0].type[3]=http_method
 
 # Adding the first rate limit policy to "myServiceId"
 zuul.ratelimit.policy-list.myServiceId[0].limit=10
@@ -219,7 +219,7 @@ zuul.ratelimit.policy-list.myServiceId[1].type[0]=user=anonymous
 zuul.ratelimit.policy-list.myServiceId[1].type[1]=origin=somemachine.com
 zuul.ratelimit.policy-list.myServiceId[1].type[2]=url_pattern=/api/*/payment
 zuul.ratelimit.policy-list.myServiceId[1].type[3]=role=user
-zuul.ratelimit.policy-list.myServiceId[1].type[4]=httpmethod=get
+zuul.ratelimit.policy-list.myServiceId[1].type[4]=http_method=get
 ----
 
 == Available implementations
@@ -282,7 +282,7 @@ Policy properties:
 |limit           |number of calls      |  -
 |quota           |time of calls        |  -
 |refresh-interval|seconds              | 60
-|type            | [ORIGIN, USER, URL, ROLE] | []
+|type            | [ORIGIN, USER, URL, URL_PATTERN, ROLE, HTTP_METHOD] | []
 |breakOnMatch    |true/false           |false
 
 |===
