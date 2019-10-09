@@ -23,6 +23,7 @@ import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateL
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING;
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING_QUOTA;
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_RESET;
+import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
@@ -66,7 +67,7 @@ public class Bucket4jIgniteApplicationTestIT {
     }
 
     @Test
-    public void testExceedingCapacity() throws InterruptedException {
+    public void testExceedingCapacity() {
         ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceB", String.class);
         HttpHeaders headers = response.getHeaders();
         String key = "rate-limit-application_serviceB_127.0.0.1";
@@ -80,12 +81,13 @@ public class Bucket4jIgniteApplicationTestIT {
         assertEquals(TOO_MANY_REQUESTS, response.getStatusCode());
         assertNotEquals(Bucket4jIgniteApplication.ServiceController.RESPONSE_BODY, response.getBody());
 
-        TimeUnit.SECONDS.sleep(2);
-
-        response = this.restTemplate.getForEntity("/serviceB", String.class);
-        headers = response.getHeaders();
-        assertHeaders(headers, key,false, false);
-        assertEquals(OK, response.getStatusCode());
+        await().pollDelay(2, TimeUnit.SECONDS).untilAsserted(() -> {
+            final ResponseEntity<String> responseAfterReset = this.restTemplate
+                .getForEntity("/serviceB", String.class);
+            final HttpHeaders headersAfterReset = responseAfterReset.getHeaders();
+            assertHeaders(headersAfterReset, key, false, false);
+            assertEquals(OK, responseAfterReset.getStatusCode());
+        });
     }
 
     @Test
