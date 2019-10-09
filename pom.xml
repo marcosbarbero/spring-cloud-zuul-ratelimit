@@ -45,6 +45,7 @@
         </jacoco.ut.execution.data.file>
         <package.root.path>com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit</package.root.path>
         <spring-cloud.version>Greenwich.SR3</spring-cloud.version>
+        <awaitility.version>4.0.1</awaitility.version>
     </properties>
 
     <developers>
@@ -131,6 +132,13 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
             <version>${mockito-all.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <version>${awaitility.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
