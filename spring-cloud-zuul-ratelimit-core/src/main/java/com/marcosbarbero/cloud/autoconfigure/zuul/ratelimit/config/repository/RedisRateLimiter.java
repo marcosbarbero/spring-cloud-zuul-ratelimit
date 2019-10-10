@@ -65,14 +65,14 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
         try {
             current = redisTemplate.opsForValue().increment(key, usage);
             // Redis returns 1 when the key is incremented for the first time, and the expiration time is set
-            if (current != null && current.equals(1L)) {
+            if (current != null && current.equals(usage)) {
                 handleExpiration(key, refreshInterval);
             }
         } catch (RuntimeException e) {
             String msg = "Failed retrieving rate for " + key + ", will return the current value";
             rateLimiterErrorHandler.handleError(msg, e);
         }
-        return Math.max(-1, limit - current);
+        return Math.max(-1, limit - (current != null ? current : 0L));
     }
 
     private void handleExpiration(String key, Long refreshInterval) {
