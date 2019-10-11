@@ -10,3 +10,14 @@ update_configs:
     allowed_updates:
       - match:
           update_type: "all"
+  - package_manager: "java:maven"
+      directory: "/"
+      update_schedule: "daily"
+      default_reviewers:
+        - "marcosbarbero"
+      default_labels:
+        - "dependencies"
+      allowed_updates:
+        - match:
+            update_type: "all"
+      target_branch: "1.7.x"
