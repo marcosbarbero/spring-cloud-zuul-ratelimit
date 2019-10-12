@@ -15,6 +15,8 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bu
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j.Bucket4jInfinispanRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j.Bucket4jJCacheRateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitKeyGenerator;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitUtils;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.SecuredRateLimitUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.StringToMatchTypeConverter;
 import com.netflix.zuul.ZuulFilter;
 import io.github.bucket4j.grid.GridBucketState;
@@ -24,11 +26,13 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.context.annotation.UserConfigurations;
+import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 import java.util.Map;
@@ -54,9 +58,20 @@ public class RateLimitAutoConfigurationTest {
     }
 
     @Test
-    public void testRateLimitUtils() {
+    public void testDefaultRateLimitUtils() {
         contextRunner.withPropertyValues(PREFIX + ".repository=BUCKET4J_JCACHE")
-                .run((context) -> assertThat(context).hasSingleBean(RateLimitUtils.class));
+                .withClassLoader(new FilteredClassLoader(Authentication.class))
+                .run((context) ->
+                        assertThat(context).getBean(RateLimitUtils.class).isExactlyInstanceOf(DefaultRateLimitUtils.class)
+                );
+    }
+
+    @Test
+    public void testSecuredRateLimitUtils() {
+        contextRunner.withPropertyValues(PREFIX + ".repository=BUCKET4J_JCACHE")
+                .run((context) ->
+                        assertThat(context).getBean(RateLimitUtils.class).isExactlyInstanceOf(SecuredRateLimitUtils.class)
+                );
     }
 
     @Test
