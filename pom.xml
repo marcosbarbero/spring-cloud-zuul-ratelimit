@@ -175,6 +175,7 @@
                         <exclude>**/test/**</exclude>
                         <exclude>**/tests/**</exclude>
                         <exclude>**/*Constants.*</exclude>
+                        <exclude>**/properties/*Properties.*</exclude>
                     </excludes>
                 </configuration>
                 <executions>

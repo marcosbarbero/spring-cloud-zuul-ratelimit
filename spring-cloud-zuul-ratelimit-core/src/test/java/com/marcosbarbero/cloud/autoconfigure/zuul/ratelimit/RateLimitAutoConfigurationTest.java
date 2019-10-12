@@ -4,6 +4,7 @@ import com.ecwid.consul.v1.ConsulClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hazelcast.core.IMap;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
@@ -20,7 +21,6 @@ import io.github.bucket4j.grid.GridBucketState;
 import org.apache.ignite.IgniteCache;
 import org.infinispan.functional.FunctionalMap.ReadWriteMap;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.context.annotation.UserConfigurations;
@@ -35,6 +35,7 @@ import java.util.Map;
 
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Marcos Barbero
@@ -50,6 +51,12 @@ public class RateLimitAutoConfigurationTest {
     public void testStringToMatchTypeConverter() {
         contextRunner.withPropertyValues(PREFIX + ".repository=BUCKET4J_JCACHE")
                 .run((context) -> assertThat(context).hasSingleBean(StringToMatchTypeConverter.class));
+    }
+
+    @Test
+    public void testRateLimitUtils() {
+        contextRunner.withPropertyValues(PREFIX + ".repository=BUCKET4J_JCACHE")
+                .run((context) -> assertThat(context).hasSingleBean(RateLimitUtils.class));
     }
 
     @Test
@@ -132,43 +139,44 @@ public class RateLimitAutoConfigurationTest {
 
         @Bean
         public RouteLocator routeLocator() {
-            return Mockito.mock(RouteLocator.class);
+            return mock(RouteLocator.class);
         }
 
         @Bean
         public ConsulClient consulClient() {
-            return Mockito.mock(ConsulClient.class);
+            return mock(ConsulClient.class);
         }
 
         @Bean
         public ObjectMapper objectMapper() {
-            return Mockito.mock(ObjectMapper.class);
+            return mock(ObjectMapper.class);
         }
 
         @Bean
         public RedisConnectionFactory redisConnectionFactory() {
-            return Mockito.mock(RedisConnectionFactory.class);
+            return mock(RedisConnectionFactory.class);
         }
 
         @Bean
         @Qualifier("RateLimit")
         @SuppressWarnings("unchecked")
         public IMap<String, GridBucketState> hazelcastMap() {
-            return Mockito.mock(IMap.class);
+            return mock(IMap.class);
         }
 
         @Bean
         @Qualifier("RateLimit")
         @SuppressWarnings("unchecked")
         public IgniteCache<String, GridBucketState> igniteCache() {
-            return Mockito.mock(IgniteCache.class);
+            return mock(IgniteCache.class);
         }
 
         @Bean
         @Qualifier("RateLimit")
         @SuppressWarnings("unchecked")
         public ReadWriteMap<String, GridBucketState> infinispanMap() {
-            return Mockito.mock(ReadWriteMap.class);
+            return mock(ReadWriteMap.class);
         }
+
     }
 }
