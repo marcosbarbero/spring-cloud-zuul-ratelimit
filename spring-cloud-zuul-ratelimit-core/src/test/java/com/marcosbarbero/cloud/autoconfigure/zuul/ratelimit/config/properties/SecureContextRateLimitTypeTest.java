@@ -47,4 +47,10 @@ public class SecureContextRateLimitTypeTest {
         boolean apply = RateLimitType.ROLE.apply(httpServletRequest, route, rateLimitUtils, "user");
         assertThat(apply).isFalse();
     }
+
+    @Test
+    public void withEmptyAuthentication() {
+        boolean apply = RateLimitType.ROLE.apply(httpServletRequest, route, rateLimitUtils, "user");
+        assertThat(apply).isFalse();
+    }
 }
