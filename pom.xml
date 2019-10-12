@@ -37,15 +37,14 @@
         <jacoco.version>0.8.4</jacoco.version>
         <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
         <mockito-all.version>1.10.19</mockito-all.version>
+        <spring-cloud.version>Greenwich.SR3</spring-cloud.version>
+        <awaitility.version>4.0.1</awaitility.version>
+
         <jacoco.it.execution.data.file>
             ${project.build.directory}/coverage-reports/jacoco.exec
         </jacoco.it.execution.data.file>
-        <jacoco.ut.execution.data.file>
-            ${project.build.directory}/coverage-reports/jacoco.exec
-        </jacoco.ut.execution.data.file>
+        <jacoco.ut.execution.data.file>${jacoco.it.execution.data.file}</jacoco.ut.execution.data.file>
         <package.root.path>com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit</package.root.path>
-        <spring-cloud.version>Greenwich.SR3</spring-cloud.version>
-        <awaitility.version>4.0.1</awaitility.version>
     </properties>
 
     <developers>
@@ -156,6 +155,13 @@
                         </jacocoReport>
                     </jacocoReports>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>javax.xml.bind</groupId>
+                        <artifactId>jaxb-api</artifactId>
+                        <version>2.3.1</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <plugin>
