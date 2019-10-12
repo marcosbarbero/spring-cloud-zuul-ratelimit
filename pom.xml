@@ -175,9 +175,7 @@
                         <exclude>**/test/**</exclude>
                         <exclude>**/tests/**</exclude>
                         <exclude>**/*Constants.*</exclude>
-                        <exclude>
-                            com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.*
-                        </exclude>
+                        <exclude>**/properties/RateLimitProperties.*</exclude>
                     </excludes>
                 </configuration>
                 <executions>
