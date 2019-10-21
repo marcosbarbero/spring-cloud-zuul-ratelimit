@@ -311,14 +311,14 @@ implementation adding further qualifiers or something entirely different:
 ----
 
 === Error Handling
-This framework uses some 3rd party applications to store and control the rate limit access, as it does not has control
-over those applications and they can fail once a while the framework itself handles the failure in the class 
-link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/repository/DefaultRateLimiterErrorHandler.java[`DefaultRateLimiterErrorHandler`]
-just by adding some error logs.
+This framework uses 3rd party applications to control the rate limit access and these libraries are out of control of this framework.
+If one of the 3rd party applications fails, the framework will handle this failure in the
+link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/repository/DefaultRateLimiterErrorHandler.java[`DefaultRateLimiterErrorHandler`] class
+which will log the error upon failure.
 
-If there is a need to handle the errors differently, it can be achieved just by defining a custom
+If there is a need to handle the errors differently, it can be achieved by defining a custom
 link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/repository/RateLimiterErrorHandler.java[`RateLimiterErrorHandler`]
-bean, e.g:
+beanfootnote:[By declaring a new `RateLimitErrorHandler`, you replace the `DefaultRateLimitErrorHandler`.], e.g:
 
 [source, java]
 ----
