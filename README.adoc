@@ -355,7 +355,7 @@ By participating, you are expected to uphold this code. Please report unacceptab
 
 === Acknowledgement
 
-image::jetbrains_logo.png[Jetbrains, 150, link="https://www.jetbrains.com/"]
+image::jetbrains_logo.png[Jetbrains, 150, link="https://www.jetbrains.com/?from=spring-cloud-zuul-ratelimit"]
 
 == Footnote
 Any doubt open an https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit/issues[issue].
