@@ -89,6 +89,20 @@ Add the following dependency accordingly to the chosen data storage:
 </dependency>
 ----
 
+This implementation also requires a database table, bellow here you can find a sample script:
+
+[source, sql]
+----
+CREATE TABLE rate (
+  rate_key VARCHAR(255) NOT NULL,
+  remaining BIGINT,
+  remaining_quota BIGINT,
+  reset BIGINT,
+  expiration TIMESTAMP,
+  PRIMARY KEY(rate_key)
+);
+----
+
 * Bucket4j JCache
 
 [source, xml]
