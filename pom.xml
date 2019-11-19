@@ -37,7 +37,7 @@
         <jacoco.version>0.8.5</jacoco.version>
         <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
         <mockito-all.version>1.10.19</mockito-all.version>
-        <spring-cloud.version>Greenwich.SR3</spring-cloud.version>
+        <spring-cloud.version>Greenwich.SR4</spring-cloud.version>
         <awaitility.version>4.0.1</awaitility.version>
 
         <jacoco.it.execution.data.file>
