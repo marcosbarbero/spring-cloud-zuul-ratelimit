@@ -14,9 +14,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
+
 import java.io.IOException;
 import java.util.Base64;
 import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -58,7 +60,9 @@ public class ConsulRateLimiterTest extends BaseRateLimiterTest {
         GetValue getValue = new GetValue();
         getValue.setValue("");
         when(consulClient.getKVValue(any())).thenReturn(new Response<>(getValue, 1L, true, 1L));
-        when(objectMapper.readValue(anyString(), eq(Rate.class))).thenThrow(new IOException());
+        when(objectMapper.readValue(anyString(), eq(Rate.class))).thenAnswer(invocation -> {
+            throw new IOException();
+        });
         ConsulRateLimiter consulRateLimiter = new ConsulRateLimiter(rateLimiterErrorHandler, consulClient, objectMapper);
 
         Rate rate = consulRateLimiter.getRate("");
