@@ -38,5 +38,6 @@ public final class RateLimitConstants {
     public static final String CURRENT_REQUEST_ROUTE = "rateLimitRequestRoute";
     public static final String CURRENT_REQUEST_POLICY = "rateLimitRequestPolicy";
     public static final String RATE_LIMIT_EXCEEDED = "rateLimitExceeded";
+    public static final String ALREADY_LIMITED = "rateLimitAlreadyDone";
 
 }
