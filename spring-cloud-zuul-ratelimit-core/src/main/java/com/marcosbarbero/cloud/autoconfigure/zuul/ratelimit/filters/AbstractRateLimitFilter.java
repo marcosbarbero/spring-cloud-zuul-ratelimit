@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.ALREADY_LIMITED;
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.CURRENT_REQUEST_POLICY;
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.CURRENT_REQUEST_ROUTE;
 
@@ -44,8 +45,6 @@ abstract class AbstractRateLimitFilter extends ZuulFilter {
     private final RouteLocator routeLocator;
     private final UrlPathHelper urlPathHelper;
     private final RateLimitUtils rateLimitUtils;
-
-    private boolean alreadyLimited;
 
     AbstractRateLimitFilter(final RateLimitProperties properties, final RouteLocator routeLocator,
                             final UrlPathHelper urlPathHelper, final RateLimitUtils rateLimitUtils) {
@@ -83,7 +82,9 @@ abstract class AbstractRateLimitFilter extends ZuulFilter {
         }
 
         String routeId = route != null ? route.getId() : null;
-        alreadyLimited = false;
+
+        RequestContext.getCurrentContext().put(ALREADY_LIMITED, false);
+
         policies = properties.getPolicies(routeId).stream()
                 .filter(policy -> applyPolicy(request, route, policy))
                 .collect(Collectors.toList());
@@ -101,10 +102,10 @@ abstract class AbstractRateLimitFilter extends ZuulFilter {
 
     private boolean applyPolicy(HttpServletRequest request, Route route, Policy policy) {
         List<MatchType> types = policy.getType();
-        boolean tmp = alreadyLimited;
-        if (policy.isBreakOnMatch() && types.stream().allMatch(type -> type.apply(request, route, rateLimitUtils))) {
-            alreadyLimited = true;
+        boolean isAlreadyLimited = (boolean) RequestContext.getCurrentContext().get(ALREADY_LIMITED);
+        if (policy.isBreakOnMatch() && !isAlreadyLimited && types.stream().allMatch(type -> type.apply(request, route, rateLimitUtils))) {
+            RequestContext.getCurrentContext().put(ALREADY_LIMITED, true);
         }
-        return (types.isEmpty() || types.stream().allMatch(type -> type.apply(request, route, rateLimitUtils))) && !tmp;
+        return (types.isEmpty() || types.stream().allMatch(type -> type.apply(request, route, rateLimitUtils))) && !isAlreadyLimited;
     }
 }
