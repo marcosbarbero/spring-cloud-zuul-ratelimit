@@ -120,7 +120,7 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
                 ctx.put(RATE_LIMIT_EXCEEDED, "true");
                 ctx.setSendZuulResponse(false);
 
-                this.eventPublisher.publishEvent(new RateLimitEvent(this, policy));
+                this.eventPublisher.publishEvent(new RateLimitEvent(this, policy, this.rateLimitUtils.getRemoteAddress(request)));
 
                 throw new RateLimitExceededException();
             }
@@ -133,14 +133,20 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
       private static final long serialVersionUID = 5241485625003998587L;
 
       private final Policy policy;
+      private final String remoteAddress;
 
-      public RateLimitEvent(RateLimitPreFilter source, Policy policy) {
+      public RateLimitEvent(RateLimitPreFilter source, Policy policy, String remoteAddress) {
         super(source);
         this.policy = Objects.requireNonNull(policy, "Policy should not be null.");
+        this.remoteAddress = Objects.requireNonNull(remoteAddress, "RemoteAddress should not be null.");
       }
 
       public Policy getPolicy() {
         return this.policy;
+      }
+
+      public String getRemoteAddress() {
+        return this.remoteAddress;
       }
     }
 }
