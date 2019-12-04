@@ -66,8 +66,8 @@ public class RateLimitPreFilterTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-
         CounterFactory.initialize(new EmptyCounterFactory());
+        
         when(this.httpServletRequest.getContextPath()).thenReturn("");
         when(this.httpServletRequest.getRequestURI()).thenReturn("/servicea/test");
         RequestContext requestContext = new RequestContext();
