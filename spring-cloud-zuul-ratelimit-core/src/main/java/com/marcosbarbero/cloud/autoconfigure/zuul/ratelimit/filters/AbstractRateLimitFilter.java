@@ -41,7 +41,7 @@ import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateL
  */
 abstract class AbstractRateLimitFilter extends ZuulFilter {
 
-    private final RateLimitProperties properties;
+    protected final RateLimitProperties properties;
     private final RouteLocator routeLocator;
     private final UrlPathHelper urlPathHelper;
     private final RateLimitUtils rateLimitUtils;

@@ -16,7 +16,13 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.*;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_LIMIT;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_QUOTA;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING_QUOTA;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_RESET;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.RATE_LIMIT_EXCEEDED;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.REQUEST_START_TIME;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 
@@ -26,16 +32,19 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyG
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitExceededException;
 import com.netflix.zuul.context.RequestContext;
+import java.util.Map;
+import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.util.UrlPathHelper;
-
-import java.util.Map;
 
 /**
  * @author Marcos Barbero
@@ -44,17 +53,18 @@ import java.util.Map;
  */
 public class RateLimitPreFilter extends AbstractRateLimitFilter {
 
-    private final RateLimitProperties properties;
     private final RateLimiter rateLimiter;
     private final RateLimitKeyGenerator rateLimitKeyGenerator;
+    private final ApplicationEventPublisher eventPublisher;
 
     public RateLimitPreFilter(final RateLimitProperties properties, final RouteLocator routeLocator,
                               final UrlPathHelper urlPathHelper, final RateLimiter rateLimiter,
-                              final RateLimitKeyGenerator rateLimitKeyGenerator, final RateLimitUtils rateLimitUtils) {
+                              final RateLimitKeyGenerator rateLimitKeyGenerator, final RateLimitUtils rateLimitUtils,
+                              final ApplicationEventPublisher eventPublisher) {
         super(properties, routeLocator, urlPathHelper, rateLimitUtils);
-        this.properties = properties;
         this.rateLimiter = rateLimiter;
         this.rateLimitKeyGenerator = rateLimitKeyGenerator;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -64,7 +74,7 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
 
     @Override
     public int filterOrder() {
-        return properties.getPreFilterOrder();
+        return this.properties.getPreFilterOrder();
     }
 
     @Override
@@ -77,8 +87,8 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
         policy(route, request).forEach(policy -> {
             Map<String, String> responseHeaders = Maps.newHashMap();
 
-            final String key = rateLimitKeyGenerator.key(request, route, policy);
-            final Rate rate = rateLimiter.consume(policy, key, null);
+            final String key = this.rateLimitKeyGenerator.key(request, route, policy);
+            final Rate rate = this.rateLimiter.consume(policy, key, null);
             final String httpHeaderKey = key.replaceAll("[^A-Za-z0-9-.]", "_").replaceAll("__", "_");
 
             final Long limit = policy.getLimit();
@@ -99,7 +109,7 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
 
             responseHeaders.put(HEADER_RESET + httpHeaderKey, String.valueOf(rate.getReset()));
 
-            if (properties.isAddResponseHeaders()) {
+            if (this.properties.isAddResponseHeaders()) {
                 for (Map.Entry<String, String> headersEntry : responseHeaders.entrySet()) {
                     response.setHeader(headersEntry.getKey(), headersEntry.getValue());
                 }
@@ -109,10 +119,28 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
                 ctx.setResponseStatusCode(HttpStatus.TOO_MANY_REQUESTS.value());
                 ctx.put(RATE_LIMIT_EXCEEDED, "true");
                 ctx.setSendZuulResponse(false);
+
+                this.eventPublisher.publishEvent(new RateLimitEvent(this, policy));
+
                 throw new RateLimitExceededException();
             }
         });
 
         return null;
+    }
+
+    public class RateLimitEvent extends ApplicationEvent {
+      private static final long serialVersionUID = 5241485625003998587L;
+
+      private final Policy policy;
+
+      public RateLimitEvent(RateLimitPreFilter source, Policy policy) {
+        super(source);
+        this.policy = Objects.requireNonNull(policy, "Policy should not be null.");
+      }
+
+      public Policy getPolicy() {
+        return this.policy;
+      }
     }
 }
