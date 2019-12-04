@@ -359,15 +359,15 @@ beanfootnote:[By declaring a new `RateLimitErrorHandler`, you replace the `Defau
 
 === Event Handling
 If the application needs to be notified when a rate limit access was exceeded then it can be done by listening
-to link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/filters/RateLimitPreFilter$RateLimitEvent.java[`RateLimitEvent`]:
+to link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/filters/RateLimitPreFilter.java#L132[`RateLimitEvent`]:
 
 [source, java]
----
+----
     @EventListener
     public void observe(RateLimitEvent event) {
         // custom code
     }
----
+----
 
 == Contributing
 Spring Cloud Zuul Rate Limit is released under the non-restrictive Apache 2.0 license, and follows a very
