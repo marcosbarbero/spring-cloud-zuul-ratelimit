@@ -40,8 +40,8 @@ Latest version: image:https://maven-badges.herokuapp.com/maven-central/com.marco
 [NOTE]
 ====
 If you are using Spring Boot version `1.5.x` you *MUST* use Spring Cloud Zuul RateLimit version `1.7.x`.
-Please take a look at the 
-link:https://mvnrepository.com/artifact/com.marcosbarbero.cloud/spring-cloud-zuul-ratelimit[Maven Central] and pick the 
+Please take a look at the
+link:https://mvnrepository.com/artifact/com.marcosbarbero.cloud/spring-cloud-zuul-ratelimit[Maven Central] and pick the
 latest artifact in this version line.
 ====
 
@@ -56,7 +56,7 @@ Add the dependency on pom.xml
 </dependency>
 ----
 
-Add the following dependency accordingly to the chosen data storage: 
+Add the following dependency accordingly to the chosen data storage:
 
 
 * Redis
@@ -168,8 +168,8 @@ Sample YAML configuration
 ----
 zuul:
   ratelimit:
-    key-prefix: your-prefix 
-    enabled: true 
+    key-prefix: your-prefix
+    enabled: true
     repository: REDIS
     behind-proxy: true
     add-response-headers: true
@@ -268,7 +268,7 @@ Bucket4j implementations require the relevant bean with `@Qualifier("RateLimit")
  * `Hazelcast` - com.hazelcast.core.IMap
  * `Ignite` - org.apache.ignite.IgniteCache
  * `Infinispan` - org.infinispan.functional.ReadWriteMap
- 
+
 == Common application properties
 
 Property namespace: __zuul.ratelimit__
@@ -303,11 +303,11 @@ Policy properties:
 
 == Further Customization
 
-This section details how to add custom implementations 
+This section details how to add custom implementations
 
 === Key Generator
 
-If the application needs to control the key strategy beyond the options offered by the type property then it can 
+If the application needs to control the key strategy beyond the options offered by the type property then it can
 be done just by creating a custom link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/RateLimitKeyGenerator.java[`RateLimitKeyGenerator`]
 implementation adding further qualifiers or something entirely different:
 
@@ -343,12 +343,12 @@ beanfootnote:[By declaring a new `RateLimitErrorHandler`, you replace the `Defau
         public void handleSaveError(String key, Exception e) {
             // custom code
         }
-        
+
         @Override
         public void handleFetchError(String key, Exception e) {
             // custom code
         }
-        
+
         @Override
         public void handleError(String msg, Exception e) {
             // custom code
@@ -357,13 +357,25 @@ beanfootnote:[By declaring a new `RateLimitErrorHandler`, you replace the `Defau
   }
 ----
 
+=== Event Handling
+If the application needs to be notified when a rate limit access was exceeded then it can be done by listening
+to link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/filters/RateLimitPreFilter$RateLimitEvent.java[`RateLimitEvent`]:
+
+[source, java]
+---
+    @EventListener
+    public void observe(RateLimitEvent event) {
+        // custom code
+    }
+---
+
 == Contributing
-Spring Cloud Zuul Rate Limit is released under the non-restrictive Apache 2.0 license, and follows a very 
-standard Github development process, using Github tracker for issues and merging pull requests into master. 
+Spring Cloud Zuul Rate Limit is released under the non-restrictive Apache 2.0 license, and follows a very
+standard Github development process, using Github tracker for issues and merging pull requests into master.
 If you want to contribute even something trivial please do not hesitate, but follow the guidelines below.
 
 === Code of Conduct
-This project adheres to the Contributor Covenant 
+This project adheres to the Contributor Covenant
 https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit/blob/master/docs/code-of-conduct.adoc[code of conduct].
 By participating, you are expected to uphold this code. Please report unacceptable behavior to marcos.hgb@gmail.com.
 
