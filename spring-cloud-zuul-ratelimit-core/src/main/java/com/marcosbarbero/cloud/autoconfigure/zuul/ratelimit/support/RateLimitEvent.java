@@ -6,7 +6,7 @@ import java.util.Objects;
 import org.springframework.context.ApplicationEvent;
 
 /**
- * Event raised when an rate limit exceeded.
+ * Event raised when a rate limit exceeded.
  *
  * @author vasilaio
  */
