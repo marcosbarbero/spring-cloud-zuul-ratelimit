@@ -54,7 +54,7 @@ public class RateLimitPostFilter extends AbstractRateLimitFilter {
 
     @Override
     public int filterOrder() {
-        return this.properties.getPostFilterOrder();
+        return properties.getPostFilterOrder();
     }
 
     @Override
@@ -76,8 +76,8 @@ public class RateLimitPostFilter extends AbstractRateLimitFilter {
 
         policy(route, request).forEach(policy -> {
             long requestTime = System.currentTimeMillis() - getRequestStartTime();
-            String key = this.rateLimitKeyGenerator.key(request, route, policy);
-            this.rateLimiter.consume(policy, key, requestTime > 0 ? requestTime : 1);
+            String key = rateLimitKeyGenerator.key(request, route, policy);
+            rateLimiter.consume(policy, key, requestTime > 0 ? requestTime : 1);
         });
 
         return null;

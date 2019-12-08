@@ -72,7 +72,7 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
 
     @Override
     public int filterOrder() {
-        return this.properties.getPreFilterOrder();
+        return properties.getPreFilterOrder();
     }
 
     @Override
@@ -85,8 +85,8 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
         policy(route, request).forEach(policy -> {
             Map<String, String> responseHeaders = Maps.newHashMap();
 
-            final String key = this.rateLimitKeyGenerator.key(request, route, policy);
-            final Rate rate = this.rateLimiter.consume(policy, key, null);
+            final String key = rateLimitKeyGenerator.key(request, route, policy);
+            final Rate rate = rateLimiter.consume(policy, key, null);
             final String httpHeaderKey = key.replaceAll("[^A-Za-z0-9-.]", "_").replaceAll("__", "_");
 
             final Long limit = policy.getLimit();
@@ -107,7 +107,7 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
 
             responseHeaders.put(HEADER_RESET + httpHeaderKey, String.valueOf(rate.getReset()));
 
-            if (this.properties.isAddResponseHeaders()) {
+            if (properties.isAddResponseHeaders()) {
                 for (Map.Entry<String, String> headersEntry : responseHeaders.entrySet()) {
                     response.setHeader(headersEntry.getKey(), headersEntry.getValue());
                 }
@@ -118,7 +118,7 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
                 ctx.put(RATE_LIMIT_EXCEEDED, "true");
                 ctx.setSendZuulResponse(false);
 
-                this.eventPublisher.publishEvent(new RateLimitEvent(this, policy, this.rateLimitUtils.getRemoteAddress(request)));
+                eventPublisher.publishEvent(new RateLimitEvent(this, policy, rateLimitUtils.getRemoteAddress(request)));
 
                 throw new RateLimitExceededException();
             }

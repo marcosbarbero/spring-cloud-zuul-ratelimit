@@ -10,7 +10,7 @@ import org.springframework.context.ApplicationEvent;
  *
  * @author vasilaio
  */
-public class RateLimitEvent extends ApplicationEvent {
+public final class RateLimitEvent extends ApplicationEvent {
     private static final long serialVersionUID = 5241485625003998587L;
 
     private final Policy policy;

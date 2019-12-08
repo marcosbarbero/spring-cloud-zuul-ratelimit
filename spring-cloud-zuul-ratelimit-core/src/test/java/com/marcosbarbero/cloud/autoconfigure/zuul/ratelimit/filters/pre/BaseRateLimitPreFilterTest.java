@@ -106,7 +106,7 @@ public abstract class BaseRateLimitPreFilterTest {
             rateLimitUtils);
         UrlPathHelper urlPathHelper = new UrlPathHelper();
         this.filter = new RateLimitPreFilter(properties, this.routeLocator(), urlPathHelper, this.rateLimiter,
-            rateLimitKeyGenerator, rateLimitUtils, this.eventPublisher);
+            rateLimitKeyGenerator, rateLimitUtils, eventPublisher);
         this.context = new RequestContext();
         RequestContext.testSetCurrentContext(this.context);
         RequestContextHolder.setRequestAttributes(requestAttributes);
