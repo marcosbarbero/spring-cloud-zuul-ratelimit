@@ -10,13 +10,13 @@ import org.springframework.context.ApplicationEvent;
  *
  * @author vasilaio
  */
-public final class RateLimitEvent extends ApplicationEvent {
+public final class RateLimitExceededEvent extends ApplicationEvent {
     private static final long serialVersionUID = 5241485625003998587L;
 
     private final Policy policy;
     private final String remoteAddress;
 
-    public RateLimitEvent(RateLimitPreFilter source, Policy policy, String remoteAddress) {
+    public RateLimitExceededEvent(RateLimitPreFilter source, Policy policy, String remoteAddress) {
         super(source);
         this.policy = Objects.requireNonNull(policy, "Policy should not be null.");
         this.remoteAddress = Objects.requireNonNull(remoteAddress, "RemoteAddress should not be null.");
