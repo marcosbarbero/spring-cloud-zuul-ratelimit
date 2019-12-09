@@ -33,6 +33,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.cloud.netflix.zuul.metrics.EmptyCounterFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.context.request.RequestAttributes;
@@ -49,6 +50,8 @@ public abstract class BaseRateLimitPreFilterTest {
 
     @Mock
     private RequestAttributes requestAttributes;
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     MockHttpServletRequest request;
     MockHttpServletResponse response;
@@ -103,7 +106,7 @@ public abstract class BaseRateLimitPreFilterTest {
             rateLimitUtils);
         UrlPathHelper urlPathHelper = new UrlPathHelper();
         this.filter = new RateLimitPreFilter(properties, this.routeLocator(), urlPathHelper, this.rateLimiter,
-            rateLimitKeyGenerator, rateLimitUtils);
+            rateLimitKeyGenerator, rateLimitUtils, eventPublisher);
         this.context = new RequestContext();
         RequestContext.testSetCurrentContext(this.context);
         RequestContextHolder.setRequestAttributes(requestAttributes);

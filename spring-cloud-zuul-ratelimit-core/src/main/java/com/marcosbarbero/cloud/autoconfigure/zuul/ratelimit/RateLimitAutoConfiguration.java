@@ -57,6 +57,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesBindin
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -95,9 +96,9 @@ public class RateLimitAutoConfiguration {
     @Bean
     public ZuulFilter rateLimiterPreFilter(final RateLimiter rateLimiter, final RateLimitProperties rateLimitProperties,
                                            final RouteLocator routeLocator, final RateLimitKeyGenerator rateLimitKeyGenerator,
-                                           final RateLimitUtils rateLimitUtils) {
+                                           final RateLimitUtils rateLimitUtils, final ApplicationEventPublisher eventPublisher) {
         return new RateLimitPreFilter(rateLimitProperties, routeLocator, URL_PATH_HELPER, rateLimiter,
-                rateLimitKeyGenerator, rateLimitUtils);
+                rateLimitKeyGenerator, rateLimitUtils, eventPublisher);
     }
 
     @Bean

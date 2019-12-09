@@ -26,6 +26,7 @@ local.properties
 .loadpath
 target/
 **/target/
+ignite/
 
 # Eclipse Core
 .project
