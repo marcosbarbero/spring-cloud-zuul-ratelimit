@@ -26,16 +26,17 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyG
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitExceededEvent;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitExceededException;
 import com.netflix.zuul.context.RequestContext;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.util.UrlPathHelper;
-
-import java.util.Map;
 
 /**
  * @author Marcos Barbero
@@ -44,17 +45,18 @@ import java.util.Map;
  */
 public class RateLimitPreFilter extends AbstractRateLimitFilter {
 
-    private final RateLimitProperties properties;
     private final RateLimiter rateLimiter;
     private final RateLimitKeyGenerator rateLimitKeyGenerator;
+    private final ApplicationEventPublisher eventPublisher;
 
     public RateLimitPreFilter(final RateLimitProperties properties, final RouteLocator routeLocator,
                               final UrlPathHelper urlPathHelper, final RateLimiter rateLimiter,
-                              final RateLimitKeyGenerator rateLimitKeyGenerator, final RateLimitUtils rateLimitUtils) {
+                              final RateLimitKeyGenerator rateLimitKeyGenerator, final RateLimitUtils rateLimitUtils,
+                              final ApplicationEventPublisher eventPublisher) {
         super(properties, routeLocator, urlPathHelper, rateLimitUtils);
-        this.properties = properties;
         this.rateLimiter = rateLimiter;
         this.rateLimitKeyGenerator = rateLimitKeyGenerator;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -109,6 +111,9 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
                 ctx.setResponseStatusCode(HttpStatus.TOO_MANY_REQUESTS.value());
                 ctx.put(RATE_LIMIT_EXCEEDED, "true");
                 ctx.setSendZuulResponse(false);
+
+                eventPublisher.publishEvent(new RateLimitExceededEvent(this, policy, rateLimitUtils.getRemoteAddress(request)));
+
                 throw new RateLimitExceededException();
             }
         });
