@@ -21,7 +21,7 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.commons.TestRouteLocator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitUtils;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitEvent;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitExceededEvent;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitExceededException;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.monitoring.CounterFactory;
@@ -59,7 +59,7 @@ public class RateLimitPreFilterTest {
     @Mock
     private ApplicationEventPublisher eventPublisher;
     @Captor
-    protected ArgumentCaptor<RateLimitEvent> rateLimitEventCaptor;
+    protected ArgumentCaptor<RateLimitExceededEvent> rateLimitEventCaptor;
 
     private RateLimitProperties rateLimitProperties = new RateLimitProperties();
 
@@ -147,7 +147,7 @@ public class RateLimitPreFilterTest {
         assertThrows(RateLimitExceededException.class,() -> target.run());
 
         verify(eventPublisher).publishEvent(rateLimitEventCaptor.capture());
-        RateLimitEvent rateLimitEvent = rateLimitEventCaptor.getValue();
+        RateLimitExceededEvent rateLimitEvent = rateLimitEventCaptor.getValue();
         assertNotNull(rateLimitEvent);
         assertEquals(policy, rateLimitEvent.getPolicy());
     }
