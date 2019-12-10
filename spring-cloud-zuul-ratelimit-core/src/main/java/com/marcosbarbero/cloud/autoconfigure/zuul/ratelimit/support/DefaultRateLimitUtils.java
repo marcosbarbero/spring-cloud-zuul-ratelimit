@@ -29,31 +29,31 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
  */
 public class DefaultRateLimitUtils implements RateLimitUtils {
 
-    private static final String ANONYMOUS_USER = "anonymous";
-    private static final String X_FORWARDED_FOR_HEADER_DELIMITER = ",";
+	private static final String ANONYMOUS_USER = "anonymous";
+	private static final String X_FORWARDED_FOR_HEADER_DELIMITER = ",";
 
-    private final RateLimitProperties properties;
+	private final RateLimitProperties properties;
 
-    public DefaultRateLimitUtils(RateLimitProperties properties) {
-        this.properties = properties;
-    }
+	public DefaultRateLimitUtils(RateLimitProperties properties) {
+		this.properties = properties;
+	}
 
-    @Override
-    public String getUser(final HttpServletRequest request) {
-        return request.getRemoteUser() != null ? request.getRemoteUser() : ANONYMOUS_USER;
-    }
+	@Override
+	public String getUser(final HttpServletRequest request) {
+		return request.getRemoteUser() != null ? request.getRemoteUser() : ANONYMOUS_USER;
+	}
 
-    @Override
-    public String getRemoteAddress(final HttpServletRequest request) {
-        String xForwardedFor = request.getHeader(X_FORWARDED_FOR_HEADER);
-        if (properties.isBehindProxy() && xForwardedFor != null) {
-            return xForwardedFor.split(X_FORWARDED_FOR_HEADER_DELIMITER)[0].trim();
-        }
-        return request.getRemoteAddr();
-    }
+	@Override
+	public String getRemoteAddress(final HttpServletRequest request) {
+		String xForwardedFor = request.getHeader(X_FORWARDED_FOR_HEADER);
+		if (properties.isBehindProxy() && xForwardedFor != null) {
+			return xForwardedFor.split(X_FORWARDED_FOR_HEADER_DELIMITER)[0].trim();
+		}
+		return request.getRemoteAddr();
+	}
 
-    @Override
-    public Set<String> getUserRoles() {
-        throw new UnsupportedOperationException("Not supported");
-    }
+	@Override
+	public Set<String> getUserRoles() {
+		throw new UnsupportedOperationException("Not supported");
+	}
 }

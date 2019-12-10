@@ -16,7 +16,6 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
-import com.google.common.collect.Maps;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
@@ -33,6 +32,7 @@ import org.springframework.web.util.UrlPathHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_LIMIT;
@@ -52,79 +52,79 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
  */
 public class RateLimitPreFilter extends AbstractRateLimitFilter {
 
-    private final RateLimiter rateLimiter;
-    private final RateLimitKeyGenerator rateLimitKeyGenerator;
-    private final ApplicationEventPublisher eventPublisher;
+	private final RateLimiter rateLimiter;
+	private final RateLimitKeyGenerator rateLimitKeyGenerator;
+	private final ApplicationEventPublisher eventPublisher;
 
-    public RateLimitPreFilter(final RateLimitProperties properties, final RouteLocator routeLocator,
-                              final UrlPathHelper urlPathHelper, final RateLimiter rateLimiter,
-                              final RateLimitKeyGenerator rateLimitKeyGenerator, final RateLimitUtils rateLimitUtils,
-                              final ApplicationEventPublisher eventPublisher) {
-        super(properties, routeLocator, urlPathHelper, rateLimitUtils);
-        this.rateLimiter = rateLimiter;
-        this.rateLimitKeyGenerator = rateLimitKeyGenerator;
-        this.eventPublisher = eventPublisher;
-    }
+	public RateLimitPreFilter(final RateLimitProperties properties, final RouteLocator routeLocator,
+							  final UrlPathHelper urlPathHelper, final RateLimiter rateLimiter,
+							  final RateLimitKeyGenerator rateLimitKeyGenerator,
+							  final RateLimitUtils rateLimitUtils, final ApplicationEventPublisher eventPublisher) {
+		super(properties, routeLocator, urlPathHelper, rateLimitUtils);
+		this.rateLimiter = rateLimiter;
+		this.rateLimitKeyGenerator = rateLimitKeyGenerator;
+		this.eventPublisher = eventPublisher;
+	}
 
-    @Override
-    public String filterType() {
-        return PRE_TYPE;
-    }
+	@Override
+	public String filterType() {
+		return PRE_TYPE;
+	}
 
-    @Override
-    public int filterOrder() {
-        return properties.getPreFilterOrder();
-    }
+	@Override
+	public int filterOrder() {
+		return properties.getPreFilterOrder();
+	}
 
-    @Override
-    public Object run() {
-        final RequestContext ctx = RequestContext.getCurrentContext();
-        final HttpServletResponse response = ctx.getResponse();
-        final HttpServletRequest request = ctx.getRequest();
-        final Route route = route(request);
+	@Override
+	public Object run() {
+		final RequestContext ctx = RequestContext.getCurrentContext();
+		final HttpServletResponse response = ctx.getResponse();
+		final HttpServletRequest request = ctx.getRequest();
+		final Route route = route(request);
 
-        policy(route, request).forEach(policy -> {
-            Map<String, String> responseHeaders = Maps.newHashMap();
+		policy(route, request).forEach(policy -> {
+			Map<String, String> responseHeaders = new HashMap<>();
 
-            final String key = rateLimitKeyGenerator.key(request, route, policy);
-            final Rate rate = rateLimiter.consume(policy, key, null);
-            final String httpHeaderKey = key.replaceAll("[^A-Za-z0-9-.]", "_").replaceAll("__", "_");
+			final String key = rateLimitKeyGenerator.key(request, route, policy);
+			final Rate rate = rateLimiter.consume(policy, key, null);
+			final String httpHeaderKey = key.replaceAll("[^A-Za-z0-9-.]", "_").replaceAll("__", "_");
 
-            final Long limit = policy.getLimit();
-            final Long remaining = rate.getRemaining();
-            if (limit != null) {
-                responseHeaders.put(HEADER_LIMIT + httpHeaderKey, String.valueOf(limit));
-                responseHeaders.put(HEADER_REMAINING + httpHeaderKey, String.valueOf(Math.max(remaining, 0)));
-            }
+			final Long limit = policy.getLimit();
+			final Long remaining = rate.getRemaining();
+			if (limit != null) {
+				responseHeaders.put(HEADER_LIMIT + httpHeaderKey, String.valueOf(limit));
+				responseHeaders.put(HEADER_REMAINING + httpHeaderKey, String.valueOf(Math.max(remaining, 0)));
+			}
 
-            final Long quota = policy.getQuota();
-            final Long remainingQuota = rate.getRemainingQuota();
-            if (quota != null) {
-                request.setAttribute(REQUEST_START_TIME, System.currentTimeMillis());
-                responseHeaders.put(HEADER_QUOTA + httpHeaderKey, String.valueOf(quota));
-                responseHeaders.put(HEADER_REMAINING_QUOTA + httpHeaderKey,
-                        String.valueOf(MILLISECONDS.toSeconds(Math.max(remainingQuota, 0))));
-            }
+			final Long quota = policy.getQuota();
+			final Long remainingQuota = rate.getRemainingQuota();
+			if (quota != null) {
+				request.setAttribute(REQUEST_START_TIME, System.currentTimeMillis());
+				responseHeaders.put(HEADER_QUOTA + httpHeaderKey, String.valueOf(quota));
+				responseHeaders.put(HEADER_REMAINING_QUOTA + httpHeaderKey,
+						String.valueOf(MILLISECONDS.toSeconds(Math.max(remainingQuota, 0))));
+			}
 
-            responseHeaders.put(HEADER_RESET + httpHeaderKey, String.valueOf(rate.getReset()));
+			responseHeaders.put(HEADER_RESET + httpHeaderKey, String.valueOf(rate.getReset()));
 
-            if (properties.isAddResponseHeaders()) {
-                for (Map.Entry<String, String> headersEntry : responseHeaders.entrySet()) {
-                    response.setHeader(headersEntry.getKey(), headersEntry.getValue());
-                }
-            }
+			if (properties.isAddResponseHeaders()) {
+				for (Map.Entry<String, String> headersEntry : responseHeaders.entrySet()) {
+					response.setHeader(headersEntry.getKey(), headersEntry.getValue());
+				}
+			}
 
-            if ((limit != null && remaining < 0) || (quota != null && remainingQuota < 0)) {
-                ctx.setResponseStatusCode(HttpStatus.TOO_MANY_REQUESTS.value());
-                ctx.put(RATE_LIMIT_EXCEEDED, "true");
-                ctx.setSendZuulResponse(false);
+			if ((limit != null && remaining < 0) || (quota != null && remainingQuota < 0)) {
+				ctx.setResponseStatusCode(HttpStatus.TOO_MANY_REQUESTS.value());
+				ctx.put(RATE_LIMIT_EXCEEDED, "true");
+				ctx.setSendZuulResponse(false);
 
-                eventPublisher.publishEvent(new RateLimitExceededEvent(this, policy, rateLimitUtils.getRemoteAddress(request)));
+				eventPublisher.publishEvent(new RateLimitExceededEvent(this, policy, rateLimitUtils.getRemoteAddress(request)));
 
-                throw new RateLimitExceededException();
-            }
-        });
+				throw new RateLimitExceededException();
+			}
+		});
 
-        return null;
-    }
+		return null;
+	}
 }

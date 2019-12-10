@@ -30,22 +30,22 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.Ra
  */
 public class JpaRateLimiter extends AbstractRateLimiter {
 
-    private final RateLimiterRepository repository;
+	private final RateLimiterRepository repository;
 
-    public JpaRateLimiter(final RateLimiterErrorHandler rateLimiterErrorHandler,
-                          final RateLimiterRepository repository) {
-        super(rateLimiterErrorHandler);
-        this.repository = repository;
-    }
+	public JpaRateLimiter(final RateLimiterErrorHandler rateLimiterErrorHandler,
+						  final RateLimiterRepository repository) {
+		super(rateLimiterErrorHandler);
+		this.repository = repository;
+	}
 
-    @Override
-    protected Rate getRate(String key) {
-        return this.repository.findById(key).orElse(null);
-    }
+	@Override
+	protected Rate getRate(String key) {
+		return this.repository.findById(key).orElse(null);
+	}
 
-    @Override
-    protected void saveRate(Rate rate) {
-        this.repository.save(rate);
-    }
+	@Override
+	protected void saveRate(Rate rate) {
+		this.repository.save(rate);
+	}
 
 }

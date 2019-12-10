@@ -11,26 +11,26 @@ import org.mockito.MockitoAnnotations;
 
 public class Bucket4jJCacheRateLimiterTest extends BaseRateLimiterTest {
 
-    private static Ignite ignite;
+	private static Ignite ignite;
 
-    @BeforeClass
-    public static void setUpClass() {
-        ignite = Ignition.start();
-    }
+	@BeforeClass
+	public static void setUpClass() {
+		ignite = Ignition.start();
+	}
 
-    @AfterClass
-    public static void tearDownClass() {
-        Ignition.stop(true);
-    }
+	@AfterClass
+	public static void tearDownClass() {
+		Ignition.stop(true);
+	}
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        target = new Bucket4jJCacheRateLimiter(ignite.createCache("rateLimit"));
-    }
+	@Before
+	public void setUp() {
+		MockitoAnnotations.initMocks(this);
+		target = new Bucket4jJCacheRateLimiter(ignite.createCache("rateLimit"));
+	}
 
-    @After
-    public void tearDown() {
-        ignite.destroyCache("rateLimit");
-    }
+	@After
+	public void tearDown() {
+		ignite.destroyCache("rateLimit");
+	}
 }

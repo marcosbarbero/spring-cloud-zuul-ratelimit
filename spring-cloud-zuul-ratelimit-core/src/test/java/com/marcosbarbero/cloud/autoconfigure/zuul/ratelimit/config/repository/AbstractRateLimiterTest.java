@@ -18,41 +18,41 @@ import static org.mockito.Mockito.when;
 
 public class AbstractRateLimiterTest {
 
-    private AbstractRateLimiter target;
+	private AbstractRateLimiter target;
 
-    @Mock
-    private RateLimiterErrorHandler rateLimiterErrorHandler;
+	@Mock
+	private RateLimiterErrorHandler rateLimiterErrorHandler;
 
-    @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-        target = Mockito.mock(AbstractRateLimiter.class, Mockito.CALLS_REAL_METHODS);
-        Field rateLimiterErrorHandler = AbstractRateLimiter.class.getDeclaredField("rateLimiterErrorHandler");
-        boolean accessible = rateLimiterErrorHandler.isAccessible();
-        rateLimiterErrorHandler.setAccessible(true);
-        Field modifiersField = Field.class.getDeclaredField("modifiers");
-        modifiersField.setAccessible(true);
-        modifiersField.setInt(rateLimiterErrorHandler, rateLimiterErrorHandler.getModifiers() & ~Modifier.FINAL);
-        rateLimiterErrorHandler.set(target, this.rateLimiterErrorHandler);
-        rateLimiterErrorHandler.setAccessible(accessible);
-        modifiersField.setInt(rateLimiterErrorHandler, rateLimiterErrorHandler.getModifiers() & Modifier.FINAL);
-    }
+	@Before
+	public void setUp() throws Exception {
+		MockitoAnnotations.initMocks(this);
+		target = Mockito.mock(AbstractRateLimiter.class, Mockito.CALLS_REAL_METHODS);
+		Field rateLimiterErrorHandler = AbstractRateLimiter.class.getDeclaredField("rateLimiterErrorHandler");
+		boolean accessible = rateLimiterErrorHandler.isAccessible();
+		rateLimiterErrorHandler.setAccessible(true);
+		Field modifiersField = Field.class.getDeclaredField("modifiers");
+		modifiersField.setAccessible(true);
+		modifiersField.setInt(rateLimiterErrorHandler, rateLimiterErrorHandler.getModifiers() & ~Modifier.FINAL);
+		rateLimiterErrorHandler.set(target, this.rateLimiterErrorHandler);
+		rateLimiterErrorHandler.setAccessible(accessible);
+		modifiersField.setInt(rateLimiterErrorHandler, rateLimiterErrorHandler.getModifiers() & Modifier.FINAL);
+	}
 
-    @Test
-    public void testConsumeGetRateException() {
-        when(target.getRate(any())).thenThrow(new RuntimeException());
-        Policy policy = new Policy();
-        policy.setLimit(100L);
-        target.consume(policy, "key", 0L);
-        verify(rateLimiterErrorHandler).handleFetchError(matches("key"), any());
-    }
+	@Test
+	public void testConsumeGetRateException() {
+		when(target.getRate(any())).thenThrow(new RuntimeException());
+		Policy policy = new Policy();
+		policy.setLimit(100L);
+		target.consume(policy, "key", 0L);
+		verify(rateLimiterErrorHandler).handleFetchError(matches("key"), any());
+	}
 
-    @Test
-    public void testConsumeSaveRateException() {
-        doThrow(new RuntimeException()).when(target).saveRate(any());
-        Policy policy = new Policy();
-        policy.setLimit(100L);
-        target.consume(policy, "key", 0L);
-        verify(rateLimiterErrorHandler).handleSaveError(matches("key"), any());
-    }
+	@Test
+	public void testConsumeSaveRateException() {
+		doThrow(new RuntimeException()).when(target).saveRate(any());
+		Policy policy = new Policy();
+		policy.setLimit(100L);
+		target.consume(policy, "key", 0L);
+		verify(rateLimiterErrorHandler).handleSaveError(matches("key"), any());
+	}
 }

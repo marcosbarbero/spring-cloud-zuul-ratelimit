@@ -22,35 +22,35 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestExecutionListeners(WithSecurityContextTestExecutionListener.class)
 public class SecureContextRateLimitTypeTest {
 
-    @Mock
-    private HttpServletRequest httpServletRequest;
-    private Route route = new Route("servicea", "/test", "servicea", "/servicea", null, Collections.emptySet());
-    private RateLimitUtils rateLimitUtils;
+	@Mock
+	private HttpServletRequest httpServletRequest;
+	private Route route = new Route("servicea", "/test", "servicea", "/servicea", null, Collections.emptySet());
+	private RateLimitUtils rateLimitUtils;
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        RateLimitProperties properties = new RateLimitProperties();
-        rateLimitUtils = new SecuredRateLimitUtils(properties);
-    }
+	@Before
+	public void setUp() {
+		MockitoAnnotations.initMocks(this);
+		RateLimitProperties properties = new RateLimitProperties();
+		rateLimitUtils = new SecuredRateLimitUtils(properties);
+	}
 
-    @Test
-    @WithMockUser(username = "commonuser", authorities = {"USER"})
-    public void applyRole() {
-        boolean apply = RateLimitType.ROLE.apply(httpServletRequest, route, rateLimitUtils, "user");
-        assertThat(apply).isTrue();
-    }
+	@Test
+	@WithMockUser(username = "commonuser", authorities = {"USER"})
+	public void applyRole() {
+		boolean apply = RateLimitType.ROLE.apply(httpServletRequest, route, rateLimitUtils, "user");
+		assertThat(apply).isTrue();
+	}
 
-    @Test
-    @WithMockUser(username = "commonuser", authorities = {"ADMIN"})
-    public void doNotApplyRole() {
-        boolean apply = RateLimitType.ROLE.apply(httpServletRequest, route, rateLimitUtils, "user");
-        assertThat(apply).isFalse();
-    }
+	@Test
+	@WithMockUser(username = "commonuser", authorities = {"ADMIN"})
+	public void doNotApplyRole() {
+		boolean apply = RateLimitType.ROLE.apply(httpServletRequest, route, rateLimitUtils, "user");
+		assertThat(apply).isFalse();
+	}
 
-    @Test
-    public void withEmptyAuthentication() {
-        boolean apply = RateLimitType.ROLE.apply(httpServletRequest, route, rateLimitUtils, "user");
-        assertThat(apply).isFalse();
-    }
+	@Test
+	public void withEmptyAuthentication() {
+		boolean apply = RateLimitType.ROLE.apply(httpServletRequest, route, rateLimitUtils, "user");
+		assertThat(apply).isFalse();
+	}
 }

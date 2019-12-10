@@ -26,14 +26,14 @@ import org.springframework.core.convert.converter.Converter;
  */
 public final class StringToMatchTypeConverter implements Converter<String, MatchType> {
 
-    private static final String DELIMITER = "=";
+	private static final String DELIMITER = "=";
 
-    @Override
-    public MatchType convert(@NotNull String type) {
-        if (type.contains(DELIMITER)) {
-            String[] matchType = type.split(DELIMITER);
-            return new MatchType(RateLimitType.valueOf(matchType[0].toUpperCase()), matchType[1]);
-        }
-        return new MatchType(RateLimitType.valueOf(type.toUpperCase()), null);
-    }
+	@Override
+	public MatchType convert(@NotNull String type) {
+		if (type.contains(DELIMITER)) {
+			String[] matchType = type.split(DELIMITER);
+			return new MatchType(RateLimitType.valueOf(matchType[0].toUpperCase()), matchType[1]);
+		}
+		return new MatchType(RateLimitType.valueOf(type.toUpperCase()), null);
+	}
 }

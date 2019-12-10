@@ -47,207 +47,207 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 @ConfigurationProperties(RateLimitProperties.PREFIX)
 public class RateLimitProperties {
 
-    public static final String PREFIX = "zuul.ratelimit";
+	public static final String PREFIX = "zuul.ratelimit";
 
-    @Valid
-    @NotNull
-    @Policies
-    @NestedConfigurationProperty
-    private List<Policy> defaultPolicyList = Lists.newArrayList();
+	@Valid
+	@NotNull
+	@Policies
+	@NestedConfigurationProperty
+	private List<Policy> defaultPolicyList = Lists.newArrayList();
 
-    @Valid
-    @NotNull
-    @Policies
-    @NestedConfigurationProperty
-    private Map<String, List<Policy>> policyList = Maps.newHashMap();
+	@Valid
+	@NotNull
+	@Policies
+	@NestedConfigurationProperty
+	private Map<String, List<Policy>> policyList = Maps.newHashMap();
 
-    private boolean behindProxy;
+	private boolean behindProxy;
 
-    private boolean enabled;
+	private boolean enabled;
 
-    private boolean addResponseHeaders = true;
+	private boolean addResponseHeaders = true;
 
-    @NotNull
-    @Value("${spring.application.name:rate-limit-application}")
-    private String keyPrefix;
+	@NotNull
+	@Value("${spring.application.name:rate-limit-application}")
+	private String keyPrefix;
 
-    @NotNull
-    private RateLimitRepository repository;
+	@NotNull
+	private RateLimitRepository repository;
 
-    private int postFilterOrder = SEND_RESPONSE_FILTER_ORDER - 10;
+	private int postFilterOrder = SEND_RESPONSE_FILTER_ORDER - 10;
 
-    private int preFilterOrder = FORM_BODY_WRAPPER_FILTER_ORDER;
+	private int preFilterOrder = FORM_BODY_WRAPPER_FILTER_ORDER;
 
-    public List<Policy> getPolicies(String key) {
-        return policyList.getOrDefault(key, defaultPolicyList);
-    }
+	public List<Policy> getPolicies(String key) {
+		return policyList.getOrDefault(key, defaultPolicyList);
+	}
 
-    public List<Policy> getDefaultPolicyList() {
-        return defaultPolicyList;
-    }
+	public List<Policy> getDefaultPolicyList() {
+		return defaultPolicyList;
+	}
 
-    public void setDefaultPolicyList(List<Policy> defaultPolicyList) {
-        this.defaultPolicyList = defaultPolicyList;
-    }
+	public void setDefaultPolicyList(List<Policy> defaultPolicyList) {
+		this.defaultPolicyList = defaultPolicyList;
+	}
 
-    public Map<String, List<Policy>> getPolicyList() {
-        return policyList;
-    }
+	public Map<String, List<Policy>> getPolicyList() {
+		return policyList;
+	}
 
-    public void setPolicyList(Map<String, List<Policy>> policyList) {
-        this.policyList = policyList;
-    }
+	public void setPolicyList(Map<String, List<Policy>> policyList) {
+		this.policyList = policyList;
+	}
 
-    public boolean isBehindProxy() {
-        return behindProxy;
-    }
+	public boolean isBehindProxy() {
+		return behindProxy;
+	}
 
-    public void setBehindProxy(boolean behindProxy) {
-        this.behindProxy = behindProxy;
-    }
+	public void setBehindProxy(boolean behindProxy) {
+		this.behindProxy = behindProxy;
+	}
 
-    public boolean isEnabled() {
-        return enabled;
-    }
+	public boolean isEnabled() {
+		return enabled;
+	}
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
 
-    public boolean isAddResponseHeaders() {
-        return addResponseHeaders;
-    }
+	public boolean isAddResponseHeaders() {
+		return addResponseHeaders;
+	}
 
-    public void setAddResponseHeaders(boolean addResponseHeaders) {
-        this.addResponseHeaders = addResponseHeaders;
-    }
+	public void setAddResponseHeaders(boolean addResponseHeaders) {
+		this.addResponseHeaders = addResponseHeaders;
+	}
 
-    public String getKeyPrefix() {
-        return keyPrefix;
-    }
+	public String getKeyPrefix() {
+		return keyPrefix;
+	}
 
-    public void setKeyPrefix(String keyPrefix) {
-        this.keyPrefix = keyPrefix;
-    }
+	public void setKeyPrefix(String keyPrefix) {
+		this.keyPrefix = keyPrefix;
+	}
 
-    public RateLimitRepository getRepository() {
-        return repository;
-    }
+	public RateLimitRepository getRepository() {
+		return repository;
+	}
 
-    public void setRepository(RateLimitRepository repository) {
-        this.repository = repository;
-    }
+	public void setRepository(RateLimitRepository repository) {
+		this.repository = repository;
+	}
 
-    public int getPostFilterOrder() {
-        return postFilterOrder;
-    }
+	public int getPostFilterOrder() {
+		return postFilterOrder;
+	}
 
-    public void setPostFilterOrder(int postFilterOrder) {
-        this.postFilterOrder = postFilterOrder;
-    }
+	public void setPostFilterOrder(int postFilterOrder) {
+		this.postFilterOrder = postFilterOrder;
+	}
 
-    public int getPreFilterOrder() {
-        return preFilterOrder;
-    }
+	public int getPreFilterOrder() {
+		return preFilterOrder;
+	}
 
-    public void setPreFilterOrder(int preFilterOrder) {
-        this.preFilterOrder = preFilterOrder;
-    }
+	public void setPreFilterOrder(int preFilterOrder) {
+		this.preFilterOrder = preFilterOrder;
+	}
 
-    public static class Policy {
+	public static class Policy {
 
-        @NotNull
-        private Long refreshInterval = MINUTES.toSeconds(1L);
+		@NotNull
+		private Long refreshInterval = MINUTES.toSeconds(1L);
 
-        private Long limit;
+		private Long limit;
 
-        private Long quota;
+		private Long quota;
 
-        @NotNull
-        private boolean breakOnMatch;
+		@NotNull
+		private boolean breakOnMatch;
 
-        @Valid
-        @NotNull
-        @NestedConfigurationProperty
-        private List<MatchType> type = Lists.newArrayList();
+		@Valid
+		@NotNull
+		@NestedConfigurationProperty
+		private List<MatchType> type = Lists.newArrayList();
 
-        public Long getRefreshInterval() {
-            return refreshInterval;
-        }
+		public Long getRefreshInterval() {
+			return refreshInterval;
+		}
 
-        public void setRefreshInterval(Long refreshInterval) {
-            this.refreshInterval = refreshInterval;
-        }
+		public void setRefreshInterval(Long refreshInterval) {
+			this.refreshInterval = refreshInterval;
+		}
 
-        public Long getLimit() {
-            return limit;
-        }
+		public Long getLimit() {
+			return limit;
+		}
 
-        public void setLimit(Long limit) {
-            this.limit = limit;
-        }
+		public void setLimit(Long limit) {
+			this.limit = limit;
+		}
 
-        public Long getQuota() {
-            return quota;
-        }
+		public Long getQuota() {
+			return quota;
+		}
 
-        public void setQuota(Long quota) {
-            this.quota = quota;
-        }
+		public void setQuota(Long quota) {
+			this.quota = quota;
+		}
 
-        public boolean isBreakOnMatch() {
-            return breakOnMatch;
-        }
+		public boolean isBreakOnMatch() {
+			return breakOnMatch;
+		}
 
-        public void setBreakOnMatch(boolean breakOnMatch) {
-            this.breakOnMatch = breakOnMatch;
-        }
+		public void setBreakOnMatch(boolean breakOnMatch) {
+			this.breakOnMatch = breakOnMatch;
+		}
 
-        public List<MatchType> getType() {
-            return type;
-        }
+		public List<MatchType> getType() {
+			return type;
+		}
 
-        public void setType(List<MatchType> type) {
-            this.type = type;
-        }
+		public void setType(List<MatchType> type) {
+			this.type = type;
+		}
 
-        public static class MatchType {
+		public static class MatchType {
 
-            @Valid
-            @NotNull
-            private RateLimitType type;
+			@Valid
+			@NotNull
+			private RateLimitType type;
 
-            private String matcher;
+			private String matcher;
 
-            public MatchType(@Valid @NotNull RateLimitType type, String matcher) {
-                this.type = type;
-                this.matcher = matcher;
-            }
+			public MatchType(@Valid @NotNull RateLimitType type, String matcher) {
+				this.type = type;
+				this.matcher = matcher;
+			}
 
-            public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils) {
-                return StringUtils.isEmpty(matcher) || type.apply(request, route, rateLimitUtils, matcher);
-            }
+			public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils) {
+				return StringUtils.isEmpty(matcher) || type.apply(request, route, rateLimitUtils, matcher);
+			}
 
-            public String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils) {
-                return type.key(request, route, rateLimitUtils, matcher) +
-                        (StringUtils.isEmpty(matcher) ? StringUtils.EMPTY : (":" + matcher));
-            }
+			public String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils) {
+				return type.key(request, route, rateLimitUtils, matcher) +
+						(StringUtils.isEmpty(matcher) ? StringUtils.EMPTY : (":" + matcher));
+			}
 
-            public RateLimitType getType() {
-                return type;
-            }
+			public RateLimitType getType() {
+				return type;
+			}
 
-            public void setType(RateLimitType type) {
-                this.type = type;
-            }
+			public void setType(RateLimitType type) {
+				this.type = type;
+			}
 
-            public String getMatcher() {
-                return matcher;
-            }
+			public String getMatcher() {
+				return matcher;
+			}
 
-            public void setMatcher(String matcher) {
-                this.matcher = matcher;
-            }
-        }
-    }
+			public void setMatcher(String matcher) {
+				this.matcher = matcher;
+			}
+		}
+	}
 }

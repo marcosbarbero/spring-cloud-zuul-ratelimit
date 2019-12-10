@@ -30,16 +30,16 @@ import org.infinispan.functional.FunctionalMap.ReadWriteMap;
  */
 public class Bucket4jInfinispanRateLimiter extends AbstractBucket4jRateLimiter<InfinispanBucketBuilder, Infinispan> {
 
-    private final ReadWriteMap<String, GridBucketState> readWriteMap;
+	private final ReadWriteMap<String, GridBucketState> readWriteMap;
 
-    public Bucket4jInfinispanRateLimiter(final ReadWriteMap<String, GridBucketState> readWriteMap) {
-        super(io.github.bucket4j.grid.infinispan.Infinispan.class);
-        this.readWriteMap = readWriteMap;
-        super.init();
-    }
+	public Bucket4jInfinispanRateLimiter(final ReadWriteMap<String, GridBucketState> readWriteMap) {
+		super(io.github.bucket4j.grid.infinispan.Infinispan.class);
+		this.readWriteMap = readWriteMap;
+		super.init();
+	}
 
-    @Override
-    protected ProxyManager<String> getProxyManager(io.github.bucket4j.grid.infinispan.Infinispan extension) {
-        return extension.proxyManagerForMap(readWriteMap);
-    }
+	@Override
+	protected ProxyManager<String> getProxyManager(io.github.bucket4j.grid.infinispan.Infinispan extension) {
+		return extension.proxyManagerForMap(readWriteMap);
+	}
 }

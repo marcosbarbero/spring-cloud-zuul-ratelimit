@@ -16,25 +16,25 @@ import static org.mockito.Mockito.when;
 
 public class JpaRateLimiterTest extends BaseRateLimiterTest {
 
-    @Mock
-    private RateLimiterErrorHandler rateLimiterErrorHandler;
-    @Mock
-    private RateLimiterRepository rateLimiterRepository;
+	@Mock
+	private RateLimiterErrorHandler rateLimiterErrorHandler;
+	@Mock
+	private RateLimiterRepository rateLimiterRepository;
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        Map<String, Rate> repository = Maps.newHashMap();
-        when(rateLimiterRepository.save(any(Rate.class))).thenAnswer(invocationOnMock -> {
-            Rate rate = invocationOnMock.getArgument(0);
-            repository.put(rate.getKey(), rate);
-            return rate;
-        });
-        when(rateLimiterRepository.findById(any())).thenAnswer(invocationOnMock -> {
-            String key = invocationOnMock.getArgument(0);
-            return Optional.of(repository.get(key));
-        });
+	@Before
+	public void setUp() {
+		MockitoAnnotations.initMocks(this);
+		Map<String, Rate> repository = Maps.newHashMap();
+		when(rateLimiterRepository.save(any(Rate.class))).thenAnswer(invocationOnMock -> {
+			Rate rate = invocationOnMock.getArgument(0);
+			repository.put(rate.getKey(), rate);
+			return rate;
+		});
+		when(rateLimiterRepository.findById(any())).thenAnswer(invocationOnMock -> {
+			String key = invocationOnMock.getArgument(0);
+			return Optional.of(repository.get(key));
+		});
 
-        target = new JpaRateLimiter(rateLimiterErrorHandler, rateLimiterRepository);
-    }
+		target = new JpaRateLimiter(rateLimiterErrorHandler, rateLimiterRepository);
+	}
 }

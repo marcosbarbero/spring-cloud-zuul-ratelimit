@@ -24,27 +24,27 @@ import java.util.Set;
  */
 public interface RateLimitUtils {
 
-    /**
-     * Returns the authenticated user from {@link HttpServletRequest}.
-     *
-     * @param request The {@link HttpServletRequest}
-     * @return The authenticated user or annonymous
-     */
-    String getUser(HttpServletRequest request);
+	/**
+	 * Returns the authenticated user from {@link HttpServletRequest}.
+	 *
+	 * @param request The {@link HttpServletRequest}
+	 * @return The authenticated user or annonymous
+	 */
+	String getUser(HttpServletRequest request);
 
-    /**
-     * Returns the remote IP address from {@link HttpServletRequest}.
-     *
-     * @param request The {@link HttpServletRequest}
-     * @return The remote IP address
-     */
-    String getRemoteAddress(HttpServletRequest request);
+	/**
+	 * Returns the remote IP address from {@link HttpServletRequest}.
+	 *
+	 * @param request The {@link HttpServletRequest}
+	 * @return The remote IP address
+	 */
+	String getRemoteAddress(HttpServletRequest request);
 
-    /**
-     * Returns the authenticated user's roles.
-     *
-     * @return The authenticated user's roles or empty
-     */
-    Set<String> getUserRoles();
+	/**
+	 * Returns the authenticated user's roles.
+	 *
+	 * @return The authenticated user's roles or empty
+	 */
+	Set<String> getUserRoles();
 
 }

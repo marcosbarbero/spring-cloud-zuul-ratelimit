@@ -37,44 +37,44 @@ import static org.springframework.util.StringUtils.hasText;
  */
 public class ConsulRateLimiter extends AbstractRateLimiter {
 
-    private static Logger log = LoggerFactory.getLogger(ConsulRateLimiter.class);
+	private static Logger log = LoggerFactory.getLogger(ConsulRateLimiter.class);
 
-    private final ConsulClient consulClient;
-    private final ObjectMapper objectMapper;
+	private final ConsulClient consulClient;
+	private final ObjectMapper objectMapper;
 
-    public ConsulRateLimiter(RateLimiterErrorHandler rateLimiterErrorHandler,
-                             ConsulClient consulClient, ObjectMapper objectMapper) {
-        super(rateLimiterErrorHandler);
-        this.consulClient = consulClient;
-        this.objectMapper = objectMapper;
-    }
+	public ConsulRateLimiter(RateLimiterErrorHandler rateLimiterErrorHandler,
+							 ConsulClient consulClient, ObjectMapper objectMapper) {
+		super(rateLimiterErrorHandler);
+		this.consulClient = consulClient;
+		this.objectMapper = objectMapper;
+	}
 
-    @Override
-    protected Rate getRate(String key) {
-        Rate rate = null;
-        GetValue value = this.consulClient.getKVValue(key).getValue();
-        if (value != null && value.getDecodedValue() != null) {
-            try {
-                rate = this.objectMapper.readValue(value.getDecodedValue(), Rate.class);
-            } catch (IOException e) {
-                log.error("Failed to deserialize Rate", e);
-            }
-        }
-        return rate;
-    }
+	@Override
+	protected Rate getRate(String key) {
+		Rate rate = null;
+		GetValue value = this.consulClient.getKVValue(key).getValue();
+		if (value != null && value.getDecodedValue() != null) {
+			try {
+				rate = this.objectMapper.readValue(value.getDecodedValue(), Rate.class);
+			} catch (IOException e) {
+				log.error("Failed to deserialize Rate", e);
+			}
+		}
+		return rate;
+	}
 
-    @Override
-    protected void saveRate(Rate rate) {
-        String value = "";
-        try {
-            value = this.objectMapper.writeValueAsString(rate);
-        } catch (JsonProcessingException e) {
-            log.error("Failed to serialize Rate", e);
-        }
+	@Override
+	protected void saveRate(Rate rate) {
+		String value = "";
+		try {
+			value = this.objectMapper.writeValueAsString(rate);
+		} catch (JsonProcessingException e) {
+			log.error("Failed to serialize Rate", e);
+		}
 
-        if (hasText(value)) {
-            this.consulClient.setKVValue(rate.getKey(), value);
-        }
-    }
+		if (hasText(value)) {
+			this.consulClient.setKVValue(rate.getKey(), value);
+		}
+	}
 
 }

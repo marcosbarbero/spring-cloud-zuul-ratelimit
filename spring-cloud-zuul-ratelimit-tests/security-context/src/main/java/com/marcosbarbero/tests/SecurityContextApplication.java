@@ -26,94 +26,94 @@ import java.net.Socket;
 @SpringBootApplication
 public class SecurityContextApplication {
 
-    public static void main(String... args) {
-        SpringApplication.run(SecurityContextApplication.class, args);
-    }
+	public static void main(String... args) {
+		SpringApplication.run(SecurityContextApplication.class, args);
+	}
 
-    @RestController
-    public static class ServiceController {
+	@RestController
+	public static class ServiceController {
 
-        static final String RESPONSE_BODY = "ResponseBody";
+		static final String RESPONSE_BODY = "ResponseBody";
 
-        @GetMapping("/serviceA")
-        public ResponseEntity<String> serviceA() {
-            return ResponseEntity.ok(RESPONSE_BODY);
-        }
+		@GetMapping("/serviceA")
+		public ResponseEntity<String> serviceA() {
+			return ResponseEntity.ok(RESPONSE_BODY);
+		}
 
-        @GetMapping("/serviceB")
-        public ResponseEntity<String> serviceB() {
-            return ResponseEntity.ok(RESPONSE_BODY);
-        }
+		@GetMapping("/serviceB")
+		public ResponseEntity<String> serviceB() {
+			return ResponseEntity.ok(RESPONSE_BODY);
+		}
 
-        @GetMapping("/serviceC")
-        public ResponseEntity<String> serviceC() {
-            return ResponseEntity.ok(RESPONSE_BODY);
-        }
+		@GetMapping("/serviceC")
+		public ResponseEntity<String> serviceC() {
+			return ResponseEntity.ok(RESPONSE_BODY);
+		}
 
-        @GetMapping("/serviceD/{paramName}")
-        public ResponseEntity<String> serviceD(@PathVariable String paramName) {
-            return ResponseEntity.ok(RESPONSE_BODY + " " + paramName);
-        }
+		@GetMapping("/serviceD/{paramName}")
+		public ResponseEntity<String> serviceD(@PathVariable String paramName) {
+			return ResponseEntity.ok(RESPONSE_BODY + " " + paramName);
+		}
 
-        @GetMapping("/serviceE")
-        public ResponseEntity<String> serviceE() throws InterruptedException {
-            Thread.sleep(1100);
-            return ResponseEntity.ok(RESPONSE_BODY);
-        }
-    }
+		@GetMapping("/serviceE")
+		public ResponseEntity<String> serviceE() throws InterruptedException {
+			Thread.sleep(1100);
+			return ResponseEntity.ok(RESPONSE_BODY);
+		}
+	}
 
-    @Configuration
-    public static class RedisConfig {
+	@Configuration
+	public static class RedisConfig {
 
-        private static final int DEFAULT_PORT = 6380;
+		private static final int DEFAULT_PORT = 6380;
 
-        private RedisServer redisServer;
+		private RedisServer redisServer;
 
-        private static boolean available(int port) {
-            try (Socket ignored = new Socket("localhost", port)) {
-                return false;
-            } catch (IOException ignored) {
-                return true;
-            }
-        }
+		private static boolean available(int port) {
+			try (Socket ignored = new Socket("localhost", port)) {
+				return false;
+			} catch (IOException ignored) {
+				return true;
+			}
+		}
 
-        @PostConstruct
-        public void setUp() throws IOException {
-            this.redisServer = new RedisServer(DEFAULT_PORT);
-            if (available(DEFAULT_PORT)) {
-                this.redisServer.start();
-            }
-        }
+		@PostConstruct
+		public void setUp() throws IOException {
+			this.redisServer = new RedisServer(DEFAULT_PORT);
+			if (available(DEFAULT_PORT)) {
+				this.redisServer.start();
+			}
+		}
 
-        @PreDestroy
-        public void destroy() {
-            this.redisServer.stop();
-        }
-    }
+		@PreDestroy
+		public void destroy() {
+			this.redisServer.stop();
+		}
+	}
 
-    @Configuration
-    @EnableWebSecurity
-    static class SecurityConfig extends WebSecurityConfigurerAdapter {
+	@Configuration
+	@EnableWebSecurity
+	static class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-        @Bean
-        @Override
-        @SuppressWarnings("deprecation")
-        public UserDetailsService userDetailsService() {
-            UserDetails user =
-                    User.withDefaultPasswordEncoder()
-                            .username("user")
-                            .password("user")
-                            .roles("USER")
-                            .build();
+		@Bean
+		@Override
+		@SuppressWarnings("deprecation")
+		public UserDetailsService userDetailsService() {
+			UserDetails user =
+					User.withDefaultPasswordEncoder()
+							.username("user")
+							.password("user")
+							.roles("USER")
+							.build();
 
-            UserDetails admin = User.withDefaultPasswordEncoder()
-                    .username("admin")
-                    .password("admin")
-                    .roles("ADMIN")
-                    .build();
+			UserDetails admin = User.withDefaultPasswordEncoder()
+					.username("admin")
+					.password("admin")
+					.roles("ADMIN")
+					.build();
 
-            return new InMemoryUserDetailsManager(user, admin);
-        }
-    }
+			return new InMemoryUserDetailsManager(user, admin);
+		}
+	}
 
 }

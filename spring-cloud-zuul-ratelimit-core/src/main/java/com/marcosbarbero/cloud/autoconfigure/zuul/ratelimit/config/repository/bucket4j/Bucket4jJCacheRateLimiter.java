@@ -31,16 +31,16 @@ import javax.cache.Cache;
  */
 public class Bucket4jJCacheRateLimiter extends AbstractBucket4jRateLimiter<JCacheBucketBuilder, JCache> {
 
-    private final Cache<String, GridBucketState> cache;
+	private final Cache<String, GridBucketState> cache;
 
-    public Bucket4jJCacheRateLimiter(final Cache<String, GridBucketState> cache) {
-        super(io.github.bucket4j.grid.jcache.JCache.class);
-        this.cache = cache;
-        super.init();
-    }
+	public Bucket4jJCacheRateLimiter(final Cache<String, GridBucketState> cache) {
+		super(io.github.bucket4j.grid.jcache.JCache.class);
+		this.cache = cache;
+		super.init();
+	}
 
-    @Override
-    protected ProxyManager<String> getProxyManager(io.github.bucket4j.grid.jcache.JCache extension) {
-        return extension.proxyManagerForCache(cache);
-    }
+	@Override
+	protected ProxyManager<String> getProxyManager(io.github.bucket4j.grid.jcache.JCache extension) {
+		return extension.proxyManagerForCache(cache);
+	}
 }

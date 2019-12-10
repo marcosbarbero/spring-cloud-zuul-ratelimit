@@ -32,93 +32,93 @@ import static org.mockito.Mockito.when;
 
 public class RateLimitPostFilterTest {
 
-    private RateLimitPostFilter target;
+	private RateLimitPostFilter target;
 
-    @Mock
-    private RouteLocator routeLocator;
-    @Mock
-    private RateLimiter rateLimiter;
-    @Mock
-    private RateLimitKeyGenerator rateLimitKeyGenerator;
-    @Mock
-    private RequestAttributes requestAttributes;
-    @Mock
-    private HttpServletRequest httpServletRequest;
+	@Mock
+	private RouteLocator routeLocator;
+	@Mock
+	private RateLimiter rateLimiter;
+	@Mock
+	private RateLimitKeyGenerator rateLimitKeyGenerator;
+	@Mock
+	private RequestAttributes requestAttributes;
+	@Mock
+	private HttpServletRequest httpServletRequest;
 
-    private RateLimitProperties rateLimitProperties = new RateLimitProperties();
+	private RateLimitProperties rateLimitProperties = new RateLimitProperties();
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        when(httpServletRequest.getContextPath()).thenReturn("/servicea/test");
-        when(httpServletRequest.getRequestURI()).thenReturn("/servicea/test");
-        RequestContext requestContext = new RequestContext();
-        requestContext.setRequest(httpServletRequest);
-        RequestContext.testSetCurrentContext(requestContext);
-        RequestContextHolder.setRequestAttributes(requestAttributes);
-        rateLimitProperties = new RateLimitProperties();
-        UrlPathHelper urlPathHelper = new UrlPathHelper();
-        RateLimitUtils rateLimitUtils = new DefaultRateLimitUtils(rateLimitProperties);
-        target = new RateLimitPostFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter, rateLimitKeyGenerator, rateLimitUtils);
-    }
+	@Before
+	public void setUp() {
+		MockitoAnnotations.initMocks(this);
+		when(httpServletRequest.getContextPath()).thenReturn("/servicea/test");
+		when(httpServletRequest.getRequestURI()).thenReturn("/servicea/test");
+		RequestContext requestContext = new RequestContext();
+		requestContext.setRequest(httpServletRequest);
+		RequestContext.testSetCurrentContext(requestContext);
+		RequestContextHolder.setRequestAttributes(requestAttributes);
+		rateLimitProperties = new RateLimitProperties();
+		UrlPathHelper urlPathHelper = new UrlPathHelper();
+		RateLimitUtils rateLimitUtils = new DefaultRateLimitUtils(rateLimitProperties);
+		target = new RateLimitPostFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter, rateLimitKeyGenerator, rateLimitUtils);
+	}
 
-    @Test
-    public void testFilterType() {
-        assertThat(target.filterType()).isEqualTo(FilterConstants.POST_TYPE);
-    }
+	@Test
+	public void testFilterType() {
+		assertThat(target.filterType()).isEqualTo(FilterConstants.POST_TYPE);
+	}
 
-    @Test
-    public void testFilterOrder() {
-        assertThat(target.filterOrder()).isEqualTo(FilterConstants.SEND_RESPONSE_FILTER_ORDER - 10);
-    }
+	@Test
+	public void testFilterOrder() {
+		assertThat(target.filterOrder()).isEqualTo(FilterConstants.SEND_RESPONSE_FILTER_ORDER - 10);
+	}
 
-    @Test
-    public void testShouldFilterOnDisabledProperty() {
-        assertThat(target.shouldFilter()).isEqualTo(false);
-    }
+	@Test
+	public void testShouldFilterOnDisabledProperty() {
+		assertThat(target.shouldFilter()).isEqualTo(false);
+	}
 
-    @Test
-    public void testShouldFilterOnNoPolicy() {
-        rateLimitProperties.setEnabled(true);
+	@Test
+	public void testShouldFilterOnNoPolicy() {
+		rateLimitProperties.setEnabled(true);
 
-        assertThat(target.shouldFilter()).isEqualTo(false);
-    }
+		assertThat(target.shouldFilter()).isEqualTo(false);
+	}
 
-    @Test
-    public void testShouldFilterOnNullStartTime() {
-        rateLimitProperties.setEnabled(true);
-        Policy defaultPolicy = new Policy();
-        rateLimitProperties.getDefaultPolicyList().add(defaultPolicy);
+	@Test
+	public void testShouldFilterOnNullStartTime() {
+		rateLimitProperties.setEnabled(true);
+		Policy defaultPolicy = new Policy();
+		rateLimitProperties.getDefaultPolicyList().add(defaultPolicy);
 
-        assertThat(target.shouldFilter()).isEqualTo(false);
-    }
+		assertThat(target.shouldFilter()).isEqualTo(false);
+	}
 
-    @Test
-    public void testShouldFilter() {
-        rateLimitProperties.setEnabled(true);
-        when(httpServletRequest.getAttribute(REQUEST_START_TIME)).thenReturn(System.currentTimeMillis());
-        Policy defaultPolicy = new Policy();
-        rateLimitProperties.setDefaultPolicyList(Lists.newArrayList(defaultPolicy));
+	@Test
+	public void testShouldFilter() {
+		rateLimitProperties.setEnabled(true);
+		when(httpServletRequest.getAttribute(REQUEST_START_TIME)).thenReturn(System.currentTimeMillis());
+		Policy defaultPolicy = new Policy();
+		rateLimitProperties.setDefaultPolicyList(Lists.newArrayList(defaultPolicy));
 
-        assertThat(target.shouldFilter()).isEqualTo(true);
-    }
+		assertThat(target.shouldFilter()).isEqualTo(true);
+	}
 
-    @Test
-    public void testRunNoPolicy() {
-        target.run();
-        verifyZeroInteractions(rateLimiter);
-    }
+	@Test
+	public void testRunNoPolicy() {
+		target.run();
+		verifyZeroInteractions(rateLimiter);
+	}
 
-    @Test
-    public void testRun() {
-        rateLimitProperties.setEnabled(true);
-        when(httpServletRequest.getAttribute(REQUEST_START_TIME)).thenReturn(System.currentTimeMillis());
-        Policy defaultPolicy = new Policy();
-        defaultPolicy.setQuota(2L);
-        rateLimitProperties.setDefaultPolicyList(Lists.newArrayList(defaultPolicy));
-        when(rateLimitKeyGenerator.key(any(), any(), any())).thenReturn("generatedKey");
+	@Test
+	public void testRun() {
+		rateLimitProperties.setEnabled(true);
+		when(httpServletRequest.getAttribute(REQUEST_START_TIME)).thenReturn(System.currentTimeMillis());
+		Policy defaultPolicy = new Policy();
+		defaultPolicy.setQuota(2L);
+		rateLimitProperties.setDefaultPolicyList(Lists.newArrayList(defaultPolicy));
+		when(rateLimitKeyGenerator.key(any(), any(), any())).thenReturn("generatedKey");
 
-        target.run();
-        verify(rateLimiter).consume(eq(defaultPolicy), eq("generatedKey"), anyLong());
-    }
+		target.run();
+		verify(rateLimiter).consume(eq(defaultPolicy), eq("generatedKey"), anyLong());
+	}
 }

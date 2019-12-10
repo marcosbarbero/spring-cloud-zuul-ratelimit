@@ -47,142 +47,142 @@ import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
  */
 public abstract class BaseRateLimitPreFilterTest {
 
-    RateLimitPreFilter filter;
-    MockHttpServletRequest request;
-    MockHttpServletResponse response;
-    @Mock
-    private RequestAttributes requestAttributes;
-    @Mock
-    private ApplicationEventPublisher eventPublisher;
-    private RequestContext context;
-    private RateLimiter rateLimiter;
+	RateLimitPreFilter filter;
+	MockHttpServletRequest request;
+	MockHttpServletResponse response;
+	@Mock
+	private RequestAttributes requestAttributes;
+	@Mock
+	private ApplicationEventPublisher eventPublisher;
+	private RequestContext context;
+	private RateLimiter rateLimiter;
 
-    private Route createRoute(String id) {
-        return new Route(id, "", id, "/" + id, null, Collections.emptySet());
-    }
+	private Route createRoute(String id) {
+		return new Route(id, "", id, "/" + id, null, Collections.emptySet());
+	}
 
-    private RateLimitProperties properties() {
-        RateLimitProperties properties = new RateLimitProperties();
-        properties.setEnabled(true);
-        properties.setBehindProxy(true);
+	private RateLimitProperties properties() {
+		RateLimitProperties properties = new RateLimitProperties();
+		properties.setEnabled(true);
+		properties.setBehindProxy(true);
 
-        Map<String, List<Policy>> policies = new HashMap<>();
+		Map<String, List<Policy>> policies = new HashMap<>();
 
-        Policy policy = new Policy();
-        policy.setLimit(2L);
-        policy.setQuota(2L);
-        policy.setRefreshInterval(2L);
-        policy.getType().add(new MatchType(RateLimitType.ORIGIN, null));
-        policy.getType().add(new MatchType(RateLimitType.URL, null));
-        policy.getType().add(new MatchType(RateLimitType.USER, null));
-        policy.getType().add(new MatchType(RateLimitType.HTTP_METHOD, null));
+		Policy policy = new Policy();
+		policy.setLimit(2L);
+		policy.setQuota(2L);
+		policy.setRefreshInterval(2L);
+		policy.getType().add(new MatchType(RateLimitType.ORIGIN, null));
+		policy.getType().add(new MatchType(RateLimitType.URL, null));
+		policy.getType().add(new MatchType(RateLimitType.USER, null));
+		policy.getType().add(new MatchType(RateLimitType.HTTP_METHOD, null));
 
-        policies.put("serviceA", Lists.newArrayList(policy));
-        properties.setPolicyList(policies);
+		policies.put("serviceA", Lists.newArrayList(policy));
+		properties.setPolicyList(policies);
 
-        return properties;
-    }
+		return properties;
+	}
 
-    private RouteLocator routeLocator() {
-        return new TestRouteLocator(Collections.singletonList("ignored"),
-                asList(createRoute("serviceA"), createRoute("serviceB")));
-    }
+	private RouteLocator routeLocator() {
+		return new TestRouteLocator(Collections.singletonList("ignored"),
+				asList(createRoute("serviceA"), createRoute("serviceB")));
+	}
 
-    void setRateLimiter(RateLimiter rateLimiter) {
-        this.rateLimiter = rateLimiter;
-    }
+	void setRateLimiter(RateLimiter rateLimiter) {
+		this.rateLimiter = rateLimiter;
+	}
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        CounterFactory.initialize(new EmptyCounterFactory());
-        this.request = new MockHttpServletRequest();
-        this.response = new MockHttpServletResponse();
-        RateLimitProperties properties = this.properties();
-        RateLimitUtils rateLimitUtils = new DefaultRateLimitUtils(properties);
-        RateLimitKeyGenerator rateLimitKeyGenerator = new DefaultRateLimitKeyGenerator(properties,
-                rateLimitUtils);
-        UrlPathHelper urlPathHelper = new UrlPathHelper();
-        this.filter = new RateLimitPreFilter(properties, this.routeLocator(), urlPathHelper, this.rateLimiter,
-                rateLimitKeyGenerator, rateLimitUtils, eventPublisher);
-        this.context = new RequestContext();
-        RequestContext.testSetCurrentContext(this.context);
-        RequestContextHolder.setRequestAttributes(requestAttributes);
-        this.context.clear();
-        this.context.setRequest(this.request);
-        this.context.setResponse(this.response);
-    }
+	@Before
+	public void setUp() {
+		MockitoAnnotations.initMocks(this);
+		CounterFactory.initialize(new EmptyCounterFactory());
+		this.request = new MockHttpServletRequest();
+		this.response = new MockHttpServletResponse();
+		RateLimitProperties properties = this.properties();
+		RateLimitUtils rateLimitUtils = new DefaultRateLimitUtils(properties);
+		RateLimitKeyGenerator rateLimitKeyGenerator = new DefaultRateLimitKeyGenerator(properties,
+				rateLimitUtils);
+		UrlPathHelper urlPathHelper = new UrlPathHelper();
+		this.filter = new RateLimitPreFilter(properties, this.routeLocator(), urlPathHelper, this.rateLimiter,
+				rateLimitKeyGenerator, rateLimitUtils, eventPublisher);
+		this.context = new RequestContext();
+		RequestContext.testSetCurrentContext(this.context);
+		RequestContextHolder.setRequestAttributes(requestAttributes);
+		this.context.clear();
+		this.context.setRequest(this.request);
+		this.context.setResponse(this.response);
+	}
 
-    @Test
-    public void testRateLimit() throws Exception {
-        this.request.setRequestURI("/serviceA");
-        this.request.setRemoteAddr("10.0.0.100");
-        this.request.setMethod("GET");
+	@Test
+	public void testRateLimit() throws Exception {
+		this.request.setRequestURI("/serviceA");
+		this.request.setRemoteAddr("10.0.0.100");
+		this.request.setMethod("GET");
 
-        assertTrue(this.filter.shouldFilter());
+		assertTrue(this.filter.shouldFilter());
 
-        for (int i = 0; i < 2; i++) {
-            this.filter.run();
-        }
+		for (int i = 0; i < 2; i++) {
+			this.filter.run();
+		}
 
-        String key = "null_serviceA_10.0.0.100_anonymous_GET";
-        String remaining = this.response.getHeader(HEADER_REMAINING + key);
-        assertEquals("0", remaining);
+		String key = "null_serviceA_10.0.0.100_anonymous_GET";
+		String remaining = this.response.getHeader(HEADER_REMAINING + key);
+		assertEquals("0", remaining);
 
-        TimeUnit.SECONDS.sleep(3);
+		TimeUnit.SECONDS.sleep(3);
 
-        this.filter.run();
-        remaining = this.response.getHeader(HEADER_REMAINING + key);
-        assertEquals("1", remaining);
-    }
+		this.filter.run();
+		remaining = this.response.getHeader(HEADER_REMAINING + key);
+		assertEquals("1", remaining);
+	}
 
-    @Test
-    public void testRateLimitExceedCapacity() throws Exception {
-        this.request.setRequestURI("/serviceA");
-        this.request.setRemoteAddr("10.0.0.100");
-        this.request.addHeader("X-FORWARDED-FOR", "10.0.0.1");
-        this.request.setMethod("GET");
+	@Test
+	public void testRateLimitExceedCapacity() throws Exception {
+		this.request.setRequestURI("/serviceA");
+		this.request.setRemoteAddr("10.0.0.100");
+		this.request.addHeader("X-FORWARDED-FOR", "10.0.0.1");
+		this.request.setMethod("GET");
 
-        assertTrue(this.filter.shouldFilter());
+		assertTrue(this.filter.shouldFilter());
 
-        try {
-            for (int i = 0; i <= 3; i++) {
-                this.filter.run();
-            }
-        } catch (Exception e) {
-            // do nothing
-        }
+		try {
+			for (int i = 0; i <= 3; i++) {
+				this.filter.run();
+			}
+		} catch (Exception e) {
+			// do nothing
+		}
 
-        String exceeded = (String) this.context.get("rateLimitExceeded");
-        assertTrue("RateLimit Exceeded", Boolean.valueOf(exceeded));
-        assertEquals("Too many requests", TOO_MANY_REQUESTS.value(), this.context.getResponseStatusCode());
-    }
+		String exceeded = (String) this.context.get("rateLimitExceeded");
+		assertTrue("RateLimit Exceeded", Boolean.valueOf(exceeded));
+		assertEquals("Too many requests", TOO_MANY_REQUESTS.value(), this.context.getResponseStatusCode());
+	}
 
-    @Test
-    public void testNoRateLimitService() {
-        this.request.setRequestURI("/serviceZ");
-        this.request.setRemoteAddr("10.0.0.100");
-        this.request.setMethod("GET");
+	@Test
+	public void testNoRateLimitService() {
+		this.request.setRequestURI("/serviceZ");
+		this.request.setRemoteAddr("10.0.0.100");
+		this.request.setMethod("GET");
 
-        assertFalse(this.filter.shouldFilter());
+		assertFalse(this.filter.shouldFilter());
 
-        try {
-            for (int i = 0; i <= 3; i++) {
-                this.filter.run();
-            }
-        } catch (Exception e) {
-            // do nothing
-        }
+		try {
+			for (int i = 0; i <= 3; i++) {
+				this.filter.run();
+			}
+		} catch (Exception e) {
+			// do nothing
+		}
 
-        String exceeded = (String) this.context.get("rateLimitExceeded");
-        assertFalse("RateLimit not exceeded", Boolean.valueOf(exceeded));
-    }
+		String exceeded = (String) this.context.get("rateLimitExceeded");
+		assertFalse("RateLimit not exceeded", Boolean.valueOf(exceeded));
+	}
 
-    @Test
-    public void testNoRateLimit() {
-        this.request.setRequestURI("/serviceB");
-        this.request.setRemoteAddr("127.0.0.1");
-        this.request.setMethod("GET");
-        assertFalse(this.filter.shouldFilter());
-    }
+	@Test
+	public void testNoRateLimit() {
+		this.request.setRequestURI("/serviceB");
+		this.request.setRemoteAddr("127.0.0.1");
+		this.request.setMethod("GET");
+		assertFalse(this.filter.shouldFilter());
+	}
 }

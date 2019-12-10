@@ -11,22 +11,22 @@ import static org.mockito.Mockito.mock;
 
 public class RateLimitExceededExceptionTest {
 
-    private RateLimitExceededException target;
+	private RateLimitExceededException target;
 
-    @Before
-    public void setUp() {
-        CounterFactory counterFactory = mock(CounterFactory.class);
-        MockitoAnnotations.initMocks(this);
-        CounterFactory.initialize(counterFactory);
-        target = new RateLimitExceededException();
-    }
+	@Before
+	public void setUp() {
+		CounterFactory counterFactory = mock(CounterFactory.class);
+		MockitoAnnotations.initMocks(this);
+		CounterFactory.initialize(counterFactory);
+		target = new RateLimitExceededException();
+	}
 
-    @Test
-    public void testExceptionInfo() {
-        Throwable cause = target.getCause();
-        assertThat(cause).isInstanceOf(ZuulException.class);
+	@Test
+	public void testExceptionInfo() {
+		Throwable cause = target.getCause();
+		assertThat(cause).isInstanceOf(ZuulException.class);
 
-        ZuulException zuulException = (ZuulException) cause;
-        assertThat(zuulException.getMessage()).contains("429");
-    }
+		ZuulException zuulException = (ZuulException) cause;
+		assertThat(zuulException.getMessage()).contains("429");
+	}
 }

@@ -30,16 +30,16 @@ import static java.util.Collections.emptySet;
  */
 public class SecuredRateLimitUtils extends DefaultRateLimitUtils {
 
-    public SecuredRateLimitUtils(final RateLimitProperties properties) {
-        super(properties);
-    }
+	public SecuredRateLimitUtils(final RateLimitProperties properties) {
+		super(properties);
+	}
 
-    @Override
-    public Set<String> getUserRoles() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null) {
-            return emptySet();
-        }
-        return AuthorityUtils.authorityListToSet(authentication.getAuthorities());
-    }
+	@Override
+	public Set<String> getUserRoles() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null) {
+			return emptySet();
+		}
+		return AuthorityUtils.authorityListToSet(authentication.getAuthorities());
+	}
 }

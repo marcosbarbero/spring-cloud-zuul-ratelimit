@@ -24,20 +24,20 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultRateLimiterErrorHandler implements RateLimiterErrorHandler {
 
-    private static Logger log = LoggerFactory.getLogger(DefaultRateLimiterErrorHandler.class);
+	private static Logger log = LoggerFactory.getLogger(DefaultRateLimiterErrorHandler.class);
 
-    @Override
-    public void handleSaveError(String key, Exception e) {
-        log.error("Failed saving rate for " + key + ", returning unsaved rate", e);
-    }
+	@Override
+	public void handleSaveError(String key, Exception e) {
+		log.error("Failed saving rate for " + key + ", returning unsaved rate", e);
+	}
 
-    @Override
-    public void handleFetchError(String key, Exception e) {
-        log.error("Failed retrieving rate for " + key + ", will create new rate", e);
-    }
+	@Override
+	public void handleFetchError(String key, Exception e) {
+		log.error("Failed retrieving rate for " + key + ", will create new rate", e);
+	}
 
-    @Override
-    public void handleError(String msg, Exception e) {
-        log.error(msg, e);
-    }
+	@Override
+	public void handleError(String msg, Exception e) {
+		log.error(msg, e);
+	}
 }

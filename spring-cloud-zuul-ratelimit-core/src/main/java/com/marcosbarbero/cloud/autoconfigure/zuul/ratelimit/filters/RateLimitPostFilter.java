@@ -36,50 +36,50 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
  */
 public class RateLimitPostFilter extends AbstractRateLimitFilter {
 
-    private final RateLimiter rateLimiter;
-    private final RateLimitKeyGenerator rateLimitKeyGenerator;
+	private final RateLimiter rateLimiter;
+	private final RateLimitKeyGenerator rateLimitKeyGenerator;
 
-    public RateLimitPostFilter(final RateLimitProperties properties, final RouteLocator routeLocator,
-                               final UrlPathHelper urlPathHelper, final RateLimiter rateLimiter,
-                               final RateLimitKeyGenerator rateLimitKeyGenerator, final RateLimitUtils rateLimitUtils) {
-        super(properties, routeLocator, urlPathHelper, rateLimitUtils);
-        this.rateLimiter = rateLimiter;
-        this.rateLimitKeyGenerator = rateLimitKeyGenerator;
-    }
+	public RateLimitPostFilter(final RateLimitProperties properties, final RouteLocator routeLocator,
+							   final UrlPathHelper urlPathHelper, final RateLimiter rateLimiter,
+							   final RateLimitKeyGenerator rateLimitKeyGenerator, final RateLimitUtils rateLimitUtils) {
+		super(properties, routeLocator, urlPathHelper, rateLimitUtils);
+		this.rateLimiter = rateLimiter;
+		this.rateLimitKeyGenerator = rateLimitKeyGenerator;
+	}
 
-    @Override
-    public String filterType() {
-        return POST_TYPE;
-    }
+	@Override
+	public String filterType() {
+		return POST_TYPE;
+	}
 
-    @Override
-    public int filterOrder() {
-        return properties.getPostFilterOrder();
-    }
+	@Override
+	public int filterOrder() {
+		return properties.getPostFilterOrder();
+	}
 
-    @Override
-    public boolean shouldFilter() {
-        return super.shouldFilter() && getRequestStartTime() != null;
-    }
+	@Override
+	public boolean shouldFilter() {
+		return super.shouldFilter() && getRequestStartTime() != null;
+	}
 
-    private Long getRequestStartTime() {
-        final RequestContext ctx = RequestContext.getCurrentContext();
-        final HttpServletRequest request = ctx.getRequest();
-        return (Long) request.getAttribute(REQUEST_START_TIME);
-    }
+	private Long getRequestStartTime() {
+		final RequestContext ctx = RequestContext.getCurrentContext();
+		final HttpServletRequest request = ctx.getRequest();
+		return (Long) request.getAttribute(REQUEST_START_TIME);
+	}
 
-    @Override
-    public Object run() {
-        RequestContext ctx = RequestContext.getCurrentContext();
-        HttpServletRequest request = ctx.getRequest();
-        Route route = route(request);
+	@Override
+	public Object run() {
+		RequestContext ctx = RequestContext.getCurrentContext();
+		HttpServletRequest request = ctx.getRequest();
+		Route route = route(request);
 
-        policy(route, request).forEach(policy -> {
-            long requestTime = System.currentTimeMillis() - getRequestStartTime();
-            String key = rateLimitKeyGenerator.key(request, route, policy);
-            rateLimiter.consume(policy, key, requestTime > 0 ? requestTime : 1);
-        });
+		policy(route, request).forEach(policy -> {
+			long requestTime = System.currentTimeMillis() - getRequestStartTime();
+			String key = rateLimitKeyGenerator.key(request, route, policy);
+			rateLimiter.consume(policy, key, requestTime > 0 ? requestTime : 1);
+		});
 
-        return null;
-    }
+		return null;
+	}
 }

@@ -12,29 +12,29 @@ import java.util.List;
  */
 public class TestRouteLocator implements RouteLocator {
 
-    private final Collection<String> ignoredPaths;
-    private final List<Route> routes;
+	private final Collection<String> ignoredPaths;
+	private final List<Route> routes;
 
-    public TestRouteLocator(Collection<String> ignoredPaths, List<Route> routes) {
-        this.ignoredPaths = ignoredPaths;
-        this.routes = routes;
-    }
+	public TestRouteLocator(Collection<String> ignoredPaths, List<Route> routes) {
+		this.ignoredPaths = ignoredPaths;
+		this.routes = routes;
+	}
 
-    @Override
-    public Collection<String> getIgnoredPaths() {
-        return this.ignoredPaths;
-    }
+	@Override
+	public Collection<String> getIgnoredPaths() {
+		return this.ignoredPaths;
+	}
 
-    @Override
-    public List<Route> getRoutes() {
-        return this.routes;
-    }
+	@Override
+	public List<Route> getRoutes() {
+		return this.routes;
+	}
 
-    @Override
-    public Route getMatchingRoute(String path) {
-        return this.routes.stream()
-                .filter(route -> path.startsWith(route.getPrefix()))
-                .findFirst()
-                .orElse(null);
-    }
+	@Override
+	public Route getMatchingRoute(String path) {
+		return this.routes.stream()
+				.filter(route -> path.startsWith(route.getPrefix()))
+				.findFirst()
+				.orElse(null);
+	}
 }

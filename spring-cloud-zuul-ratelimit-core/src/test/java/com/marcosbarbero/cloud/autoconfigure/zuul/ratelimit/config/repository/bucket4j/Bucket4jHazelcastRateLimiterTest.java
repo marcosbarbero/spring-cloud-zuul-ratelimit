@@ -11,26 +11,26 @@ import org.mockito.MockitoAnnotations;
 
 public class Bucket4jHazelcastRateLimiterTest extends BaseRateLimiterTest {
 
-    private static HazelcastInstance hazelcastInstance;
+	private static HazelcastInstance hazelcastInstance;
 
-    @BeforeClass
-    public static void setUpClass() {
-        hazelcastInstance = Hazelcast.newHazelcastInstance();
-    }
+	@BeforeClass
+	public static void setUpClass() {
+		hazelcastInstance = Hazelcast.newHazelcastInstance();
+	}
 
-    @AfterClass
-    public static void tearDownClass() {
-        Hazelcast.shutdownAll();
-    }
+	@AfterClass
+	public static void tearDownClass() {
+		Hazelcast.shutdownAll();
+	}
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        target = new Bucket4jHazelcastRateLimiter(hazelcastInstance.getMap("rateLimit"));
-    }
+	@Before
+	public void setUp() {
+		MockitoAnnotations.initMocks(this);
+		target = new Bucket4jHazelcastRateLimiter(hazelcastInstance.getMap("rateLimit"));
+	}
 
-    @After
-    public void tearDown() {
-        hazelcastInstance.getMap("rateLimit").destroy();
-    }
+	@After
+	public void tearDown() {
+		hazelcastInstance.getMap("rateLimit").destroy();
+	}
 }

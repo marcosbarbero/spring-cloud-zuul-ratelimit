@@ -27,62 +27,62 @@ import static org.mockito.Mockito.when;
  */
 public class ConsulRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
 
-    private ConsulClient consulClient;
-    private ObjectMapper objectMapper = new ObjectMapper();
+	private ConsulClient consulClient;
+	private ObjectMapper objectMapper = new ObjectMapper();
 
-    private Rate rate(long remaining) {
-        return new Rate("key", remaining, 2000L, 100L, new Date(System.currentTimeMillis() + SECONDS.toMillis(2)));
-    }
+	private Rate rate(long remaining) {
+		return new Rate("key", remaining, 2000L, 100L, new Date(System.currentTimeMillis() + SECONDS.toMillis(2)));
+	}
 
-    @Before
-    @Override
-    public void setUp() {
-        RateLimiterErrorHandler rateLimiterErrorHandler = mock(RateLimiterErrorHandler.class);
-        consulClient = mock(ConsulClient.class);
-        this.setRateLimiter(new ConsulRateLimiter(rateLimiterErrorHandler, this.consulClient, this.objectMapper));
-        super.setUp();
-    }
+	@Before
+	@Override
+	public void setUp() {
+		RateLimiterErrorHandler rateLimiterErrorHandler = mock(RateLimiterErrorHandler.class);
+		consulClient = mock(ConsulClient.class);
+		this.setRateLimiter(new ConsulRateLimiter(rateLimiterErrorHandler, this.consulClient, this.objectMapper));
+		super.setUp();
+	}
 
-    @Test
-    @Override
-    @SuppressWarnings("unchecked")
-    public void testRateLimitExceedCapacity() throws Exception {
-        Response<GetValue> response = mock(Response.class);
-        GetValue getValue = mock(GetValue.class);
-        when(this.consulClient.getKVValue(anyString())).thenReturn(response);
-        when(response.getValue()).thenReturn(getValue);
-        when(getValue.getDecodedValue()).thenReturn(this.objectMapper.writeValueAsString(this.rate(-1)));
-        super.testRateLimitExceedCapacity();
-    }
+	@Test
+	@Override
+	@SuppressWarnings("unchecked")
+	public void testRateLimitExceedCapacity() throws Exception {
+		Response<GetValue> response = mock(Response.class);
+		GetValue getValue = mock(GetValue.class);
+		when(this.consulClient.getKVValue(anyString())).thenReturn(response);
+		when(response.getValue()).thenReturn(getValue);
+		when(getValue.getDecodedValue()).thenReturn(this.objectMapper.writeValueAsString(this.rate(-1)));
+		super.testRateLimitExceedCapacity();
+	}
 
-    @Test
-    @Override
-    @SuppressWarnings("unchecked")
-    public void testRateLimit() throws Exception {
-        Response<GetValue> response = mock(Response.class);
-        GetValue getValue = mock(GetValue.class);
-        when(this.consulClient.getKVValue(anyString())).thenReturn(response);
-        when(response.getValue()).thenReturn(getValue);
-        when(getValue.getDecodedValue()).thenReturn(this.objectMapper.writeValueAsString(this.rate(1)));
+	@Test
+	@Override
+	@SuppressWarnings("unchecked")
+	public void testRateLimit() throws Exception {
+		Response<GetValue> response = mock(Response.class);
+		GetValue getValue = mock(GetValue.class);
+		when(this.consulClient.getKVValue(anyString())).thenReturn(response);
+		when(response.getValue()).thenReturn(getValue);
+		when(getValue.getDecodedValue()).thenReturn(this.objectMapper.writeValueAsString(this.rate(1)));
 
-        this.request.setRequestURI("/serviceA");
-        this.request.setRemoteAddr("10.0.0.100");
+		this.request.setRequestURI("/serviceA");
+		this.request.setRemoteAddr("10.0.0.100");
 
-        assertTrue(this.filter.shouldFilter());
+		assertTrue(this.filter.shouldFilter());
 
-        for (int i = 0; i < 2; i++) {
-            this.filter.run();
-        }
+		for (int i = 0; i < 2; i++) {
+			this.filter.run();
+		}
 
-        String key = "null_serviceA_10.0.0.100_anonymous";
-        String remaining = this.response.getHeader(HEADER_REMAINING + key);
-        assertEquals("0", remaining);
+		String key = "null_serviceA_10.0.0.100_anonymous";
+		String remaining = this.response.getHeader(HEADER_REMAINING + key);
+		assertEquals("0", remaining);
 
-        TimeUnit.SECONDS.sleep(2);
+		TimeUnit.SECONDS.sleep(2);
 
-        when(getValue.getDecodedValue()).thenReturn(this.objectMapper.writeValueAsString(this.rate(2)));
-        this.filter.run();
-        remaining = this.response.getHeader(HEADER_REMAINING + key);
-        assertEquals("1", remaining);
-    }
+		when(getValue.getDecodedValue()).thenReturn(this.objectMapper.writeValueAsString(this.rate(2)));
+		this.filter.run();
+		remaining = this.response.getHeader(HEADER_REMAINING + key);
+		assertEquals("1", remaining);
+	}
 }

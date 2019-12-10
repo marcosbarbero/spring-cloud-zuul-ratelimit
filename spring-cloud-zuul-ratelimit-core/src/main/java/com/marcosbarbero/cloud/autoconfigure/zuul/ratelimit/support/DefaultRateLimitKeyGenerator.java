@@ -35,27 +35,27 @@ import java.util.StringJoiner;
  */
 public class DefaultRateLimitKeyGenerator implements RateLimitKeyGenerator {
 
-    private final RateLimitProperties properties;
-    private final RateLimitUtils rateLimitUtils;
+	private final RateLimitProperties properties;
+	private final RateLimitUtils rateLimitUtils;
 
-    public DefaultRateLimitKeyGenerator(RateLimitProperties properties, RateLimitUtils rateLimitUtils) {
-        this.properties = properties;
-        this.rateLimitUtils = rateLimitUtils;
-    }
+	public DefaultRateLimitKeyGenerator(RateLimitProperties properties, RateLimitUtils rateLimitUtils) {
+		this.properties = properties;
+		this.rateLimitUtils = rateLimitUtils;
+	}
 
-    @Override
-    public String key(final HttpServletRequest request, final Route route, final Policy policy) {
-        final StringJoiner joiner = new StringJoiner(":");
-        joiner.add(properties.getKeyPrefix());
-        if (route != null) {
-            joiner.add(route.getId());
-        }
-        policy.getType().forEach(matchType -> {
-            String key = matchType.key(request, route, rateLimitUtils);
-            if (StringUtils.isNotEmpty(key)) {
-                joiner.add(key);
-            }
-        });
-        return joiner.toString();
-    }
+	@Override
+	public String key(final HttpServletRequest request, final Route route, final Policy policy) {
+		final StringJoiner joiner = new StringJoiner(":");
+		joiner.add(properties.getKeyPrefix());
+		if (route != null) {
+			joiner.add(route.getId());
+		}
+		policy.getType().forEach(matchType -> {
+			String key = matchType.key(request, route, rateLimitUtils);
+			if (StringUtils.isNotEmpty(key)) {
+				joiner.add(key);
+			}
+		});
+		return joiner.toString();
+	}
 }

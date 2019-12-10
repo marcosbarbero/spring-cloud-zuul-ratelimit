@@ -45,109 +45,109 @@ import static org.mockito.Mockito.when;
 
 public class RateLimitPreFilterTest {
 
-    @Captor
-    protected ArgumentCaptor<RateLimitExceededEvent> rateLimitEventCaptor;
-    private RateLimitPreFilter target;
-    @Mock
-    private RateLimiter rateLimiter;
-    @Mock
-    private RateLimitKeyGenerator rateLimitKeyGenerator;
-    @Mock
-    private RequestAttributes requestAttributes;
-    @Mock
-    private HttpServletRequest httpServletRequest;
-    @Mock
-    private HttpServletResponse httpServletResponse;
-    @Mock
-    private ApplicationEventPublisher eventPublisher;
-    private RateLimitProperties rateLimitProperties = new RateLimitProperties();
+	@Captor
+	protected ArgumentCaptor<RateLimitExceededEvent> rateLimitEventCaptor;
+	private RateLimitPreFilter target;
+	@Mock
+	private RateLimiter rateLimiter;
+	@Mock
+	private RateLimitKeyGenerator rateLimitKeyGenerator;
+	@Mock
+	private RequestAttributes requestAttributes;
+	@Mock
+	private HttpServletRequest httpServletRequest;
+	@Mock
+	private HttpServletResponse httpServletResponse;
+	@Mock
+	private ApplicationEventPublisher eventPublisher;
+	private RateLimitProperties rateLimitProperties = new RateLimitProperties();
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        CounterFactory.initialize(new EmptyCounterFactory());
+	@Before
+	public void setUp() {
+		MockitoAnnotations.initMocks(this);
+		CounterFactory.initialize(new EmptyCounterFactory());
 
-        when(httpServletRequest.getContextPath()).thenReturn("");
-        when(httpServletRequest.getRequestURI()).thenReturn("/servicea/test");
-        when(httpServletRequest.getRemoteAddr()).thenReturn("127.0.0.1");
-        RequestContext requestContext = new RequestContext();
-        requestContext.setRequest(httpServletRequest);
-        requestContext.setResponse(httpServletResponse);
-        RequestContext.testSetCurrentContext(requestContext);
-        RequestContextHolder.setRequestAttributes(requestAttributes);
-        rateLimitProperties = new RateLimitProperties();
-        rateLimitProperties.setAddResponseHeaders(false);
-        UrlPathHelper urlPathHelper = new UrlPathHelper();
-        RateLimitUtils rateLimitUtils = new DefaultRateLimitUtils(rateLimitProperties);
-        Route route = new Route("servicea", "/test", "servicea", "/servicea", null, Collections.emptySet());
-        TestRouteLocator routeLocator = new TestRouteLocator(Collections.emptyList(), Lists.newArrayList(route));
-        target = new RateLimitPreFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter, rateLimitKeyGenerator, rateLimitUtils, eventPublisher);
-    }
+		when(httpServletRequest.getContextPath()).thenReturn("");
+		when(httpServletRequest.getRequestURI()).thenReturn("/servicea/test");
+		when(httpServletRequest.getRemoteAddr()).thenReturn("127.0.0.1");
+		RequestContext requestContext = new RequestContext();
+		requestContext.setRequest(httpServletRequest);
+		requestContext.setResponse(httpServletResponse);
+		RequestContext.testSetCurrentContext(requestContext);
+		RequestContextHolder.setRequestAttributes(requestAttributes);
+		rateLimitProperties = new RateLimitProperties();
+		rateLimitProperties.setAddResponseHeaders(false);
+		UrlPathHelper urlPathHelper = new UrlPathHelper();
+		RateLimitUtils rateLimitUtils = new DefaultRateLimitUtils(rateLimitProperties);
+		Route route = new Route("servicea", "/test", "servicea", "/servicea", null, Collections.emptySet());
+		TestRouteLocator routeLocator = new TestRouteLocator(Collections.emptyList(), Lists.newArrayList(route));
+		target = new RateLimitPreFilter(rateLimitProperties, routeLocator, urlPathHelper, rateLimiter, rateLimitKeyGenerator, rateLimitUtils, eventPublisher);
+	}
 
-    @Test
-    public void testFilterType() {
-        assertThat(target.filterType()).isEqualTo(FilterConstants.PRE_TYPE);
-    }
+	@Test
+	public void testFilterType() {
+		assertThat(target.filterType()).isEqualTo(FilterConstants.PRE_TYPE);
+	}
 
-    @Test
-    public void testFilterOrder() {
-        assertThat(target.filterOrder()).isEqualTo(FilterConstants.FORM_BODY_WRAPPER_FILTER_ORDER);
-    }
+	@Test
+	public void testFilterOrder() {
+		assertThat(target.filterOrder()).isEqualTo(FilterConstants.FORM_BODY_WRAPPER_FILTER_ORDER);
+	}
 
-    @Test
-    public void testShouldFilterOnDisabledProperty() {
-        assertThat(target.shouldFilter()).isEqualTo(false);
-    }
+	@Test
+	public void testShouldFilterOnDisabledProperty() {
+		assertThat(target.shouldFilter()).isEqualTo(false);
+	}
 
-    @Test
-    public void testShouldFilterOnNoPolicy() {
-        rateLimitProperties.setEnabled(true);
+	@Test
+	public void testShouldFilterOnNoPolicy() {
+		rateLimitProperties.setEnabled(true);
 
-        assertThat(target.shouldFilter()).isEqualTo(false);
-    }
+		assertThat(target.shouldFilter()).isEqualTo(false);
+	}
 
-    @Test
-    public void testShouldFilterOnNonMatchingPolicyType() {
-        rateLimitProperties.setEnabled(true);
-        Policy servicebPolicy = new Policy();
-        MatchType matchType = new MatchType(RateLimitType.URL, "other");
-        servicebPolicy.getType().add(matchType);
-        rateLimitProperties.getPolicyList().put("servicea", Lists.newArrayList(servicebPolicy));
+	@Test
+	public void testShouldFilterOnNonMatchingPolicyType() {
+		rateLimitProperties.setEnabled(true);
+		Policy servicebPolicy = new Policy();
+		MatchType matchType = new MatchType(RateLimitType.URL, "other");
+		servicebPolicy.getType().add(matchType);
+		rateLimitProperties.getPolicyList().put("servicea", Lists.newArrayList(servicebPolicy));
 
-        assertThat(target.shouldFilter()).isEqualTo(false);
-    }
+		assertThat(target.shouldFilter()).isEqualTo(false);
+	}
 
-    @Test
-    public void testShouldFilter() {
-        rateLimitProperties.setEnabled(true);
-        Policy defaultPolicy = new Policy();
-        rateLimitProperties.setDefaultPolicyList(Lists.newArrayList(defaultPolicy));
+	@Test
+	public void testShouldFilter() {
+		rateLimitProperties.setEnabled(true);
+		Policy defaultPolicy = new Policy();
+		rateLimitProperties.setDefaultPolicyList(Lists.newArrayList(defaultPolicy));
 
-        assertThat(target.shouldFilter()).isEqualTo(true);
-    }
+		assertThat(target.shouldFilter()).isEqualTo(true);
+	}
 
-    @Test
-    public void testShouldFireRateLimitEvent() {
-        rateLimitProperties.setEnabled(true);
+	@Test
+	public void testShouldFireRateLimitEvent() {
+		rateLimitProperties.setEnabled(true);
 
-        Policy policy = new Policy();
-        policy.setLimit(1L);
-        MatchType matchType = new MatchType(RateLimitType.URL, "/test");
-        policy.getType().add(matchType);
-        rateLimitProperties.getPolicyList().put("servicea", Lists.newArrayList(policy));
+		Policy policy = new Policy();
+		policy.setLimit(1L);
+		MatchType matchType = new MatchType(RateLimitType.URL, "/test");
+		policy.getType().add(matchType);
+		rateLimitProperties.getPolicyList().put("servicea", Lists.newArrayList(policy));
 
-        String key = "rate-limit-application_servicea_127.0.0.1";
-        when(rateLimitKeyGenerator.key(any(), any(), eq(policy))).thenReturn(key);
-        Rate rate = new Rate(key, -1L, null, 60L, null);
-        when(rateLimiter.consume(policy, key, null)).thenReturn(rate);
+		String key = "rate-limit-application_servicea_127.0.0.1";
+		when(rateLimitKeyGenerator.key(any(), any(), eq(policy))).thenReturn(key);
+		Rate rate = new Rate(key, -1L, null, 60L, null);
+		when(rateLimiter.consume(policy, key, null)).thenReturn(rate);
 
-        assertThat(target.shouldFilter()).isEqualTo(true);
+		assertThat(target.shouldFilter()).isEqualTo(true);
 
-        assertThrows(RateLimitExceededException.class, () -> target.run());
+		assertThrows(RateLimitExceededException.class, () -> target.run());
 
-        verify(eventPublisher).publishEvent(rateLimitEventCaptor.capture());
-        RateLimitExceededEvent rateLimitEvent = rateLimitEventCaptor.getValue();
-        assertNotNull(rateLimitEvent);
-        assertEquals(policy, rateLimitEvent.getPolicy());
-    }
+		verify(eventPublisher).publishEvent(rateLimitEventCaptor.capture());
+		RateLimitExceededEvent rateLimitEvent = rateLimitEventCaptor.getValue();
+		assertNotNull(rateLimitEvent);
+		assertEquals(policy, rateLimitEvent.getPolicy());
+	}
 }

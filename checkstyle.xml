@@ -26,7 +26,7 @@
 
     <!-- TreeWalker Checks -->
     <module name="com.puppycrawl.tools.checkstyle.TreeWalker">
-        <property name="tabWidth" value="1"/>
+        <property name="tabWidth" value="4"/>
 
         <!-- Spring Cloud ones -->
         <!-- <module name="LineLength">
@@ -159,7 +159,8 @@
 
         <!-- Regexp -->
         <module name="com.puppycrawl.tools.checkstyle.checks.regexp.RegexpSinglelineJavaCheck">
-            <property name="format" value="^\t* +\t*\S"/>
+            <!--            <property name="format" value="^\t* +\t*\S"/>-->
+            <property name="format" value="^\t* "/>
             <property name="message"
                       value="Line has leading space characters; indentation should be performed with tabs only."/>
             <property name="ignoreComments" value="true"/>

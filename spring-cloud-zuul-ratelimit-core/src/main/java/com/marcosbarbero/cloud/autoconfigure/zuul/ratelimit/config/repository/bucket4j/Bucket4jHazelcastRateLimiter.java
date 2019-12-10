@@ -30,16 +30,16 @@ import io.github.bucket4j.grid.hazelcast.HazelcastBucketBuilder;
  */
 public class Bucket4jHazelcastRateLimiter extends AbstractBucket4jRateLimiter<HazelcastBucketBuilder, Hazelcast> {
 
-    private final IMap<String, GridBucketState> rateLimit;
+	private final IMap<String, GridBucketState> rateLimit;
 
-    public Bucket4jHazelcastRateLimiter(final IMap<String, GridBucketState> rateLimit) {
-        super(io.github.bucket4j.grid.hazelcast.Hazelcast.class);
-        this.rateLimit = rateLimit;
-        super.init();
-    }
+	public Bucket4jHazelcastRateLimiter(final IMap<String, GridBucketState> rateLimit) {
+		super(io.github.bucket4j.grid.hazelcast.Hazelcast.class);
+		this.rateLimit = rateLimit;
+		super.init();
+	}
 
-    @Override
-    protected ProxyManager<String> getProxyManager(io.github.bucket4j.grid.hazelcast.Hazelcast extension) {
-        return extension.proxyManagerForMap(rateLimit);
-    }
+	@Override
+	protected ProxyManager<String> getProxyManager(io.github.bucket4j.grid.hazelcast.Hazelcast extension) {
+		return extension.proxyManagerForMap(rateLimit);
+	}
 }

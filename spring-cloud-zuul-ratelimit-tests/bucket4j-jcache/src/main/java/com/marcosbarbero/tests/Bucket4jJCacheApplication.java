@@ -25,58 +25,58 @@ import javax.annotation.PreDestroy;
 @SpringCloudApplication
 public class Bucket4jJCacheApplication {
 
-    private Ignite ignite;
+	private Ignite ignite;
 
-    public static void main(String... args) {
-        SpringApplication.run(Bucket4jJCacheApplication.class, args);
-    }
+	public static void main(String... args) {
+		SpringApplication.run(Bucket4jJCacheApplication.class, args);
+	}
 
-    @Bean
-    @Qualifier("RateLimit")
-    public IgniteCache<String, GridBucketState> cache() {
-        ignite = Ignition.getOrStart(new IgniteConfiguration());
-        return ignite.getOrCreateCache("rateLimit");
-    }
+	@Bean
+	@Qualifier("RateLimit")
+	public IgniteCache<String, GridBucketState> cache() {
+		ignite = Ignition.getOrStart(new IgniteConfiguration());
+		return ignite.getOrCreateCache("rateLimit");
+	}
 
-    @PreDestroy
-    public void destroy() {
-        ignite.destroyCache("rateLimit");
-    }
+	@PreDestroy
+	public void destroy() {
+		ignite.destroyCache("rateLimit");
+	}
 
-    @RestController
-    public static class ServiceController {
+	@RestController
+	public static class ServiceController {
 
-        public static final String RESPONSE_BODY = "ResponseBody";
+		public static final String RESPONSE_BODY = "ResponseBody";
 
-        @GetMapping("/serviceA")
-        public ResponseEntity<String> serviceA() {
-            return ResponseEntity.ok(RESPONSE_BODY);
-        }
+		@GetMapping("/serviceA")
+		public ResponseEntity<String> serviceA() {
+			return ResponseEntity.ok(RESPONSE_BODY);
+		}
 
-        @GetMapping("/serviceB")
-        public ResponseEntity<String> serviceB() {
-            return ResponseEntity.ok(RESPONSE_BODY);
-        }
+		@GetMapping("/serviceB")
+		public ResponseEntity<String> serviceB() {
+			return ResponseEntity.ok(RESPONSE_BODY);
+		}
 
-        @GetMapping("/serviceC")
-        public ResponseEntity<String> serviceC() {
-            return ResponseEntity.ok(RESPONSE_BODY);
-        }
+		@GetMapping("/serviceC")
+		public ResponseEntity<String> serviceC() {
+			return ResponseEntity.ok(RESPONSE_BODY);
+		}
 
-        @GetMapping("/serviceD/{paramName}")
-        public ResponseEntity<String> serviceD(@PathVariable String paramName) {
-            return ResponseEntity.ok(RESPONSE_BODY + " " + paramName);
-        }
+		@GetMapping("/serviceD/{paramName}")
+		public ResponseEntity<String> serviceD(@PathVariable String paramName) {
+			return ResponseEntity.ok(RESPONSE_BODY + " " + paramName);
+		}
 
-        @GetMapping("/serviceE")
-        public ResponseEntity<String> serviceE() throws InterruptedException {
-            Thread.sleep(1100);
-            return ResponseEntity.ok(RESPONSE_BODY);
-        }
+		@GetMapping("/serviceE")
+		public ResponseEntity<String> serviceE() throws InterruptedException {
+			Thread.sleep(1100);
+			return ResponseEntity.ok(RESPONSE_BODY);
+		}
 
-        @GetMapping("/serviceF/{paramName}/specific")
-        public ResponseEntity<String> serviceF(@PathVariable Integer paramName) {
-            return ResponseEntity.ok(RESPONSE_BODY + " " + paramName);
-        }
-    }
+		@GetMapping("/serviceF/{paramName}/specific")
+		public ResponseEntity<String> serviceF(@PathVariable Integer paramName) {
+			return ResponseEntity.ok(RESPONSE_BODY + " " + paramName);
+		}
+	}
 }

@@ -79,153 +79,153 @@ import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.proper
 @ConditionalOnProperty(prefix = PREFIX, name = "enabled", havingValue = "true")
 public class RateLimitAutoConfiguration {
 
-    private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
+	private static final UrlPathHelper URL_PATH_HELPER = new UrlPathHelper();
 
-    @Bean
-    @ConfigurationPropertiesBinding
-    public StringToMatchTypeConverter stringToMatchTypeConverter() {
-        return new StringToMatchTypeConverter();
-    }
+	@Bean
+	@ConfigurationPropertiesBinding
+	public StringToMatchTypeConverter stringToMatchTypeConverter() {
+		return new StringToMatchTypeConverter();
+	}
 
-    @Bean
-    @ConditionalOnMissingBean(RateLimiterErrorHandler.class)
-    public RateLimiterErrorHandler rateLimiterErrorHandler() {
-        return new DefaultRateLimiterErrorHandler();
-    }
+	@Bean
+	@ConditionalOnMissingBean(RateLimiterErrorHandler.class)
+	public RateLimiterErrorHandler rateLimiterErrorHandler() {
+		return new DefaultRateLimiterErrorHandler();
+	}
 
-    @Bean
-    public ZuulFilter rateLimiterPreFilter(final RateLimiter rateLimiter, final RateLimitProperties rateLimitProperties,
-                                           final RouteLocator routeLocator, final RateLimitKeyGenerator rateLimitKeyGenerator,
-                                           final RateLimitUtils rateLimitUtils, final ApplicationEventPublisher eventPublisher) {
-        return new RateLimitPreFilter(rateLimitProperties, routeLocator, URL_PATH_HELPER, rateLimiter,
-                rateLimitKeyGenerator, rateLimitUtils, eventPublisher);
-    }
+	@Bean
+	public ZuulFilter rateLimiterPreFilter(final RateLimiter rateLimiter, final RateLimitProperties rateLimitProperties,
+										   final RouteLocator routeLocator, final RateLimitKeyGenerator rateLimitKeyGenerator,
+										   final RateLimitUtils rateLimitUtils, final ApplicationEventPublisher eventPublisher) {
+		return new RateLimitPreFilter(rateLimitProperties, routeLocator, URL_PATH_HELPER, rateLimiter,
+				rateLimitKeyGenerator, rateLimitUtils, eventPublisher);
+	}
 
-    @Bean
-    public ZuulFilter rateLimiterPostFilter(final RateLimiter rateLimiter, final RateLimitProperties rateLimitProperties,
-                                            final RouteLocator routeLocator, final RateLimitKeyGenerator rateLimitKeyGenerator,
-                                            final RateLimitUtils rateLimitUtils) {
-        return new RateLimitPostFilter(rateLimitProperties, routeLocator, URL_PATH_HELPER, rateLimiter,
-                rateLimitKeyGenerator, rateLimitUtils);
-    }
+	@Bean
+	public ZuulFilter rateLimiterPostFilter(final RateLimiter rateLimiter, final RateLimitProperties rateLimitProperties,
+											final RouteLocator routeLocator, final RateLimitKeyGenerator rateLimitKeyGenerator,
+											final RateLimitUtils rateLimitUtils) {
+		return new RateLimitPostFilter(rateLimitProperties, routeLocator, URL_PATH_HELPER, rateLimiter,
+				rateLimitKeyGenerator, rateLimitUtils);
+	}
 
-    @Bean
-    @ConditionalOnMissingBean(RateLimitKeyGenerator.class)
-    public RateLimitKeyGenerator ratelimitKeyGenerator(final RateLimitProperties properties,
-                                                       final RateLimitUtils rateLimitUtils) {
-        return new DefaultRateLimitKeyGenerator(properties, rateLimitUtils);
-    }
+	@Bean
+	@ConditionalOnMissingBean(RateLimitKeyGenerator.class)
+	public RateLimitKeyGenerator ratelimitKeyGenerator(final RateLimitProperties properties,
+													   final RateLimitUtils rateLimitUtils) {
+		return new DefaultRateLimitKeyGenerator(properties, rateLimitUtils);
+	}
 
-    @Configuration
-    @ConditionalOnMissingBean(RateLimitUtils.class)
-    public static class RateLimitUtilsConfiguration {
+	@Configuration
+	@ConditionalOnMissingBean(RateLimitUtils.class)
+	public static class RateLimitUtilsConfiguration {
 
-        @Bean
-        @ConditionalOnClass(name = "org.springframework.security.core.Authentication")
-        public RateLimitUtils securedRateLimitUtils(final RateLimitProperties rateLimitProperties) {
-            return new SecuredRateLimitUtils(rateLimitProperties);
-        }
+		@Bean
+		@ConditionalOnClass(name = "org.springframework.security.core.Authentication")
+		public RateLimitUtils securedRateLimitUtils(final RateLimitProperties rateLimitProperties) {
+			return new SecuredRateLimitUtils(rateLimitProperties);
+		}
 
-        @Bean
-        @ConditionalOnMissingClass("org.springframework.security.core.Authentication")
-        public RateLimitUtils rateLimitUtils(final RateLimitProperties rateLimitProperties) {
-            return new DefaultRateLimitUtils(rateLimitProperties);
-        }
-    }
+		@Bean
+		@ConditionalOnMissingClass("org.springframework.security.core.Authentication")
+		public RateLimitUtils rateLimitUtils(final RateLimitProperties rateLimitProperties) {
+			return new DefaultRateLimitUtils(rateLimitProperties);
+		}
+	}
 
-    @Configuration
-    @ConditionalOnClass(RedisTemplate.class)
-    @ConditionalOnMissingBean(RateLimiter.class)
-    @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "REDIS")
-    public static class RedisConfiguration {
+	@Configuration
+	@ConditionalOnClass(RedisTemplate.class)
+	@ConditionalOnMissingBean(RateLimiter.class)
+	@ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "REDIS")
+	public static class RedisConfiguration {
 
-        @Bean("rateLimiterRedisTemplate")
-        public StringRedisTemplate redisTemplate(final RedisConnectionFactory connectionFactory) {
-            return new StringRedisTemplate(connectionFactory);
-        }
+		@Bean("rateLimiterRedisTemplate")
+		public StringRedisTemplate redisTemplate(final RedisConnectionFactory connectionFactory) {
+			return new StringRedisTemplate(connectionFactory);
+		}
 
-        @Bean
-        public RateLimiter redisRateLimiter(final RateLimiterErrorHandler rateLimiterErrorHandler,
-                                            @Qualifier("rateLimiterRedisTemplate") final RedisTemplate redisTemplate) {
-            return new RedisRateLimiter(rateLimiterErrorHandler, redisTemplate);
-        }
-    }
+		@Bean
+		public RateLimiter redisRateLimiter(final RateLimiterErrorHandler rateLimiterErrorHandler,
+											@Qualifier("rateLimiterRedisTemplate") final RedisTemplate redisTemplate) {
+			return new RedisRateLimiter(rateLimiterErrorHandler, redisTemplate);
+		}
+	}
 
-    @Configuration
-    @ConditionalOnConsulEnabled
-    @ConditionalOnMissingBean(RateLimiter.class)
-    @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "CONSUL")
-    public static class ConsulConfiguration {
+	@Configuration
+	@ConditionalOnConsulEnabled
+	@ConditionalOnMissingBean(RateLimiter.class)
+	@ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "CONSUL")
+	public static class ConsulConfiguration {
 
-        @Bean
-        public RateLimiter consultRateLimiter(final RateLimiterErrorHandler rateLimiterErrorHandler,
-                                              final ConsulClient consulClient, final ObjectMapper objectMapper) {
-            return new ConsulRateLimiter(rateLimiterErrorHandler, consulClient, objectMapper);
-        }
+		@Bean
+		public RateLimiter consultRateLimiter(final RateLimiterErrorHandler rateLimiterErrorHandler,
+											  final ConsulClient consulClient, final ObjectMapper objectMapper) {
+			return new ConsulRateLimiter(rateLimiterErrorHandler, consulClient, objectMapper);
+		}
 
-    }
+	}
 
-    @Configuration
-    @ConditionalOnMissingBean(RateLimiter.class)
-    @ConditionalOnClass({JCache.class, Cache.class})
-    @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "BUCKET4J_JCACHE")
-    public static class Bucket4jJCacheConfiguration {
+	@Configuration
+	@ConditionalOnMissingBean(RateLimiter.class)
+	@ConditionalOnClass({JCache.class, Cache.class})
+	@ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "BUCKET4J_JCACHE")
+	public static class Bucket4jJCacheConfiguration {
 
-        @Bean
-        public RateLimiter jCache4jHazelcastRateLimiter(@Qualifier("RateLimit") final Cache<String, GridBucketState> cache) {
-            return new Bucket4jJCacheRateLimiter(cache);
-        }
-    }
+		@Bean
+		public RateLimiter jCache4jHazelcastRateLimiter(@Qualifier("RateLimit") final Cache<String, GridBucketState> cache) {
+			return new Bucket4jJCacheRateLimiter(cache);
+		}
+	}
 
-    @Configuration
-    @ConditionalOnMissingBean(RateLimiter.class)
-    @ConditionalOnClass({Hazelcast.class, IMap.class})
-    @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "BUCKET4J_HAZELCAST")
-    public static class Bucket4jHazelcastConfiguration {
+	@Configuration
+	@ConditionalOnMissingBean(RateLimiter.class)
+	@ConditionalOnClass({Hazelcast.class, IMap.class})
+	@ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "BUCKET4J_HAZELCAST")
+	public static class Bucket4jHazelcastConfiguration {
 
-        @Bean
-        public RateLimiter bucket4jHazelcastRateLimiter(@Qualifier("RateLimit") final IMap<String, GridBucketState> rateLimit) {
-            return new Bucket4jHazelcastRateLimiter(rateLimit);
-        }
-    }
+		@Bean
+		public RateLimiter bucket4jHazelcastRateLimiter(@Qualifier("RateLimit") final IMap<String, GridBucketState> rateLimit) {
+			return new Bucket4jHazelcastRateLimiter(rateLimit);
+		}
+	}
 
-    @Configuration
-    @ConditionalOnMissingBean(RateLimiter.class)
-    @ConditionalOnClass({Ignite.class, IgniteCache.class})
-    @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "BUCKET4J_IGNITE")
-    public static class Bucket4jIgniteConfiguration {
+	@Configuration
+	@ConditionalOnMissingBean(RateLimiter.class)
+	@ConditionalOnClass({Ignite.class, IgniteCache.class})
+	@ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "BUCKET4J_IGNITE")
+	public static class Bucket4jIgniteConfiguration {
 
-        @Bean
-        public RateLimiter bucket4jIgniteRateLimiter(@Qualifier("RateLimit") final IgniteCache<String, GridBucketState> cache) {
-            return new Bucket4jIgniteRateLimiter(cache);
-        }
-    }
+		@Bean
+		public RateLimiter bucket4jIgniteRateLimiter(@Qualifier("RateLimit") final IgniteCache<String, GridBucketState> cache) {
+			return new Bucket4jIgniteRateLimiter(cache);
+		}
+	}
 
-    @Configuration
-    @ConditionalOnMissingBean(RateLimiter.class)
-    @ConditionalOnClass({Infinispan.class, ReadWriteMap.class})
-    @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "BUCKET4J_INFINISPAN")
-    public static class Bucket4jInfinispanConfiguration {
+	@Configuration
+	@ConditionalOnMissingBean(RateLimiter.class)
+	@ConditionalOnClass({Infinispan.class, ReadWriteMap.class})
+	@ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "BUCKET4J_INFINISPAN")
+	public static class Bucket4jInfinispanConfiguration {
 
-        @Bean
-        public RateLimiter bucket4jInfinispanRateLimiter(@Qualifier("RateLimit") final ReadWriteMap<String, GridBucketState> readWriteMap) {
-            return new Bucket4jInfinispanRateLimiter(readWriteMap);
-        }
-    }
+		@Bean
+		public RateLimiter bucket4jInfinispanRateLimiter(@Qualifier("RateLimit") final ReadWriteMap<String, GridBucketState> readWriteMap) {
+			return new Bucket4jInfinispanRateLimiter(readWriteMap);
+		}
+	}
 
-    @EntityScan
-    @Configuration
-    @EnableJpaRepositories(basePackages = "com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata")
-    @ConditionalOnMissingBean(RateLimiter.class)
-    @ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "JPA")
-    public static class SpringDataConfiguration {
+	@EntityScan
+	@Configuration
+	@EnableJpaRepositories(basePackages = "com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.springdata")
+	@ConditionalOnMissingBean(RateLimiter.class)
+	@ConditionalOnProperty(prefix = PREFIX, name = "repository", havingValue = "JPA")
+	public static class SpringDataConfiguration {
 
-        @Bean
-        public RateLimiter springDataRateLimiter(final RateLimiterErrorHandler rateLimiterErrorHandler,
-                                                 final RateLimiterRepository rateLimiterRepository) {
-            return new JpaRateLimiter(rateLimiterErrorHandler, rateLimiterRepository);
-        }
+		@Bean
+		public RateLimiter springDataRateLimiter(final RateLimiterErrorHandler rateLimiterErrorHandler,
+												 final RateLimiterRepository rateLimiterRepository) {
+			return new JpaRateLimiter(rateLimiterErrorHandler, rateLimiterRepository);
+		}
 
-    }
+	}
 
 }

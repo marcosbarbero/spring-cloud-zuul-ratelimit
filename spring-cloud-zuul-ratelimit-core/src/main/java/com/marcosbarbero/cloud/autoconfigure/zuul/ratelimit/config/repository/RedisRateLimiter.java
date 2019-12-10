@@ -30,48 +30,48 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 @SuppressWarnings("unchecked")
 public class RedisRateLimiter extends AbstractCacheRateLimiter {
 
-    private final RateLimiterErrorHandler rateLimiterErrorHandler;
-    private final RedisTemplate redisTemplate;
+	private final RateLimiterErrorHandler rateLimiterErrorHandler;
+	private final RedisTemplate redisTemplate;
 
-    public RedisRateLimiter(RateLimiterErrorHandler rateLimiterErrorHandler, RedisTemplate redisTemplate) {
-        this.rateLimiterErrorHandler = rateLimiterErrorHandler;
-        this.redisTemplate = redisTemplate;
-    }
+	public RedisRateLimiter(RateLimiterErrorHandler rateLimiterErrorHandler, RedisTemplate redisTemplate) {
+		this.rateLimiterErrorHandler = rateLimiterErrorHandler;
+		this.redisTemplate = redisTemplate;
+	}
 
-    @Override
-    protected void calcRemainingLimit(final Long limit, final Long refreshInterval,
-                                      final Long requestTime, final String key, final Rate rate) {
-        if (Objects.nonNull(limit)) {
-            long usage = requestTime == null ? 1L : 0L;
-            Long remaining = calcRemaining(limit, refreshInterval, usage, key, rate);
-            rate.setRemaining(remaining);
-        }
-    }
+	@Override
+	protected void calcRemainingLimit(final Long limit, final Long refreshInterval,
+									  final Long requestTime, final String key, final Rate rate) {
+		if (Objects.nonNull(limit)) {
+			long usage = requestTime == null ? 1L : 0L;
+			Long remaining = calcRemaining(limit, refreshInterval, usage, key, rate);
+			rate.setRemaining(remaining);
+		}
+	}
 
-    @Override
-    protected void calcRemainingQuota(final Long quota, final Long refreshInterval,
-                                      final Long requestTime, final String key, final Rate rate) {
-        if (Objects.nonNull(quota)) {
-            String quotaKey = key + QUOTA_SUFFIX;
-            long usage = requestTime != null ? requestTime : 0L;
-            Long remaining = calcRemaining(quota, refreshInterval, usage, quotaKey, rate);
-            rate.setRemainingQuota(remaining);
-        }
-    }
+	@Override
+	protected void calcRemainingQuota(final Long quota, final Long refreshInterval,
+									  final Long requestTime, final String key, final Rate rate) {
+		if (Objects.nonNull(quota)) {
+			String quotaKey = key + QUOTA_SUFFIX;
+			long usage = requestTime != null ? requestTime : 0L;
+			Long remaining = calcRemaining(quota, refreshInterval, usage, quotaKey, rate);
+			rate.setRemainingQuota(remaining);
+		}
+	}
 
-    private Long calcRemaining(Long limit, Long refreshInterval, long usage, String key, Rate rate) {
-        rate.setReset(SECONDS.toMillis(refreshInterval));
-        Long current = 0L;
-        try {
-            Boolean present = redisTemplate.opsForValue().setIfAbsent(key, usage, refreshInterval, SECONDS);
-            if (Boolean.FALSE.equals(present)) {
-                // Key already exists, increment
-                current = redisTemplate.opsForValue().increment(key, usage);
-            }
-        } catch (RuntimeException e) {
-            String msg = "Failed retrieving rate for " + key + ", will return the current value";
-            rateLimiterErrorHandler.handleError(msg, e);
-        }
-        return Math.max(-1, limit - (current != null ? current : 0L));
-    }
+	private Long calcRemaining(Long limit, Long refreshInterval, long usage, String key, Rate rate) {
+		rate.setReset(SECONDS.toMillis(refreshInterval));
+		Long current = 0L;
+		try {
+			Boolean present = redisTemplate.opsForValue().setIfAbsent(key, usage, refreshInterval, SECONDS);
+			if (Boolean.FALSE.equals(present)) {
+				// Key already exists, increment
+				current = redisTemplate.opsForValue().increment(key, usage);
+			}
+		} catch (RuntimeException e) {
+			String msg = "Failed retrieving rate for " + key + ", will return the current value";
+			rateLimiterErrorHandler.handleError(msg, e);
+		}
+		return Math.max(-1, limit - (current != null ? current : 0L));
+	}
 }

@@ -30,16 +30,16 @@ import org.apache.ignite.IgniteCache;
  */
 public class Bucket4jIgniteRateLimiter extends AbstractBucket4jRateLimiter<IgniteBucketBuilder, Ignite> {
 
-    private final IgniteCache<String, GridBucketState> cache;
+	private final IgniteCache<String, GridBucketState> cache;
 
-    public Bucket4jIgniteRateLimiter(final IgniteCache<String, GridBucketState> cache) {
-        super(io.github.bucket4j.grid.ignite.Ignite.class);
-        this.cache = cache;
-        super.init();
-    }
+	public Bucket4jIgniteRateLimiter(final IgniteCache<String, GridBucketState> cache) {
+		super(io.github.bucket4j.grid.ignite.Ignite.class);
+		this.cache = cache;
+		super.init();
+	}
 
-    @Override
-    protected ProxyManager<String> getProxyManager(io.github.bucket4j.grid.ignite.Ignite extension) {
-        return extension.proxyManagerForCache(cache);
-    }
+	@Override
+	protected ProxyManager<String> getProxyManager(io.github.bucket4j.grid.ignite.Ignite extension) {
+		return extension.proxyManagerForCache(cache);
+	}
 }

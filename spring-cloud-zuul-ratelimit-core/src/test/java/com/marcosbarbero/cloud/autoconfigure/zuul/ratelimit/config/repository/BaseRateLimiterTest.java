@@ -9,43 +9,43 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public abstract class BaseRateLimiterTest {
 
-    protected RateLimiter target;
+	protected RateLimiter target;
 
-    @Test
-    public void testConsumeOnlyLimit() {
-        Policy policy = new Policy();
-        policy.setLimit(10L);
-        policy.setRefreshInterval(2L);
+	@Test
+	public void testConsumeOnlyLimit() {
+		Policy policy = new Policy();
+		policy.setLimit(10L);
+		policy.setRefreshInterval(2L);
 
-        Rate rate = target.consume(policy, "key", null);
-        assertThat(rate.getRemaining()).isEqualTo(9L);
-        assertThat(rate.getRemainingQuota()).isNull();
-    }
+		Rate rate = target.consume(policy, "key", null);
+		assertThat(rate.getRemaining()).isEqualTo(9L);
+		assertThat(rate.getRemainingQuota()).isNull();
+	}
 
-    @Test
-    public void testConsumeOnlyQuota() {
-        Policy policy = new Policy();
-        policy.setQuota(1L);
-        policy.setRefreshInterval(2L);
+	@Test
+	public void testConsumeOnlyQuota() {
+		Policy policy = new Policy();
+		policy.setQuota(1L);
+		policy.setRefreshInterval(2L);
 
-        Rate rate = target.consume(policy, "key", 800L);
-        assertThat(rate.getRemainingQuota()).isEqualTo(200L);
-        assertThat(rate.getRemaining()).isNull();
-    }
+		Rate rate = target.consume(policy, "key", 800L);
+		assertThat(rate.getRemainingQuota()).isEqualTo(200L);
+		assertThat(rate.getRemaining()).isNull();
+	}
 
-    @Test
-    public void testConsume() {
-        Policy policy = new Policy();
-        policy.setLimit(10L);
-        policy.setQuota(1L);
-        policy.setRefreshInterval(2L);
+	@Test
+	public void testConsume() {
+		Policy policy = new Policy();
+		policy.setLimit(10L);
+		policy.setQuota(1L);
+		policy.setRefreshInterval(2L);
 
-        Rate rate = target.consume(policy, "key", null);
-        assertThat(rate.getRemaining()).isEqualTo(9L);
-        assertThat(rate.getRemainingQuota()).isEqualTo(1000L);
+		Rate rate = target.consume(policy, "key", null);
+		assertThat(rate.getRemaining()).isEqualTo(9L);
+		assertThat(rate.getRemainingQuota()).isEqualTo(1000L);
 
-        rate = target.consume(policy, "key", 800L);
-        assertThat(rate.getRemaining()).isEqualTo(9L);
-        assertThat(rate.getRemainingQuota()).isEqualTo(200L);
-    }
+		rate = target.consume(policy, "key", 800L);
+		assertThat(rate.getRemaining()).isEqualTo(9L);
+		assertThat(rate.getRemainingQuota()).isEqualTo(200L);
+	}
 }

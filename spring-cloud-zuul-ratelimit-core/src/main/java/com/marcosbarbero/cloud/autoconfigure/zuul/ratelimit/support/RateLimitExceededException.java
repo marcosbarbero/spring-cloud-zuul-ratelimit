@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
  */
 public class RateLimitExceededException extends ZuulRuntimeException {
 
-    public RateLimitExceededException() {
-        super(new ZuulException(HttpStatus.TOO_MANY_REQUESTS.toString(), HttpStatus.TOO_MANY_REQUESTS.value(), null));
-    }
+	public RateLimitExceededException() {
+		super(new ZuulException(HttpStatus.TOO_MANY_REQUESTS.toString(), HttpStatus.TOO_MANY_REQUESTS.value(), null));
+	}
 }

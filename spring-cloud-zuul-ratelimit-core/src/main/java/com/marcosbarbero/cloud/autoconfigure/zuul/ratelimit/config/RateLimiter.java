@@ -24,14 +24,14 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
  */
 public interface RateLimiter {
 
-    String QUOTA_SUFFIX = "-quota";
+	String QUOTA_SUFFIX = "-quota";
 
-    /**
-     * @param policy      Template for which rates should be created in case there's no rate limit associated with the
-     *                    key
-     * @param key         Unique key that identifies a request
-     * @param requestTime The total time it took to handle the request
-     * @return a view of a user's rate request limit
-     */
-    Rate consume(Policy policy, String key, Long requestTime);
+	/**
+	 * @param policy      Template for which rates should be created in case there's no rate limit associated with the
+	 *                    key
+	 * @param key         Unique key that identifies a request
+	 * @param requestTime The total time it took to handle the request
+	 * @return a view of a user's rate request limit
+	 */
+	Rate consume(Policy policy, String key, Long requestTime);
 }

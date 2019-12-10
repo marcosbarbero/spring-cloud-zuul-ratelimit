@@ -16,12 +16,12 @@ import static org.junit.Assert.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class SecurityContextApplicationTestIT {
 
-    @Autowired
-    private ApplicationContext context;
+	@Autowired
+	private ApplicationContext context;
 
-    @Test
-    public void securedRateLimitUtils() {
-        RateLimitUtils rateLimitUtils = context.getBean(RateLimitUtils.class);
-        assertThat(rateLimitUtils, instanceOf(SecuredRateLimitUtils.class));
-    }
+	@Test
+	public void securedRateLimitUtils() {
+		RateLimitUtils rateLimitUtils = context.getBean(RateLimitUtils.class);
+		assertThat(rateLimitUtils, instanceOf(SecuredRateLimitUtils.class));
+	}
 }

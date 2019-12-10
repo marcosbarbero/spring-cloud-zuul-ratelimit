@@ -16,39 +16,39 @@ import org.springframework.web.bind.annotation.RestController;
 @SpringCloudApplication
 public class RedisApplication {
 
-    public static void main(String... args) {
-        SpringApplication.run(RedisApplication.class, args);
-    }
+	public static void main(String... args) {
+		SpringApplication.run(RedisApplication.class, args);
+	}
 
-    @RestController
-    public class ServiceController {
+	@RestController
+	public class ServiceController {
 
-        public static final String RESPONSE_BODY = "ResponseBody";
+		public static final String RESPONSE_BODY = "ResponseBody";
 
-        @GetMapping("/serviceA")
-        public ResponseEntity<String> serviceA() {
-            return ResponseEntity.ok(RESPONSE_BODY);
-        }
+		@GetMapping("/serviceA")
+		public ResponseEntity<String> serviceA() {
+			return ResponseEntity.ok(RESPONSE_BODY);
+		}
 
-        @GetMapping("/serviceB")
-        public ResponseEntity<String> serviceB() {
-            return ResponseEntity.ok(RESPONSE_BODY);
-        }
+		@GetMapping("/serviceB")
+		public ResponseEntity<String> serviceB() {
+			return ResponseEntity.ok(RESPONSE_BODY);
+		}
 
-        @GetMapping("/serviceC")
-        public ResponseEntity<String> serviceC() {
-            return ResponseEntity.ok(RESPONSE_BODY);
-        }
+		@GetMapping("/serviceC")
+		public ResponseEntity<String> serviceC() {
+			return ResponseEntity.ok(RESPONSE_BODY);
+		}
 
-        @GetMapping("/serviceD/{paramName}")
-        public ResponseEntity<String> serviceD(@PathVariable String paramName) {
-            return ResponseEntity.ok(RESPONSE_BODY + " " + paramName);
-        }
+		@GetMapping("/serviceD/{paramName}")
+		public ResponseEntity<String> serviceD(@PathVariable String paramName) {
+			return ResponseEntity.ok(RESPONSE_BODY + " " + paramName);
+		}
 
-        @GetMapping("/serviceE")
-        public ResponseEntity<String> serviceE() throws InterruptedException {
-            Thread.sleep(1100);
-            return ResponseEntity.ok(RESPONSE_BODY);
-        }
-    }
+		@GetMapping("/serviceE")
+		public ResponseEntity<String> serviceE() throws InterruptedException {
+			Thread.sleep(1100);
+			return ResponseEntity.ok(RESPONSE_BODY);
+		}
+	}
 }

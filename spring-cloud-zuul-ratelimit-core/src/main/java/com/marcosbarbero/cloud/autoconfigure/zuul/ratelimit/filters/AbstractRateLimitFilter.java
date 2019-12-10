@@ -41,72 +41,72 @@ import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateL
  */
 abstract class AbstractRateLimitFilter extends ZuulFilter {
 
-    protected final RateLimitProperties properties;
-    protected final RateLimitUtils rateLimitUtils;
+	protected final RateLimitProperties properties;
+	protected final RateLimitUtils rateLimitUtils;
 
-    private final RouteLocator routeLocator;
-    private final UrlPathHelper urlPathHelper;
+	private final RouteLocator routeLocator;
+	private final UrlPathHelper urlPathHelper;
 
-    AbstractRateLimitFilter(final RateLimitProperties properties, final RouteLocator routeLocator,
-                            final UrlPathHelper urlPathHelper, final RateLimitUtils rateLimitUtils) {
-        this.properties = properties;
-        this.routeLocator = routeLocator;
-        this.urlPathHelper = urlPathHelper;
-        this.rateLimitUtils = rateLimitUtils;
-    }
+	AbstractRateLimitFilter(final RateLimitProperties properties, final RouteLocator routeLocator,
+							final UrlPathHelper urlPathHelper, final RateLimitUtils rateLimitUtils) {
+		this.properties = properties;
+		this.routeLocator = routeLocator;
+		this.urlPathHelper = urlPathHelper;
+		this.rateLimitUtils = rateLimitUtils;
+	}
 
-    @Override
-    public boolean shouldFilter() {
-        HttpServletRequest request = RequestContext.getCurrentContext().getRequest();
-        return properties.isEnabled() && !policy(route(request), request).isEmpty();
-    }
+	@Override
+	public boolean shouldFilter() {
+		HttpServletRequest request = RequestContext.getCurrentContext().getRequest();
+		return properties.isEnabled() && !policy(route(request), request).isEmpty();
+	}
 
-    Route route(HttpServletRequest request) {
-        Route route = (Route) RequestContext.getCurrentContext().get(CURRENT_REQUEST_ROUTE);
-        if (route != null) {
-            return route;
-        }
+	Route route(HttpServletRequest request) {
+		Route route = (Route) RequestContext.getCurrentContext().get(CURRENT_REQUEST_ROUTE);
+		if (route != null) {
+			return route;
+		}
 
-        String requestURI = urlPathHelper.getPathWithinApplication(request);
-        route = routeLocator.getMatchingRoute(requestURI);
+		String requestURI = urlPathHelper.getPathWithinApplication(request);
+		route = routeLocator.getMatchingRoute(requestURI);
 
-        addObjectToCurrentRequestContext(CURRENT_REQUEST_ROUTE, route);
+		addObjectToCurrentRequestContext(CURRENT_REQUEST_ROUTE, route);
 
-        return route;
-    }
+		return route;
+	}
 
-    @SuppressWarnings("unchecked")
-    protected List<Policy> policy(Route route, HttpServletRequest request) {
-        List<Policy> policies = (List<Policy>) RequestContext.getCurrentContext().get(CURRENT_REQUEST_POLICY);
-        if (policies != null) {
-            return policies;
-        }
+	@SuppressWarnings("unchecked")
+	protected List<Policy> policy(Route route, HttpServletRequest request) {
+		List<Policy> policies = (List<Policy>) RequestContext.getCurrentContext().get(CURRENT_REQUEST_POLICY);
+		if (policies != null) {
+			return policies;
+		}
 
-        String routeId = route != null ? route.getId() : null;
+		String routeId = route != null ? route.getId() : null;
 
-        RequestContext.getCurrentContext().put(ALREADY_LIMITED, false);
+		RequestContext.getCurrentContext().put(ALREADY_LIMITED, false);
 
-        policies = properties.getPolicies(routeId).stream()
-                .filter(policy -> applyPolicy(request, route, policy))
-                .collect(Collectors.toList());
+		policies = properties.getPolicies(routeId).stream()
+				.filter(policy -> applyPolicy(request, route, policy))
+				.collect(Collectors.toList());
 
-        addObjectToCurrentRequestContext(CURRENT_REQUEST_POLICY, policies);
+		addObjectToCurrentRequestContext(CURRENT_REQUEST_POLICY, policies);
 
-        return policies;
-    }
+		return policies;
+	}
 
-    private void addObjectToCurrentRequestContext(String key, Object object) {
-        if (object != null) {
-            RequestContext.getCurrentContext().put(key, object);
-        }
-    }
+	private void addObjectToCurrentRequestContext(String key, Object object) {
+		if (object != null) {
+			RequestContext.getCurrentContext().put(key, object);
+		}
+	}
 
-    private boolean applyPolicy(HttpServletRequest request, Route route, Policy policy) {
-        List<MatchType> types = policy.getType();
-        boolean isAlreadyLimited = (boolean) RequestContext.getCurrentContext().get(ALREADY_LIMITED);
-        if (policy.isBreakOnMatch() && !isAlreadyLimited && types.stream().allMatch(type -> type.apply(request, route, rateLimitUtils))) {
-            RequestContext.getCurrentContext().put(ALREADY_LIMITED, true);
-        }
-        return (types.isEmpty() || types.stream().allMatch(type -> type.apply(request, route, rateLimitUtils))) && !isAlreadyLimited;
-    }
+	private boolean applyPolicy(HttpServletRequest request, Route route, Policy policy) {
+		List<MatchType> types = policy.getType();
+		boolean isAlreadyLimited = (boolean) RequestContext.getCurrentContext().get(ALREADY_LIMITED);
+		if (policy.isBreakOnMatch() && !isAlreadyLimited && types.stream().allMatch(type -> type.apply(request, route, rateLimitUtils))) {
+			RequestContext.getCurrentContext().put(ALREADY_LIMITED, true);
+		}
+		return (types.isEmpty() || types.stream().allMatch(type -> type.apply(request, route, rateLimitUtils))) && !isAlreadyLimited;
+	}
 }

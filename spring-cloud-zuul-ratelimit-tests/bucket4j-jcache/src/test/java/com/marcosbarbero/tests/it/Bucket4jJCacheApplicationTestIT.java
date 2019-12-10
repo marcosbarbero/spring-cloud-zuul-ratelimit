@@ -42,146 +42,146 @@ import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class Bucket4jJCacheApplicationTestIT {
 
-    @Autowired
-    private TestRestTemplate restTemplate;
-    @Autowired
-    private RateLimiter rateLimiter;
-    @Autowired
-    private RateLimitProperties rateLimitProperties;
+	@Autowired
+	private TestRestTemplate restTemplate;
+	@Autowired
+	private RateLimiter rateLimiter;
+	@Autowired
+	private RateLimitProperties rateLimitProperties;
 
-    private static int randomInt() {
-        return ThreadLocalRandom.current().nextInt(0, 5000);
-    }
+	private static int randomInt() {
+		return ThreadLocalRandom.current().nextInt(0, 5000);
+	}
 
-    @Test
-    public void testBucket4jJCacheRateLimiter() {
-        assertTrue("bucket4jJCacheRateLimiter", rateLimiter instanceof Bucket4jJCacheRateLimiter);
-    }
+	@Test
+	public void testBucket4jJCacheRateLimiter() {
+		assertTrue("bucket4jJCacheRateLimiter", rateLimiter instanceof Bucket4jJCacheRateLimiter);
+	}
 
-    @Test
-    public void testKeyPrefixDefaultValue() {
-        assertEquals("rate-limit-application", rateLimitProperties.getKeyPrefix());
-    }
+	@Test
+	public void testKeyPrefixDefaultValue() {
+		assertEquals("rate-limit-application", rateLimitProperties.getKeyPrefix());
+	}
 
-    @Test
-    public void testNotExceedingCapacityRequest() {
-        ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceA", String.class);
-        HttpHeaders headers = response.getHeaders();
-        assertHeaders(headers, "rate-limit-application_serviceA_127.0.0.1", false, false);
-        assertEquals(OK, response.getStatusCode());
-    }
+	@Test
+	public void testNotExceedingCapacityRequest() {
+		ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceA", String.class);
+		HttpHeaders headers = response.getHeaders();
+		assertHeaders(headers, "rate-limit-application_serviceA_127.0.0.1", false, false);
+		assertEquals(OK, response.getStatusCode());
+	}
 
-    @Test
-    public void testExceedingCapacity() {
-        ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceB", String.class);
-        HttpHeaders headers = response.getHeaders();
-        String key = "rate-limit-application_serviceB_127.0.0.1";
-        assertHeaders(headers, key, false, false);
-        assertEquals(OK, response.getStatusCode());
+	@Test
+	public void testExceedingCapacity() {
+		ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceB", String.class);
+		HttpHeaders headers = response.getHeaders();
+		String key = "rate-limit-application_serviceB_127.0.0.1";
+		assertHeaders(headers, key, false, false);
+		assertEquals(OK, response.getStatusCode());
 
-        for (int i = 0; i < 2; i++) {
-            response = this.restTemplate.getForEntity("/serviceB", String.class);
-        }
+		for (int i = 0; i < 2; i++) {
+			response = this.restTemplate.getForEntity("/serviceB", String.class);
+		}
 
-        assertEquals(TOO_MANY_REQUESTS, response.getStatusCode());
-        assertNotEquals(Bucket4jJCacheApplication.ServiceController.RESPONSE_BODY, response.getBody());
+		assertEquals(TOO_MANY_REQUESTS, response.getStatusCode());
+		assertNotEquals(Bucket4jJCacheApplication.ServiceController.RESPONSE_BODY, response.getBody());
 
-        await().pollDelay(2, TimeUnit.SECONDS).untilAsserted(() -> {
-            final ResponseEntity<String> responseAfterReset = this.restTemplate
-                    .getForEntity("/serviceB", String.class);
-            final HttpHeaders headersAfterReset = responseAfterReset.getHeaders();
-            assertHeaders(headersAfterReset, key, false, false);
-            assertEquals(OK, responseAfterReset.getStatusCode());
-        });
-    }
+		await().pollDelay(2, TimeUnit.SECONDS).untilAsserted(() -> {
+			final ResponseEntity<String> responseAfterReset = this.restTemplate
+					.getForEntity("/serviceB", String.class);
+			final HttpHeaders headersAfterReset = responseAfterReset.getHeaders();
+			assertHeaders(headersAfterReset, key, false, false);
+			assertEquals(OK, responseAfterReset.getStatusCode());
+		});
+	}
 
-    @Test
-    public void testNoRateLimit() {
-        ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceC", String.class);
-        HttpHeaders headers = response.getHeaders();
-        assertHeaders(headers, "rate-limit-application_serviceC", true, false);
-        assertEquals(OK, response.getStatusCode());
-    }
+	@Test
+	public void testNoRateLimit() {
+		ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceC", String.class);
+		HttpHeaders headers = response.getHeaders();
+		assertHeaders(headers, "rate-limit-application_serviceC", true, false);
+		assertEquals(OK, response.getStatusCode());
+	}
 
-    @Test
-    public void testMultipleUrls() {
-        String randomPath = UUID.randomUUID().toString();
+	@Test
+	public void testMultipleUrls() {
+		String randomPath = UUID.randomUUID().toString();
 
-        for (int i = 0; i < 12; i++) {
+		for (int i = 0; i < 12; i++) {
 
-            if (i % 2 == 0) {
-                randomPath = UUID.randomUUID().toString();
-            }
+			if (i % 2 == 0) {
+				randomPath = UUID.randomUUID().toString();
+			}
 
-            ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceD/" + randomPath, String.class);
-            HttpHeaders headers = response.getHeaders();
-            assertHeaders(headers, "rate-limit-application_serviceD_serviceD_" + randomPath, false, false);
-            assertEquals(OK, response.getStatusCode());
-        }
-    }
+			ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceD/" + randomPath, String.class);
+			HttpHeaders headers = response.getHeaders();
+			assertHeaders(headers, "rate-limit-application_serviceD_serviceD_" + randomPath, false, false);
+			assertEquals(OK, response.getStatusCode());
+		}
+	}
 
-    @Test
-    public void testMultipleUrlPattern() {
-        int randomInt = randomInt();
+	@Test
+	public void testMultipleUrlPattern() {
+		int randomInt = randomInt();
 
-        for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 5; i++) {
 
-            if (i % 2 == 0) {
-                randomInt = randomInt();
-            }
+			if (i % 2 == 0) {
+				randomInt = randomInt();
+			}
 
-            ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceF/" + randomInt + "/specific", String.class);
-            HttpHeaders headers = response.getHeaders();
+			ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceF/" + randomInt + "/specific", String.class);
+			HttpHeaders headers = response.getHeaders();
 
-            assertHeaders(headers, "rate-limit-application_serviceF_serviceF__specific_serviceF__specific", false, false);
+			assertHeaders(headers, "rate-limit-application_serviceF_serviceF__specific_serviceF__specific", false, false);
 
-            HttpStatus httpStatus = OK;
-            if (i > 1) {
-                httpStatus = TOO_MANY_REQUESTS;
-            }
-            assertEquals(httpStatus, response.getStatusCode());
-        }
-    }
+			HttpStatus httpStatus = OK;
+			if (i > 1) {
+				httpStatus = TOO_MANY_REQUESTS;
+			}
+			assertEquals(httpStatus, response.getStatusCode());
+		}
+	}
 
-    @Test
-    public void testExceedingQuotaCapacityRequest() {
-        ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceE", String.class);
-        HttpHeaders headers = response.getHeaders();
-        String key = "rate-limit-application_serviceE_127.0.0.1";
-        assertHeaders(headers, key, false, true);
-        assertEquals(OK, response.getStatusCode());
+	@Test
+	public void testExceedingQuotaCapacityRequest() {
+		ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceE", String.class);
+		HttpHeaders headers = response.getHeaders();
+		String key = "rate-limit-application_serviceE_127.0.0.1";
+		assertHeaders(headers, key, false, true);
+		assertEquals(OK, response.getStatusCode());
 
-        response = this.restTemplate.getForEntity("/serviceE", String.class);
-        headers = response.getHeaders();
-        assertHeaders(headers, key, false, true);
-        assertEquals(TOO_MANY_REQUESTS, response.getStatusCode());
-    }
+		response = this.restTemplate.getForEntity("/serviceE", String.class);
+		headers = response.getHeaders();
+		assertHeaders(headers, key, false, true);
+		assertEquals(TOO_MANY_REQUESTS, response.getStatusCode());
+	}
 
-    private void assertHeaders(HttpHeaders headers, String key, boolean nullable, boolean quotaHeaders) {
-        String quota = headers.getFirst(HEADER_QUOTA + key);
-        String remainingQuota = headers.getFirst(HEADER_REMAINING_QUOTA + key);
-        String limit = headers.getFirst(HEADER_LIMIT + key);
-        String remaining = headers.getFirst(HEADER_REMAINING + key);
-        String reset = headers.getFirst(HEADER_RESET + key);
+	private void assertHeaders(HttpHeaders headers, String key, boolean nullable, boolean quotaHeaders) {
+		String quota = headers.getFirst(HEADER_QUOTA + key);
+		String remainingQuota = headers.getFirst(HEADER_REMAINING_QUOTA + key);
+		String limit = headers.getFirst(HEADER_LIMIT + key);
+		String remaining = headers.getFirst(HEADER_REMAINING + key);
+		String reset = headers.getFirst(HEADER_RESET + key);
 
-        if (nullable) {
-            if (quotaHeaders) {
-                assertNull(quota);
-                assertNull(remainingQuota);
-            } else {
-                assertNull(limit);
-                assertNull(remaining);
-            }
-            assertNull(reset);
-        } else {
-            if (quotaHeaders) {
-                assertNotNull(quota);
-                assertNotNull(remainingQuota);
-            } else {
-                assertNotNull(limit);
-                assertNotNull(remaining);
-            }
-            assertNotNull(reset);
-        }
-    }
+		if (nullable) {
+			if (quotaHeaders) {
+				assertNull(quota);
+				assertNull(remainingQuota);
+			} else {
+				assertNull(limit);
+				assertNull(remaining);
+			}
+			assertNull(reset);
+		} else {
+			if (quotaHeaders) {
+				assertNotNull(quota);
+				assertNotNull(remainingQuota);
+			} else {
+				assertNotNull(limit);
+				assertNotNull(remaining);
+			}
+			assertNotNull(reset);
+		}
+	}
 }

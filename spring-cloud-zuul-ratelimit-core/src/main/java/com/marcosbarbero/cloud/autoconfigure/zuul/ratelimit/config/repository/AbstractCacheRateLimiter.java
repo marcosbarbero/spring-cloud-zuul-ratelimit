@@ -30,19 +30,19 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  */
 public abstract class AbstractCacheRateLimiter implements RateLimiter {
 
-    @Override
-    public synchronized Rate consume(Policy policy, String key, Long requestTime) {
-        final Long refreshInterval = policy.getRefreshInterval();
-        final Long quota = policy.getQuota() != null ? SECONDS.toMillis(policy.getQuota()) : null;
-        final Rate rate = new Rate(key, policy.getLimit(), quota, null, null);
+	@Override
+	public synchronized Rate consume(Policy policy, String key, Long requestTime) {
+		final Long refreshInterval = policy.getRefreshInterval();
+		final Long quota = policy.getQuota() != null ? SECONDS.toMillis(policy.getQuota()) : null;
+		final Rate rate = new Rate(key, policy.getLimit(), quota, null, null);
 
-        calcRemainingLimit(policy.getLimit(), refreshInterval, requestTime, key, rate);
-        calcRemainingQuota(quota, refreshInterval, requestTime, key, rate);
+		calcRemainingLimit(policy.getLimit(), refreshInterval, requestTime, key, rate);
+		calcRemainingQuota(quota, refreshInterval, requestTime, key, rate);
 
-        return rate;
-    }
+		return rate;
+	}
 
-    protected abstract void calcRemainingLimit(Long limit, Long refreshInterval, Long requestTime, String key, Rate rate);
+	protected abstract void calcRemainingLimit(Long limit, Long refreshInterval, Long requestTime, String key, Rate rate);
 
-    protected abstract void calcRemainingQuota(Long quota, Long refreshInterval, Long requestTime, String key, Rate rate);
+	protected abstract void calcRemainingQuota(Long quota, Long refreshInterval, Long requestTime, String key, Rate rate);
 }

@@ -24,56 +24,56 @@ import static org.mockito.Mockito.when;
  */
 public class RedisRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
 
-    private RedisTemplate redisTemplate;
+	private RedisTemplate redisTemplate;
 
-    @Before
-    @Override
-    public void setUp() {
-        redisTemplate = mock(RedisTemplate.class);
-        RateLimiterErrorHandler rateLimiterErrorHandler = mock(RateLimiterErrorHandler.class);
-        this.setRateLimiter(new RedisRateLimiter(rateLimiterErrorHandler, this.redisTemplate));
-        super.setUp();
-    }
+	@Before
+	@Override
+	public void setUp() {
+		redisTemplate = mock(RedisTemplate.class);
+		RateLimiterErrorHandler rateLimiterErrorHandler = mock(RateLimiterErrorHandler.class);
+		this.setRateLimiter(new RedisRateLimiter(rateLimiterErrorHandler, this.redisTemplate));
+		super.setUp();
+	}
 
-    @Test
-    @Override
-    @SuppressWarnings("unchecked")
-    public void testRateLimitExceedCapacity() throws Exception {
-        ValueOperations ops = mock(ValueOperations.class);
-        doReturn(ops).when(redisTemplate).opsForValue();
+	@Test
+	@Override
+	@SuppressWarnings("unchecked")
+	public void testRateLimitExceedCapacity() throws Exception {
+		ValueOperations ops = mock(ValueOperations.class);
+		doReturn(ops).when(redisTemplate).opsForValue();
 
-        when(ops.increment(anyString(), anyLong())).thenReturn(3L);
-        super.testRateLimitExceedCapacity();
-    }
+		when(ops.increment(anyString(), anyLong())).thenReturn(3L);
+		super.testRateLimitExceedCapacity();
+	}
 
-    @Test
-    @Override
-    @SuppressWarnings("unchecked")
-    public void testRateLimit() throws Exception {
-        ValueOperations ops = mock(ValueOperations.class);
-        when(ops.increment(anyString(), anyLong())).thenReturn(1L);
-        doReturn(ops).when(redisTemplate).opsForValue();
-        when(ops.increment(anyString(), anyLong())).thenReturn(2L);
+	@Test
+	@Override
+	@SuppressWarnings("unchecked")
+	public void testRateLimit() throws Exception {
+		ValueOperations ops = mock(ValueOperations.class);
+		when(ops.increment(anyString(), anyLong())).thenReturn(1L);
+		doReturn(ops).when(redisTemplate).opsForValue();
+		when(ops.increment(anyString(), anyLong())).thenReturn(2L);
 
 
-        this.request.setRequestURI("/serviceA");
-        this.request.setRemoteAddr("10.0.0.100");
+		this.request.setRequestURI("/serviceA");
+		this.request.setRemoteAddr("10.0.0.100");
 
-        assertTrue(this.filter.shouldFilter());
+		assertTrue(this.filter.shouldFilter());
 
-        for (int i = 0; i < 2; i++) {
-            this.filter.run();
-        }
+		for (int i = 0; i < 2; i++) {
+			this.filter.run();
+		}
 
-        String key = "null_serviceA_10.0.0.100_anonymous";
-        String remaining = this.response.getHeader(HEADER_REMAINING + key);
-        assertEquals("0", remaining);
+		String key = "null_serviceA_10.0.0.100_anonymous";
+		String remaining = this.response.getHeader(HEADER_REMAINING + key);
+		assertEquals("0", remaining);
 
-        TimeUnit.SECONDS.sleep(2);
+		TimeUnit.SECONDS.sleep(2);
 
-        when(ops.increment(anyString(), anyLong())).thenReturn(1L);
-        this.filter.run();
-        remaining = this.response.getHeader(HEADER_REMAINING + key);
-        assertEquals("1", remaining);
-    }
+		when(ops.increment(anyString(), anyLong())).thenReturn(1L);
+		this.filter.run();
+		remaining = this.response.getHeader(HEADER_REMAINING + key);
+		assertEquals("1", remaining);
+	}
 }
