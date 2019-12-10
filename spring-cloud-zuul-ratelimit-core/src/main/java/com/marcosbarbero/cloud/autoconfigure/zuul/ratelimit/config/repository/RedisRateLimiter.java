@@ -64,14 +64,14 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
         rate.setReset(SECONDS.toMillis(refreshInterval));
         Long current = 0L;
         try {
-            Boolean present = this.redisTemplate.opsForValue().setIfAbsent(key, usage, refreshInterval, SECONDS);
+            Boolean present = redisTemplate.opsForValue().setIfAbsent(key, usage, refreshInterval, SECONDS);
             if (Boolean.FALSE.equals(present)) {
                 // Key already exists, increment
-              current = this.redisTemplate.opsForValue().increment(key, usage);
+              current = redisTemplate.opsForValue().increment(key, usage);
             }
         } catch (RuntimeException e) {
             String msg = "Failed retrieving rate for " + key + ", will return the current value";
-            this.rateLimiterErrorHandler.handleError(msg, e);
+            rateLimiterErrorHandler.handleError(msg, e);
         }
         return Math.max(-1, limit - (current != null ? current : 0L));
     }
