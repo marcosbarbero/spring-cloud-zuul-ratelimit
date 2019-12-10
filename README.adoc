@@ -4,30 +4,30 @@
 :imagesdir: ./assets/images
 
 == Overview
+
 Module to enable rate limit per service in Netflix Zuul.
 
 There are five built-in rate limit approaches:
 
- * Authenticated User
- ** Uses the authenticated username or 'anonymous'
- * Request Origin
- ** Uses the user origin request
- * URL
- ** Uses the request path of the downstream service
- * URL Pattern
- ** Uses the request Ant path pattern to the downstream service
- * ROLE
- ** Uses the authenticated user roles
- * Request method
- ** Uses the HTTP request method
- * Global configuration per service:
- ** This one does not validate the request Origin, Authenticated User or URI
- ** To use this approach just don't set param 'type'
+* Authenticated User
+** Uses the authenticated username or 'anonymous'
+* Request Origin
+** Uses the user origin request
+* URL
+** Uses the request path of the downstream service
+* URL Pattern
+** Uses the request Ant path pattern to the downstream service
+* ROLE
+** Uses the authenticated user roles
+* Request method
+** Uses the HTTP request method
+* Global configuration per service:
+** This one does not validate the request Origin, Authenticated User or URI
+** To use this approach just don't set param 'type'
 
 [NOTE]
 ====
-It is possible to combine Authenticated User, Request Origin, URL, ROLE and Request Method just adding
-multiple values to the list
+It is possible to combine Authenticated User, Request Origin, URL, ROLE and Request Method just adding multiple values to the list
 ====
 
 == Usage
@@ -41,13 +41,12 @@ Latest version: image:https://maven-badges.herokuapp.com/maven-central/com.marco
 ====
 If you are using Spring Boot version `1.5.x` you *MUST* use Spring Cloud Zuul RateLimit version `1.7.x`.
 Please take a look at the
-link:https://mvnrepository.com/artifact/com.marcosbarbero.cloud/spring-cloud-zuul-ratelimit[Maven Central] and pick the
-latest artifact in this version line.
+link:https://mvnrepository.com/artifact/com.marcosbarbero.cloud/spring-cloud-zuul-ratelimit[Maven Central] and pick the latest artifact in this version line.
 ====
 
 Add the dependency on pom.xml
 
-[source, xml]
+[source,xml]
 ----
 <dependency>
     <groupId>com.marcosbarbero.cloud</groupId>
@@ -61,7 +60,7 @@ Add the following dependency accordingly to the chosen data storage:
 
 * Redis
 
-[source, xml]
+[source,xml]
 ----
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -71,7 +70,7 @@ Add the following dependency accordingly to the chosen data storage:
 
 * Consul
 
-[source, xml]
+[source,xml]
 ----
 <dependency>
    <groupId>org.springframework.cloud</groupId>
@@ -81,7 +80,7 @@ Add the following dependency accordingly to the chosen data storage:
 
 * Spring Data JPA
 
-[source, xml]
+[source,xml]
 ----
 <dependency>
    <groupId>org.springframework.boot</groupId>
@@ -91,7 +90,7 @@ Add the following dependency accordingly to the chosen data storage:
 
 This implementation also requires a database table, bellow here you can find a sample script:
 
-[source, sql]
+[source,sql]
 ----
 CREATE TABLE rate (
   rate_key VARCHAR(255) NOT NULL,
@@ -105,7 +104,7 @@ CREATE TABLE rate (
 
 * Bucket4j JCache
 
-[source, xml]
+[source,xml]
 ----
 <dependency>
      <groupId>com.github.vladimir-bukhtoyarov</groupId>
@@ -123,7 +122,7 @@ CREATE TABLE rate (
 
 * Bucket4j Hazelcast (depends on Bucket4j JCache)
 
-[source, xml]
+[source,xml]
 ----
 <dependency>
      <groupId>com.github.vladimir-bukhtoyarov</groupId>
@@ -137,7 +136,7 @@ CREATE TABLE rate (
 
 * Bucket4j Infinispan (depends on Bucket4j JCache)
 
-[source, xml]
+[source,xml]
 ----
 <dependency>
      <groupId>com.github.vladimir-bukhtoyarov</groupId>
@@ -151,7 +150,7 @@ CREATE TABLE rate (
 
 * Bucket4j Ignite (depends on Bucket4j JCache)
 
-[source, xml]
+[source,xml]
 ----
 <dependency>
      <groupId>com.github.vladimir-bukhtoyarov</groupId>
@@ -164,7 +163,8 @@ CREATE TABLE rate (
 ----
 
 Sample YAML configuration
-[source, yaml]
+
+[source,yaml]
 ----
 zuul:
   ratelimit:
@@ -202,7 +202,8 @@ zuul:
 ----
 
 Sample Properties configuration
-[source, properties]
+
+[source,properties]
 ----
 zuul.ratelimit.enabled=true
 zuul.ratelimit.key-prefix=your-prefix
@@ -240,7 +241,7 @@ zuul.ratelimit.policy-list.myServiceId[1].type[4]=http_method=get
 
 There are eight implementations provided:
 
-[cols=2*, options="header"]
+[cols=2*,options="header"]
 |===
 |Implementation        | Data Storage
 
@@ -264,10 +265,10 @@ There are eight implementations provided:
 
 Bucket4j implementations require the relevant bean with `@Qualifier("RateLimit")`:
 
- * `JCache` - javax.cache.Cache
- * `Hazelcast` - com.hazelcast.core.IMap
- * `Ignite` - org.apache.ignite.IgniteCache
- * `Infinispan` - org.infinispan.functional.ReadWriteMap
+* `JCache` - javax.cache.Cache
+* `Hazelcast` - com.hazelcast.core.IMap
+* `Ignite` - org.apache.ignite.IgniteCache
+* `Infinispan` - org.infinispan.functional.ReadWriteMap
 
 == Common application properties
 
@@ -307,11 +308,10 @@ This section details how to add custom implementations
 
 === Key Generator
 
-If the application needs to control the key strategy beyond the options offered by the type property then it can
-be done just by creating a custom link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/RateLimitKeyGenerator.java[`RateLimitKeyGenerator`]
+If the application needs to control the key strategy beyond the options offered by the type property then it can be done just by creating a custom link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/RateLimitKeyGenerator.java[`RateLimitKeyGenerator`]
 implementation adding further qualifiers or something entirely different:
 
-[source, java]
+[source,java]
 ----
   @Bean
   public RateLimitKeyGenerator ratelimitKeyGenerator(RateLimitProperties properties, RateLimitUtils rateLimitUtils) {
@@ -325,16 +325,16 @@ implementation adding further qualifiers or something entirely different:
 ----
 
 === Error Handling
+
 This framework uses 3rd party applications to control the rate limit access and these libraries are out of control of this framework.
 If one of the 3rd party applications fails, the framework will handle this failure in the
-link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/repository/DefaultRateLimiterErrorHandler.java[`DefaultRateLimiterErrorHandler`] class
-which will log the error upon failure.
+link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/repository/DefaultRateLimiterErrorHandler.java[`DefaultRateLimiterErrorHandler`] class which will log the error upon failure.
 
 If there is a need to handle the errors differently, it can be achieved by defining a custom
 link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/repository/RateLimiterErrorHandler.java[`RateLimiterErrorHandler`]
-beanfootnote:[By declaring a new `RateLimitErrorHandler`, you replace the `DefaultRateLimitErrorHandler`.], e.g:
+beanfootnote:[By declaring a new `RateLimitErrorHandler`,you replace the `DefaultRateLimitErrorHandler`.], e.g:
 
-[source, java]
+[source,java]
 ----
   @Bean
   public RateLimiterErrorHandler rateLimitErrorHandler() {
@@ -358,10 +358,10 @@ beanfootnote:[By declaring a new `RateLimitErrorHandler`, you replace the `Defau
 ----
 
 === Event Handling
-If the application needs to be notified when a rate limit access was exceeded then it can be done by listening
-to link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/support/RateLimitExceededEvent.java[`RateLimitExceededEvent`] event:
 
-[source, java]
+If the application needs to be notified when a rate limit access was exceeded then it can be done by listening to link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/support/RateLimitExceededEvent.java[`RateLimitExceededEvent`] event:
+
+[source,java]
 ----
     @EventListener
     public void observe(RateLimitExceededEvent event) {
@@ -370,19 +370,22 @@ to link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud
 ----
 
 == Contributing
-Spring Cloud Zuul Rate Limit is released under the non-restrictive Apache 2.0 license, and follows a very
-standard Github development process, using Github tracker for issues and merging pull requests into master.
+
+Spring Cloud Zuul Rate Limit is released under the non-restrictive Apache 2.0 license, and follows a very standard Github development process, using Github tracker for issues and merging pull requests into master.
 If you want to contribute even something trivial please do not hesitate, but follow the guidelines below.
 
 === Code of Conduct
+
 This project adheres to the Contributor Covenant
 https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit/blob/master/docs/code-of-conduct.adoc[code of conduct].
-By participating, you are expected to uphold this code. Please report unacceptable behavior to marcos.hgb@gmail.com.
+By participating, you are expected to uphold this code.
+Please report unacceptable behavior to marcos.hgb@gmail.com.
 
 === Acknowledgement
 
-image::jetbrains_logo.png[Jetbrains, 150, link="https://www.jetbrains.com/?from=spring-cloud-zuul-ratelimit"]
+image::jetbrains_logo.png[Jetbrains,150,link="https://www.jetbrains.com/?from=spring-cloud-zuul-ratelimit"]
 
 == Footnote
+
 Any doubt open an https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit/issues[issue].
 Any fix send me a https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit/pulls[Pull Request].

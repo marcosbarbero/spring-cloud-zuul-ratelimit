@@ -4,7 +4,6 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j.Bucket4jHazelcastRateLimiter;
 import com.marcosbarbero.tests.Bucket4jHazelcastApplication;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +61,7 @@ public class Bucket4jHazelcastApplicationTestIT {
     public void testNotExceedingCapacityRequest() {
         ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceA", String.class);
         HttpHeaders headers = response.getHeaders();
-        assertHeaders(headers, "rate-limit-application_serviceA_127.0.0.1",false, false);
+        assertHeaders(headers, "rate-limit-application_serviceA_127.0.0.1", false, false);
         assertEquals(OK, response.getStatusCode());
     }
 
@@ -83,7 +82,7 @@ public class Bucket4jHazelcastApplicationTestIT {
 
         await().pollDelay(2, TimeUnit.SECONDS).untilAsserted(() -> {
             final ResponseEntity<String> responseAfterReset = this.restTemplate
-                .getForEntity("/serviceB", String.class);
+                    .getForEntity("/serviceB", String.class);
             final HttpHeaders headersAfterReset = responseAfterReset.getHeaders();
             assertHeaders(headersAfterReset, key, false, false);
             assertEquals(OK, responseAfterReset.getStatusCode());
@@ -94,7 +93,7 @@ public class Bucket4jHazelcastApplicationTestIT {
     public void testNoRateLimit() {
         ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceC", String.class);
         HttpHeaders headers = response.getHeaders();
-        assertHeaders(headers, "rate-limit-application_serviceC",true, false);
+        assertHeaders(headers, "rate-limit-application_serviceC", true, false);
         assertEquals(OK, response.getStatusCode());
     }
 
@@ -110,7 +109,7 @@ public class Bucket4jHazelcastApplicationTestIT {
 
             ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceD/" + randomPath, String.class);
             HttpHeaders headers = response.getHeaders();
-            assertHeaders(headers, "rate-limit-application_serviceD_serviceD_" + randomPath,false, false);
+            assertHeaders(headers, "rate-limit-application_serviceD_serviceD_" + randomPath, false, false);
             assertEquals(OK, response.getStatusCode());
         }
     }
@@ -120,12 +119,12 @@ public class Bucket4jHazelcastApplicationTestIT {
         ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceE", String.class);
         HttpHeaders headers = response.getHeaders();
         String key = "rate-limit-application_serviceE_127.0.0.1";
-        assertHeaders(headers, key,false, true);
+        assertHeaders(headers, key, false, true);
         assertEquals(OK, response.getStatusCode());
 
         response = this.restTemplate.getForEntity("/serviceE", String.class);
         headers = response.getHeaders();
-        assertHeaders(headers, key,false, true);
+        assertHeaders(headers, key, false, true);
         assertEquals(TOO_MANY_REQUESTS, response.getStatusCode());
     }
 

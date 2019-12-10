@@ -16,8 +16,6 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j;
 
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.AbstractCacheRateLimiter;
 import io.github.bucket4j.AbstractBucketBuilder;
@@ -28,8 +26,11 @@ import io.github.bucket4j.BucketConfiguration;
 import io.github.bucket4j.ConsumptionProbe;
 import io.github.bucket4j.Extension;
 import io.github.bucket4j.grid.ProxyManager;
+
 import java.time.Duration;
 import java.util.function.Supplier;
+
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 /**
  * Bucket4j rate limiter configuration.

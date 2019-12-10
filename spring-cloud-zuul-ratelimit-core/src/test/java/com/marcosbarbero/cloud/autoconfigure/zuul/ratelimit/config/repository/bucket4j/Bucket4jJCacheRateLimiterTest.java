@@ -18,6 +18,11 @@ public class Bucket4jJCacheRateLimiterTest extends BaseRateLimiterTest {
         ignite = Ignition.start();
     }
 
+    @AfterClass
+    public static void tearDownClass() {
+        Ignition.stop(true);
+    }
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -27,10 +32,5 @@ public class Bucket4jJCacheRateLimiterTest extends BaseRateLimiterTest {
     @After
     public void tearDown() {
         ignite.destroyCache("rateLimit");
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-        Ignition.stop(true);
     }
 }

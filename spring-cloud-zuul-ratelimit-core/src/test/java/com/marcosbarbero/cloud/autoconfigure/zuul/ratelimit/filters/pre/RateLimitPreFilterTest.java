@@ -1,14 +1,5 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.pre;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.google.common.collect.Lists;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
@@ -25,9 +16,6 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitExc
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitExceededException;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.monitoring.CounterFactory;
-import java.util.Collections;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -42,10 +30,24 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.util.UrlPathHelper;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Collections;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 public class RateLimitPreFilterTest {
 
+    @Captor
+    protected ArgumentCaptor<RateLimitExceededEvent> rateLimitEventCaptor;
     private RateLimitPreFilter target;
-
     @Mock
     private RateLimiter rateLimiter;
     @Mock
@@ -58,9 +60,6 @@ public class RateLimitPreFilterTest {
     private HttpServletResponse httpServletResponse;
     @Mock
     private ApplicationEventPublisher eventPublisher;
-    @Captor
-    protected ArgumentCaptor<RateLimitExceededEvent> rateLimitEventCaptor;
-
     private RateLimitProperties rateLimitProperties = new RateLimitProperties();
 
     @Before
@@ -144,7 +143,7 @@ public class RateLimitPreFilterTest {
 
         assertThat(target.shouldFilter()).isEqualTo(true);
 
-        assertThrows(RateLimitExceededException.class,() -> target.run());
+        assertThrows(RateLimitExceededException.class, () -> target.run());
 
         verify(eventPublisher).publishEvent(rateLimitEventCaptor.capture());
         RateLimitExceededEvent rateLimitEvent = rateLimitEventCaptor.getValue();

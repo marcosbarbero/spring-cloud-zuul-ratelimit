@@ -21,25 +21,25 @@ zuul:
     repository: REDIS
     policy-list:
       serviceA:
-      - limit: 10
-        refresh-interval: 60
-        type:
-        - user
+        - limit: 10
+          refresh-interval: 60
+          type:
+            - user
       serviceB:
-      - limit: 2
-        refresh-interval: 2
-        type:
-        - origin
+        - limit: 2
+          refresh-interval: 2
+          type:
+            - origin
       serviceD:
-      - limit: 2
-        refresh-interval: 60
-        type:
-        - url
+        - limit: 2
+          refresh-interval: 60
+          type:
+            - url
       serviceE:
-      - quota: 1
-        refresh-interval: 60
-        type:
-        - origin
+        - quota: 1
+          refresh-interval: 60
+          type:
+            - origin
   strip-prefix: true
 
 spring:

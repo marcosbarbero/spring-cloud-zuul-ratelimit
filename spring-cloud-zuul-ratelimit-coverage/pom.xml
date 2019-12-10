@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>spring-cloud-zuul-ratelimit-parent</artifactId>
@@ -18,7 +18,8 @@
         <build.directory.core>../spring-cloud-zuul-ratelimit-core/target</build.directory.core>
         <build.directory.it.redis>../spring-cloud-zuul-ratelimit-tests/redis/target</build.directory.it.redis>
         <build.directory.it.consul>../spring-cloud-zuul-ratelimit-tests/consul/target</build.directory.it.consul>
-        <build.directory.it.springdata>../spring-cloud-zuul-ratelimit-tests/springdata/target</build.directory.it.springdata>
+        <build.directory.it.springdata>../spring-cloud-zuul-ratelimit-tests/springdata/target
+        </build.directory.it.springdata>
         <build.directory.it.bucket4j-hazelcast>
             ../spring-cloud-zuul-ratelimit-tests/bucket4j-hazelcast/target
         </build.directory.it.bucket4j-hazelcast>
@@ -56,9 +57,12 @@
         </classes.directory.it.security-context>
 
         <sources.directory.core>../spring-cloud-zuul-ratelimit-core/src/main/java</sources.directory.core>
-        <sources.directory.it.redis>../spring-cloud-zuul-ratelimit-tests/redis/src/main/java</sources.directory.it.redis>
-        <sources.directory.it.consul>../spring-cloud-zuul-ratelimit-tests/consul/src/main/java</sources.directory.it.consul>
-        <sources.directory.it.springdata>../spring-cloud-zuul-ratelimit-tests/springdata/src/main/java</sources.directory.it.springdata>
+        <sources.directory.it.redis>../spring-cloud-zuul-ratelimit-tests/redis/src/main/java
+        </sources.directory.it.redis>
+        <sources.directory.it.consul>../spring-cloud-zuul-ratelimit-tests/consul/src/main/java
+        </sources.directory.it.consul>
+        <sources.directory.it.springdata>../spring-cloud-zuul-ratelimit-tests/springdata/src/main/java
+        </sources.directory.it.springdata>
         <sources.directory.it.bucket4j-hazelcast>
             ../spring-cloud-zuul-ratelimit-tests/bucket4j-hazelcast/src/main/java
         </sources.directory.it.bucket4j-hazelcast>
@@ -163,14 +167,14 @@
                                                 <fileset dir="${classes.directory.it.consul}"/>
                                                 <fileset dir="${classes.directory.it.springdata}"/>
                                                 <fileset
-                                                  dir="${classes.directory.it.bucket4j-hazelcast}"/>
+                                                        dir="${classes.directory.it.bucket4j-hazelcast}"/>
                                                 <fileset
-                                                  dir="${classes.directory.it.bucket4j-ignite}"/>
+                                                        dir="${classes.directory.it.bucket4j-ignite}"/>
                                                 <fileset
-                                                  dir="${classes.directory.it.bucket4j-infinispan}"/>
+                                                        dir="${classes.directory.it.bucket4j-infinispan}"/>
                                                 <fileset
-                                                  dir="${classes.directory.it.bucket4j-jcache}"/>
-                                                <fileset dir="${classes.directory.it.security-context}" />
+                                                        dir="${classes.directory.it.bucket4j-jcache}"/>
+                                                <fileset dir="${classes.directory.it.security-context}"/>
                                             </classfiles>
                                             <sourcefiles encoding="UTF-8">
                                                 <fileset dir="${sources.directory.core}"/>
@@ -178,14 +182,14 @@
                                                 <fileset dir="${classes.directory.it.consul}"/>
                                                 <fileset dir="${classes.directory.it.springdata}"/>
                                                 <fileset
-                                                  dir="${classes.directory.it.bucket4j-hazelcast}"/>
+                                                        dir="${classes.directory.it.bucket4j-hazelcast}"/>
                                                 <fileset
-                                                  dir="${classes.directory.it.bucket4j-ignite}"/>
+                                                        dir="${classes.directory.it.bucket4j-ignite}"/>
                                                 <fileset
-                                                  dir="${classes.directory.it.bucket4j-infinispan}"/>
+                                                        dir="${classes.directory.it.bucket4j-infinispan}"/>
                                                 <fileset
-                                                  dir="${classes.directory.it.bucket4j-jcache}"/>
-                                                <fileset dir="${classes.directory.it.security-context}" />
+                                                        dir="${classes.directory.it.bucket4j-jcache}"/>
+                                                <fileset dir="${classes.directory.it.security-context}"/>
                                             </sourcefiles>
                                         </group>
                                     </structure>

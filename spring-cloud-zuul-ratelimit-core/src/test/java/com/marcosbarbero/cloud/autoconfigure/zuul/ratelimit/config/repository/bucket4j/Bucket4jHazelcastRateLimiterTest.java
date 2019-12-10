@@ -18,6 +18,11 @@ public class Bucket4jHazelcastRateLimiterTest extends BaseRateLimiterTest {
         hazelcastInstance = Hazelcast.newHazelcastInstance();
     }
 
+    @AfterClass
+    public static void tearDownClass() {
+        Hazelcast.shutdownAll();
+    }
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
@@ -27,10 +32,5 @@ public class Bucket4jHazelcastRateLimiterTest extends BaseRateLimiterTest {
     @After
     public void tearDown() {
         hazelcastInstance.getMap("rateLimit").destroy();
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-        Hazelcast.shutdownAll();
     }
 }

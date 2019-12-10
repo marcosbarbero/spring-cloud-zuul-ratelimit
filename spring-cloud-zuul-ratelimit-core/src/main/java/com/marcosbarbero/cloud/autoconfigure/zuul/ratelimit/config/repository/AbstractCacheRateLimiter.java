@@ -16,11 +16,11 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * Bucket4j rate limiter configuration.

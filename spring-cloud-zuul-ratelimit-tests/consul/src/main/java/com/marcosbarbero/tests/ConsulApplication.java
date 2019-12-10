@@ -1,10 +1,7 @@
 package com.marcosbarbero.tests;
 
-import static org.springframework.boot.SpringApplication.run;
-
 import com.pszymczyk.consul.ConsulProcess;
 import com.pszymczyk.consul.ConsulStarterBuilder;
-import javax.annotation.PreDestroy;
 import org.springframework.cloud.client.SpringCloudApplication;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.PreDestroy;
+
+import static org.springframework.boot.SpringApplication.run;
 
 /**
  * @author Marcos Barbero
@@ -24,6 +25,26 @@ public class ConsulApplication {
 
     public static void main(String... args) {
         run(ConsulApplication.class, args);
+    }
+
+    @Configuration
+    static class ConsulConfig {
+
+        private ConsulProcess consulProcess;
+
+        @Bean
+        public ConsulProcess consulProcess() {
+            if (consulProcess == null) {
+                consulProcess = ConsulStarterBuilder.consulStarter().withHttpPort(8500).build().start();
+            }
+            return consulProcess;
+        }
+
+        @PreDestroy
+        public void cleanup() {
+            consulProcess.close();
+        }
+
     }
 
     @RestController
@@ -56,26 +77,5 @@ public class ConsulApplication {
             Thread.sleep(1100);
             return ResponseEntity.ok(RESPONSE_BODY);
         }
-    }
-
-
-    @Configuration
-    static class ConsulConfig {
-
-        private ConsulProcess consulProcess;
-
-        @Bean
-        public ConsulProcess consulProcess() {
-            if (consulProcess == null) {
-                consulProcess = ConsulStarterBuilder.consulStarter().withHttpPort(8500).build().start();
-            }
-            return consulProcess;
-        }
-
-        @PreDestroy
-        public void cleanup() {
-            consulProcess.close();
-        }
-
     }
 }

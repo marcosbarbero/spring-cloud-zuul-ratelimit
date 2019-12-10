@@ -43,7 +43,7 @@ public class ConsulRateLimiter extends AbstractRateLimiter {
     private final ObjectMapper objectMapper;
 
     public ConsulRateLimiter(RateLimiterErrorHandler rateLimiterErrorHandler,
-        ConsulClient consulClient, ObjectMapper objectMapper) {
+                             ConsulClient consulClient, ObjectMapper objectMapper) {
         super(rateLimiterErrorHandler);
         this.consulClient = consulClient;
         this.objectMapper = objectMapper;

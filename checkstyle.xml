@@ -16,10 +16,10 @@
 
     <!-- TAKEN FROM SPRING BOOT -->
     <!-- Root Checks -->
-<!--    <module name="com.puppycrawl.tools.checkstyle.checks.header.RegexpHeaderCheck">-->
-<!--        <property name="headerFile" value="${checkstyle.header.file}"/>-->
-<!--        <property name="fileExtensions" value="java,groovy"/>-->
-<!--    </module>-->
+    <!--    <module name="com.puppycrawl.tools.checkstyle.checks.header.RegexpHeaderCheck">-->
+    <!--        <property name="headerFile" value="${checkstyle.header.file}"/>-->
+    <!--        <property name="fileExtensions" value="java,groovy"/>-->
+    <!--    </module>-->
     <module name="com.puppycrawl.tools.checkstyle.checks.NewlineAtEndOfFileCheck">
         <property name="lineSeparator" value="lf"/>
     </module>

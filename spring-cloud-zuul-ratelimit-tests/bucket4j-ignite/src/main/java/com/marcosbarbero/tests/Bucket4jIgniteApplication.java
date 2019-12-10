@@ -25,11 +25,11 @@ import javax.annotation.PreDestroy;
 @SpringCloudApplication
 public class Bucket4jIgniteApplication {
 
+    private Ignite ignite;
+
     public static void main(String... args) {
         SpringApplication.run(Bucket4jIgniteApplication.class, args);
     }
-
-    private Ignite ignite;
 
     @Bean
     @Qualifier("RateLimit")

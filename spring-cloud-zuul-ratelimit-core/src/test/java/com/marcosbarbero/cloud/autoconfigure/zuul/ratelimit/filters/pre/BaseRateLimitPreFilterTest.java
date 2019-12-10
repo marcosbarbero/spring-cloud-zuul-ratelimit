@@ -1,12 +1,5 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.pre;
 
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING;
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
-
 import com.google.common.collect.Lists;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
@@ -21,11 +14,6 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateL
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitUtils;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.monitoring.CounterFactory;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -40,6 +28,19 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.util.UrlPathHelper;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
+
 /**
  * @author Marcos Barbero
  * @since 2017-06-30
@@ -47,15 +48,12 @@ import org.springframework.web.util.UrlPathHelper;
 public abstract class BaseRateLimitPreFilterTest {
 
     RateLimitPreFilter filter;
-
+    MockHttpServletRequest request;
+    MockHttpServletResponse response;
     @Mock
     private RequestAttributes requestAttributes;
     @Mock
     private ApplicationEventPublisher eventPublisher;
-
-    MockHttpServletRequest request;
-    MockHttpServletResponse response;
-
     private RequestContext context;
     private RateLimiter rateLimiter;
 
@@ -87,7 +85,7 @@ public abstract class BaseRateLimitPreFilterTest {
 
     private RouteLocator routeLocator() {
         return new TestRouteLocator(Collections.singletonList("ignored"),
-            asList(createRoute("serviceA"), createRoute("serviceB")));
+                asList(createRoute("serviceA"), createRoute("serviceB")));
     }
 
     void setRateLimiter(RateLimiter rateLimiter) {
@@ -103,10 +101,10 @@ public abstract class BaseRateLimitPreFilterTest {
         RateLimitProperties properties = this.properties();
         RateLimitUtils rateLimitUtils = new DefaultRateLimitUtils(properties);
         RateLimitKeyGenerator rateLimitKeyGenerator = new DefaultRateLimitKeyGenerator(properties,
-            rateLimitUtils);
+                rateLimitUtils);
         UrlPathHelper urlPathHelper = new UrlPathHelper();
         this.filter = new RateLimitPreFilter(properties, this.routeLocator(), urlPathHelper, this.rateLimiter,
-            rateLimitKeyGenerator, rateLimitUtils, eventPublisher);
+                rateLimitKeyGenerator, rateLimitUtils, eventPublisher);
         this.context = new RequestContext();
         RequestContext.testSetCurrentContext(this.context);
         RequestContextHolder.setRequestAttributes(requestAttributes);

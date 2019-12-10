@@ -2,8 +2,9 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
-import java.util.Objects;
 import org.springframework.context.ApplicationEvent;
+
+import java.util.Objects;
 
 /**
  * Event raised when a rate limit exceeded.
