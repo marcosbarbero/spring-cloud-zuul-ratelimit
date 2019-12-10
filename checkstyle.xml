@@ -4,7 +4,7 @@
         "https://www.puppycrawl.com/dtds/configuration_1_3.dtd">
 <module name="com.puppycrawl.tools.checkstyle.Checker">
 
-    <module name="SuppressionFilter">
+    <!--<module name="SuppressionFilter">
         <property name="file" value="${checkstyle.suppressions.file}"/>
         <property name="optional" value="true"/>
     </module>
@@ -12,14 +12,14 @@
     <module name="SuppressionFilter">
         <property name="file" value="${checkstyle.additional.suppressions.file}"/>
         <property name="optional" value="true"/>
-    </module>
+    </module>-->
 
     <!-- TAKEN FROM SPRING BOOT -->
     <!-- Root Checks -->
-    <module name="com.puppycrawl.tools.checkstyle.checks.header.RegexpHeaderCheck">
-        <property name="headerFile" value="${checkstyle.header.file}"/>
-        <property name="fileExtensions" value="java,groovy"/>
-    </module>
+<!--    <module name="com.puppycrawl.tools.checkstyle.checks.header.RegexpHeaderCheck">-->
+<!--        <property name="headerFile" value="${checkstyle.header.file}"/>-->
+<!--        <property name="fileExtensions" value="java,groovy"/>-->
+<!--    </module>-->
     <module name="com.puppycrawl.tools.checkstyle.checks.NewlineAtEndOfFileCheck">
         <property name="lineSeparator" value="lf"/>
     </module>
