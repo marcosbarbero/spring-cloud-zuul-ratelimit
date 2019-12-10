@@ -59,8 +59,7 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
         }
     }
 
-    private Long calcRemaining(Long limit, Long refreshInterval, long usage,
-                               String key, Rate rate) {
+    private Long calcRemaining(Long limit, Long refreshInterval, long usage, String key, Rate rate) {
         rate.setReset(SECONDS.toMillis(refreshInterval));
         Long current = 0L;
         try {

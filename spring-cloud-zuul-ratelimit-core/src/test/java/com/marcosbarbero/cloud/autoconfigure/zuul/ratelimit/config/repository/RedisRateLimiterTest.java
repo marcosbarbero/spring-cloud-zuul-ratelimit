@@ -37,7 +37,8 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
         MockitoAnnotations.initMocks(this);
         Map<String, BoundValueOperations> map = Maps.newHashMap();
         Map<String, Long> longMap = Maps.newHashMap();
-        when(redisTemplate.boundValueOps(any())).thenAnswer(invocation -> {
+
+        when(this.redisTemplate.boundValueOps(any())).thenAnswer(invocation -> {
             String key = invocation.getArgument(0);
             BoundValueOperations mock = map.computeIfAbsent(key, k -> Mockito.mock(BoundValueOperations.class));
             when(mock.increment(anyLong())).thenAnswer(invocationOnMock -> {
@@ -46,7 +47,7 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
             });
             return mock;
         });
-        when(redisTemplate.opsForValue()).thenAnswer(invocation -> {
+        when(this.redisTemplate.opsForValue()).thenAnswer(invocation -> {
             ValueOperations mock = mock(ValueOperations.class);
             when(mock.increment(any(), anyLong())).thenAnswer(invocationOnMock -> {
                 String key = invocationOnMock.getArgument(0);
@@ -55,7 +56,8 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
             });
             return mock;
         });
-        target = new RedisRateLimiter(rateLimiterErrorHandler, redisTemplate);
+
+        this.target = new RedisRateLimiter(this.rateLimiterErrorHandler, this.redisTemplate);
     }
 
     @Test
@@ -64,6 +66,7 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
         when(ops.setIfAbsent(anyString(), anyLong(), anyLong(), any())).thenReturn(false);
         doReturn(ops).when(redisTemplate).opsForValue();
         doThrow(new RuntimeException()).when(ops).increment(anyString(), anyLong());
+
         Policy policy = new Policy();
         policy.setLimit(100L);
         target.consume(policy, "key", 0L);
@@ -78,6 +81,7 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
         when(ops.setIfAbsent(anyString(), anyLong(), anyLong(), any())).thenReturn(false);
         doReturn(ops).when(redisTemplate).opsForValue();
         doThrow(new RuntimeException()).when(ops).increment(anyString(), anyLong());
+
         Policy policy = new Policy();
         policy.setQuota(100L);
         target.consume(policy, "key", 0L);
@@ -92,6 +96,7 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
         when(ops.setIfAbsent(anyString(), anyLong(), anyLong(), any())).thenReturn(false);
         doReturn(ops).when(redisTemplate).opsForValue();
         doThrow(new RuntimeException()).when(ops).increment(anyString(), anyLong());
+
         Policy policy = new Policy();
         policy.setLimit(100L);
         policy.setQuota(50L);
