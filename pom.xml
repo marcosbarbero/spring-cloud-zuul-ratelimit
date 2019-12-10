@@ -39,6 +39,7 @@
         <mockito-all.version>1.10.19</mockito-all.version>
         <spring-cloud.version>Hoxton.RELEASE</spring-cloud.version>
         <awaitility.version>4.0.1</awaitility.version>
+        <checkstyle-maven-plugin.version>3.1.0</checkstyle-maven-plugin.version>
 
         <jacoco.it.execution.data.file>
             ${project.build.directory}/coverage-reports/jacoco.exec
@@ -190,6 +191,29 @@
                         <phase>package</phase>
                         <goals>
                             <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${checkstyle-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>checkstyle-validation</id>
+                        <phase>validate</phase>
+                        <inherited>true</inherited>
+                        <configuration>
+                            <configLocation>checkstyle.xml</configLocation>
+                            <consoleOutput>true</consoleOutput>
+                            <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                            <failsOnError>true</failsOnError>
+                            <failOnViolation>true</failOnViolation>
+                        </configuration>
+                        <goals>
+                            <goal>check</goal>
                         </goals>
                     </execution>
                 </executions>
