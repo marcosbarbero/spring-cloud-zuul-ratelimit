@@ -64,50 +64,47 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
     public void testConsumeRemainingLimitException() {
         ValueOperations ops = mock(ValueOperations.class);
         when(ops.setIfAbsent(anyString(), anyLong(), anyLong(), any())).thenReturn(false);
-        doReturn(ops).when(this.redisTemplate).opsForValue();
+        doReturn(ops).when(redisTemplate).opsForValue();
         doThrow(new RuntimeException()).when(ops).increment(anyString(), anyLong());
 
         Policy policy = new Policy();
         policy.setLimit(100L);
-        this.target.consume(policy, "key", 0L);
-
-        verify(this.redisTemplate.opsForValue()).setIfAbsent(anyString(), anyLong(), anyLong(), any());
-        verify(this.redisTemplate.opsForValue()).increment(anyString(), anyLong());
-        verify(this.rateLimiterErrorHandler).handleError(matches(".* key, .*"), any());
+        target.consume(policy, "key", 0L);
+        verify(redisTemplate.opsForValue()).setIfAbsent(anyString(), anyLong(), anyLong(), any());
+        verify(redisTemplate.opsForValue()).increment(anyString(), anyLong());
+        verify(rateLimiterErrorHandler).handleError(matches(".* key, .*"), any());
     }
 
     @Test
     public void testConsumeRemainingQuotaLimitException() {
         ValueOperations ops = mock(ValueOperations.class);
         when(ops.setIfAbsent(anyString(), anyLong(), anyLong(), any())).thenReturn(false);
-        doReturn(ops).when(this.redisTemplate).opsForValue();
+        doReturn(ops).when(redisTemplate).opsForValue();
         doThrow(new RuntimeException()).when(ops).increment(anyString(), anyLong());
 
         Policy policy = new Policy();
         policy.setQuota(100L);
-        this.target.consume(policy, "key", 0L);
-
-        verify(this.redisTemplate.opsForValue()).setIfAbsent(anyString(), anyLong(), anyLong(), any());
-        verify(this.redisTemplate.opsForValue()).increment(anyString(), anyLong());
-        verify(this.rateLimiterErrorHandler).handleError(matches(".* key-quota, .*"), any());
+        target.consume(policy, "key", 0L);
+        verify(redisTemplate.opsForValue()).setIfAbsent(anyString(), anyLong(), anyLong(), any());
+        verify(redisTemplate.opsForValue()).increment(anyString(), anyLong());
+        verify(rateLimiterErrorHandler).handleError(matches(".* key-quota, .*"), any());
     }
 
     @Test
     public void testConsumeGetExpireException() {
         ValueOperations ops = mock(ValueOperations.class);
         when(ops.setIfAbsent(anyString(), anyLong(), anyLong(), any())).thenReturn(false);
-        doReturn(ops).when(this.redisTemplate).opsForValue();
+        doReturn(ops).when(redisTemplate).opsForValue();
         doThrow(new RuntimeException()).when(ops).increment(anyString(), anyLong());
 
         Policy policy = new Policy();
         policy.setLimit(100L);
         policy.setQuota(50L);
-        this.target.consume(policy, "key", 0L);
-
-        verify(this.redisTemplate.opsForValue(), times(2)).setIfAbsent(anyString(), anyLong(), anyLong(), any());
-        verify(this.redisTemplate.opsForValue(), times(2)).increment(anyString(), anyLong());
-        verify(this.rateLimiterErrorHandler).handleError(matches(".* key, .*"), any());
-        verify(this.rateLimiterErrorHandler).handleError(matches(".* key-quota, .*"), any());
+        target.consume(policy, "key", 0L);
+        verify(redisTemplate.opsForValue(), times(2)).setIfAbsent(anyString(), anyLong(), anyLong(), any());
+        verify(redisTemplate.opsForValue(), times(2)).increment(anyString(), anyLong());
+        verify(rateLimiterErrorHandler).handleError(matches(".* key, .*"), any());
+        verify(rateLimiterErrorHandler).handleError(matches(".* key-quota, .*"), any());
     }
 
     @Test
@@ -115,29 +112,25 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
         ValueOperations ops = mock(ValueOperations.class);
         doThrow(new RuntimeException()).when(ops).setIfAbsent(anyString(), anyLong(), anyLong(), any());
         when(ops.increment(anyString(), anyLong())).thenReturn(0L);
-        doReturn(ops).when(this.redisTemplate).opsForValue();
-
+        doReturn(ops).when(redisTemplate).opsForValue();
         Policy policy = new Policy();
         policy.setLimit(100L);
-        this.target.consume(policy, "key", 0L);
-
-        verify(this.redisTemplate.opsForValue()).setIfAbsent(anyString(), anyLong(), anyLong(), any());
-        verify(this.redisTemplate.opsForValue(), never()).increment(any(), anyLong());
-        verify(this.rateLimiterErrorHandler).handleError(matches(".* key, .*"), any());
+        target.consume(policy, "key", 0L);
+        verify(redisTemplate.opsForValue()).setIfAbsent(anyString(), anyLong(), anyLong(), any());
+        verify(redisTemplate.opsForValue(), never()).increment(any(), anyLong());
+        verify(rateLimiterErrorHandler).handleError(matches(".* key, .*"), any());
     }
 
     @Test
     public void testConsumeSetKey() {
         ValueOperations ops = mock(ValueOperations.class);
         when(ops.setIfAbsent(anyString(), anyLong(), anyLong(), any())).thenReturn(true);
-        doReturn(ops).when(this.redisTemplate).opsForValue();
-
+        doReturn(ops).when(redisTemplate).opsForValue();
         Policy policy = new Policy();
         policy.setLimit(20L);
-        this.target.consume(policy, "key", 0L);
-
-        verify(this.redisTemplate.opsForValue()).setIfAbsent(anyString(), anyLong(), anyLong(), any());
-        verify(this.redisTemplate.opsForValue(), never()).increment(any(), anyLong());
-        verify(this.rateLimiterErrorHandler, never()).handleError(any(), any());
+        target.consume(policy, "key", 0L);
+        verify(redisTemplate.opsForValue()).setIfAbsent(anyString(), anyLong(), anyLong(), any());
+        verify(redisTemplate.opsForValue(), never()).increment(any(), anyLong());
+        verify(rateLimiterErrorHandler, never()).handleError(any(), any());
     }
 }
