@@ -1,28 +1,20 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.matches;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.google.common.collect.Maps;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
-import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.redis.core.BoundValueOperations;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+
+import java.util.Map;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @SuppressWarnings("unchecked")
 public class RedisRateLimiterTest extends BaseRateLimiterTest {
@@ -30,7 +22,7 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
     @Mock
     private RateLimiterErrorHandler rateLimiterErrorHandler;
     @Mock
-    private RedisTemplate redisTemplate;
+    private StringRedisTemplate redisTemplate;
 
     @Before
     public void setUp() {
@@ -70,7 +62,7 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
         Policy policy = new Policy();
         policy.setLimit(100L);
         target.consume(policy, "key", 0L);
-        verify(redisTemplate.opsForValue()).setIfAbsent(anyString(), anyLong(), anyLong(), any());
+        verify(redisTemplate.opsForValue()).setIfAbsent(anyString(), Long.toString(anyLong()), anyLong(), any());
         verify(redisTemplate.opsForValue()).increment(anyString(), anyLong());
         verify(rateLimiterErrorHandler).handleError(matches(".* key, .*"), any());
     }
@@ -85,7 +77,7 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
         Policy policy = new Policy();
         policy.setQuota(100L);
         target.consume(policy, "key", 0L);
-        verify(redisTemplate.opsForValue()).setIfAbsent(anyString(), anyLong(), anyLong(), any());
+        verify(redisTemplate.opsForValue()).setIfAbsent(anyString(), Long.toString(anyLong()), anyLong(), any());
         verify(redisTemplate.opsForValue()).increment(anyString(), anyLong());
         verify(rateLimiterErrorHandler).handleError(matches(".* key-quota, .*"), any());
     }
@@ -101,7 +93,7 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
         policy.setLimit(100L);
         policy.setQuota(50L);
         target.consume(policy, "key", 0L);
-        verify(redisTemplate.opsForValue(), times(2)).setIfAbsent(anyString(), anyLong(), anyLong(), any());
+        verify(redisTemplate.opsForValue(), times(2)).setIfAbsent(anyString(), Long.toString(anyLong()), anyLong(), any());
         verify(redisTemplate.opsForValue(), times(2)).increment(anyString(), anyLong());
         verify(rateLimiterErrorHandler).handleError(matches(".* key, .*"), any());
         verify(rateLimiterErrorHandler).handleError(matches(".* key-quota, .*"), any());
@@ -116,7 +108,7 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
         Policy policy = new Policy();
         policy.setLimit(100L);
         target.consume(policy, "key", 0L);
-        verify(redisTemplate.opsForValue()).setIfAbsent(anyString(), anyLong(), anyLong(), any());
+        verify(redisTemplate.opsForValue()).setIfAbsent(anyString(), Long.toString(anyLong()), anyLong(), any());
         verify(redisTemplate.opsForValue(), never()).increment(any(), anyLong());
         verify(rateLimiterErrorHandler).handleError(matches(".* key, .*"), any());
     }
@@ -129,7 +121,7 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
         Policy policy = new Policy();
         policy.setLimit(20L);
         target.consume(policy, "key", 0L);
-        verify(redisTemplate.opsForValue()).setIfAbsent(anyString(), anyLong(), anyLong(), any());
+        verify(redisTemplate.opsForValue()).setIfAbsent(anyString(), Long.toString(anyLong()), anyLong(), any());
         verify(redisTemplate.opsForValue(), never()).increment(any(), anyLong());
         verify(rateLimiterErrorHandler, never()).handleError(any(), any());
     }
