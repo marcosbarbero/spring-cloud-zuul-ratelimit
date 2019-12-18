@@ -4,7 +4,7 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.Ra
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RedisRateLimiter;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
 import java.util.concurrent.TimeUnit;
@@ -20,12 +20,12 @@ import static org.mockito.Mockito.*;
  */
 public class RedisRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
 
-    private RedisTemplate redisTemplate;
+    private StringRedisTemplate redisTemplate;
 
     @Before
     @Override
     public void setUp() {
-        redisTemplate = mock(RedisTemplate.class);
+        redisTemplate = mock(StringRedisTemplate.class);
         RateLimiterErrorHandler rateLimiterErrorHandler = mock(RateLimiterErrorHandler.class);
         this.setRateLimiter(new RedisRateLimiter(rateLimiterErrorHandler, this.redisTemplate));
         super.setUp();

@@ -17,7 +17,7 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.util.Objects;
 
@@ -27,13 +27,13 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  * @author Marcos Barbero
  * @author Liel Chayoun
  */
-@SuppressWarnings("unchecked")
-public class RedisRateLimiter extends AbstractCacheRateLimiter {
+public final class RedisRateLimiter extends AbstractCacheRateLimiter {
 
     private final RateLimiterErrorHandler rateLimiterErrorHandler;
-    private final RedisTemplate redisTemplate;
+    private final StringRedisTemplate redisTemplate;
 
-    public RedisRateLimiter(RateLimiterErrorHandler rateLimiterErrorHandler, RedisTemplate redisTemplate) {
+    public RedisRateLimiter(final RateLimiterErrorHandler rateLimiterErrorHandler,
+                            final StringRedisTemplate redisTemplate) {
         this.rateLimiterErrorHandler = rateLimiterErrorHandler;
         this.redisTemplate = redisTemplate;
     }
@@ -63,10 +63,10 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
         rate.setReset(SECONDS.toMillis(refreshInterval));
         Long current = 0L;
         try {
-            Boolean present = redisTemplate.opsForValue().setIfAbsent(key, usage, refreshInterval, SECONDS);
+            Boolean present = redisTemplate.opsForValue().setIfAbsent(key, Long.toString(usage), refreshInterval, SECONDS);
             if (Boolean.FALSE.equals(present)) {
                 // Key already exists, increment
-              current = redisTemplate.opsForValue().increment(key, usage);
+                current = redisTemplate.opsForValue().increment(key, usage);
             }
         } catch (RuntimeException e) {
             String msg = "Failed retrieving rate for " + key + ", will return the current value";
