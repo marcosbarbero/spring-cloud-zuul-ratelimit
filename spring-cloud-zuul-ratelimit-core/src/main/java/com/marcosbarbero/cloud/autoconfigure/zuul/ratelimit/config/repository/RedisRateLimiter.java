@@ -27,7 +27,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  * @author Marcos Barbero
  * @author Liel Chayoun
  */
-public final class RedisRateLimiter extends AbstractCacheRateLimiter {
+public class RedisRateLimiter extends AbstractCacheRateLimiter {
 
     private final RateLimiterErrorHandler rateLimiterErrorHandler;
     private final StringRedisTemplate redisTemplate;
