@@ -376,7 +376,7 @@ If you want to contribute even something trivial please do not hesitate, but fol
 
 === Code of Conduct
 This project adheres to the Contributor Covenant
-https://github.com/marcosbarbero/spring-cloud-starter-zuul-ratelimit/blob/master/docs/code-of-conduct.adoc[code of conduct].
+link:CODE_OF_CONDUCT.md[code of conduct].
 By participating, you are expected to uphold this code. Please report unacceptable behavior to marcos.hgb@gmail.com.
 
 === Acknowledgement
