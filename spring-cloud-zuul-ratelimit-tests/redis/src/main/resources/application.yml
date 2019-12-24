@@ -16,6 +16,9 @@ zuul:
     serviceE:
       path: /serviceE
       url: forward:/
+    serviceF:
+      path: /serviceF
+      url: forward:/
   ratelimit:
     enabled: true
     repository: REDIS
@@ -40,4 +43,19 @@ zuul:
           refresh-interval: 60
           type:
             - origin
+      serviceF:
+        - limit: 5
+          refresh-interval: 60
+        - limit: 3
+          refresh-interval: 60
+          type:
+            - origin
+            - url=/serviceF
+            - httpmethod=post
+        - limit: 2
+          refresh-interval: 60
+          type:
+            - origin
+            - url=/serviceF
+            - httpmethod=get      
   strip-prefix: true

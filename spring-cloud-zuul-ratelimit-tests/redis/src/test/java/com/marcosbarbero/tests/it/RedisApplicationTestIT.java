@@ -5,6 +5,7 @@ import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateL
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING;
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING_QUOTA;
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_RESET;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -22,9 +23,11 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -42,6 +45,10 @@ public class RedisApplicationTestIT {
 
     @Autowired
     private ApplicationContext context;
+
+    @Autowired
+    @Qualifier("rateLimiterRedisTemplate")
+    private StringRedisTemplate redisTemplate;
 
     @Test
     public void testRedisRateLimiter() {
@@ -117,6 +124,32 @@ public class RedisApplicationTestIT {
         headers = response.getHeaders();
         assertHeaders(headers, key, false, true);
         assertEquals(TOO_MANY_REQUESTS, response.getStatusCode());
+    }
+
+    @Test
+    public void testGh152() {
+       for (int i = 1; i <= 2; i++) {
+         ResponseEntity<String> response = restTemplate.getForEntity("/serviceF", String.class);
+         assertEquals(OK, response.getStatusCode());
+         HttpHeaders headers = response.getHeaders();
+         String key = "rate-limit-application_serviceF";
+         assertHeaders(headers, key, false, false);
+         assertThat(redisTemplate.keys("*")).containsExactlyInAnyOrder(
+             "rate-limit-application:serviceF:127.0.0.1:/serviceF:/serviceF:http-method:get",
+             "rate-limit-application:serviceF");
+       }
+
+       for (int i = 1; i <= 3; i++) {
+         ResponseEntity<String> response = restTemplate.postForEntity("/serviceF", null, String.class);
+         assertEquals(OK, response.getStatusCode());
+         HttpHeaders headers = response.getHeaders();
+         String key = "rate-limit-application_serviceF";
+         assertHeaders(headers, key, false, false);
+         assertThat(redisTemplate.keys("*")).containsExactlyInAnyOrder(
+             "rate-limit-application:serviceF:127.0.0.1:/serviceF:/serviceF:http-method:get",
+             "rate-limit-application:serviceF:127.0.0.1:/serviceF:/serviceF:http-method:post",
+             "rate-limit-application:serviceF");
+       }
     }
 
     private void assertHeaders(HttpHeaders headers, String key, boolean nullable, boolean quotaHeaders) {

@@ -6,6 +6,7 @@ import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -49,6 +50,18 @@ public class RedisApplication {
         public ResponseEntity<String> serviceE() throws InterruptedException {
             Thread.sleep(1100);
             return ResponseEntity.ok(RESPONSE_BODY);
+        }
+
+        @GetMapping("/serviceF")
+        public ResponseEntity<String> serviceFGet() throws InterruptedException {
+          Thread.sleep(1100);
+          return ResponseEntity.ok(RESPONSE_BODY);
+        }
+
+        @PostMapping("/serviceF")
+        public ResponseEntity<String> serviceFPost() throws InterruptedException {
+          Thread.sleep(1100);
+          return ResponseEntity.ok(RESPONSE_BODY);
         }
     }
 }
