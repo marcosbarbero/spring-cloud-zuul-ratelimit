@@ -11,7 +11,7 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.sp
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * @author Marcos Barbero
@@ -19,7 +19,7 @@ import org.junit.Before;
  */
 public class JpaLimitPreFilterTest extends BaseRateLimitPreFilterTest {
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() {
         Map<String, Rate> repository = new ConcurrentHashMap<>();

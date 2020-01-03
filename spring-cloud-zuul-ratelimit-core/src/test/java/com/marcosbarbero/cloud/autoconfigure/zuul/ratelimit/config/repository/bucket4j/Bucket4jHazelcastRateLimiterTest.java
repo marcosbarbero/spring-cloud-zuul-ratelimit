@@ -3,33 +3,33 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.b
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.BaseRateLimiterTest;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.mockito.MockitoAnnotations;
 
 public class Bucket4jHazelcastRateLimiterTest extends BaseRateLimiterTest {
 
     private static HazelcastInstance hazelcastInstance;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         hazelcastInstance = Hazelcast.newHazelcastInstance();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         target = new Bucket4jHazelcastRateLimiter(hazelcastInstance.getMap("rateLimit"));
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         hazelcastInstance.getMap("rateLimit").destroy();
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() {
         Hazelcast.shutdownAll();
     }
