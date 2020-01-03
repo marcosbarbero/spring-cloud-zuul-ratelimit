@@ -72,4 +72,28 @@ public class RedisRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
         remaining = this.response.getHeader(HEADER_REMAINING + key);
         assertEquals("1", remaining);
     }
+
+    @Test
+    public void testShouldReturnCorrectRateRemainingValue() {
+        String redisKey = "null:serviceA:10.0.0.100:anonymous:GET";
+        ValueOperations ops = mock(ValueOperations.class);
+        when(redisTemplate.opsForValue()).thenReturn(ops);
+        when(ops.setIfAbsent(eq(redisKey), eq("1"), anyLong(), any())).thenReturn(true, false);
+        when(ops.increment(eq(redisKey), anyLong())).thenReturn(2L);
+
+        this.request.setRequestURI("/serviceA");
+        this.request.setRemoteAddr("10.0.0.100");
+        this.request.setMethod("GET");
+
+        assertTrue(this.filter.shouldFilter());
+
+        String key = "null_serviceA_10.0.0.100_anonymous_GET";
+
+        Long requestCounter = 2L;
+        for (int i = 0; i < 2; i++) {
+            this.filter.run();
+            Long remaining = Long.valueOf(this.response.getHeader(HEADER_REMAINING + key));
+            assertEquals(--requestCounter, remaining);
+        }
+    }
 }

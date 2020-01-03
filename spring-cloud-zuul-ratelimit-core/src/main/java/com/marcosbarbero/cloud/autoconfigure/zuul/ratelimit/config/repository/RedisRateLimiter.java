@@ -67,6 +67,8 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
             if (Boolean.FALSE.equals(present)) {
                 // Key already exists, increment
                 current = redisTemplate.opsForValue().increment(key, usage);
+            } else {
+                current = usage;
             }
         } catch (RuntimeException e) {
             String msg = "Failed retrieving rate for " + key + ", will return the current value";

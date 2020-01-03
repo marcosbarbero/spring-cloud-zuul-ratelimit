@@ -119,6 +119,33 @@ public class RedisApplicationTestIT {
         assertEquals(TOO_MANY_REQUESTS, response.getStatusCode());
     }
 
+    @Test
+    public void testShouldReturnCorrectRateRemainingValue() {
+        String key = "rate-limit-application_serviceA_127.0.0.1";
+
+        Long rateLimit = 10L;
+        Long requestCounter = rateLimit;
+        do {
+            ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceA", String.class);
+            assertEquals(OK, response.getStatusCode());
+            HttpHeaders headers = response.getHeaders();
+            assertHeaders(headers, key, false, false);
+            Long limit = Long.valueOf(headers.getFirst(HEADER_LIMIT + key));
+            assertEquals(rateLimit, limit);
+            Long remaining = Long.valueOf(headers.getFirst(HEADER_REMAINING + key));
+            assertEquals(--requestCounter, remaining);
+        } while (requestCounter > 0);
+
+        ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceA", String.class);
+        assertEquals(TOO_MANY_REQUESTS, response.getStatusCode());
+        HttpHeaders headers = response.getHeaders();
+        assertHeaders(headers, key, false, false);
+        String limit = headers.getFirst(HEADER_LIMIT + key);
+        assertEquals("10", limit);
+        String remaining = headers.getFirst(HEADER_REMAINING + key);
+        assertEquals("0", remaining);
+    }
+
     private void assertHeaders(HttpHeaders headers, String key, boolean nullable, boolean quotaHeaders) {
         String quota = headers.getFirst(HEADER_QUOTA + key);
         String remainingQuota = headers.getFirst(HEADER_REMAINING_QUOTA + key);
