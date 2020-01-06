@@ -38,7 +38,7 @@
         <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
         <mockito-all.version>1.10.19</mockito-all.version>
         <spring-cloud.version>Hoxton.SR1</spring-cloud.version>
-        <awaitility.version>4.0.1</awaitility.version>
+        <awaitility.version>4.0.2</awaitility.version>
 
         <jacoco.it.execution.data.file>
             ${project.build.directory}/coverage-reports/jacoco.exec
