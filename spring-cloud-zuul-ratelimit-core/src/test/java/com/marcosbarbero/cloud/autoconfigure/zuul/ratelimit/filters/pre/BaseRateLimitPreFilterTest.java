@@ -21,6 +21,7 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateL
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitUtils;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.monitoring.CounterFactory;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -72,8 +73,8 @@ public abstract class BaseRateLimitPreFilterTest {
 
         Policy policy = new Policy();
         policy.setLimit(2L);
-        policy.setQuota(2L);
-        policy.setRefreshInterval(2L);
+        policy.setQuota(Duration.ofSeconds(2));
+        policy.setRefreshInterval(Duration.ofSeconds(2));
         policy.getType().add(new MatchType(RateLimitType.ORIGIN, null));
         policy.getType().add(new MatchType(RateLimitType.URL, null));
         policy.getType().add(new MatchType(RateLimitType.USER, null));

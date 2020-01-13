@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Maps;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
+import java.time.Duration;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -83,7 +84,7 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
         doThrow(new RuntimeException()).when(ops).increment(anyString(), anyLong());
 
         Policy policy = new Policy();
-        policy.setQuota(100L);
+        policy.setQuota(Duration.ofSeconds(100));
         target.consume(policy, "key", 0L);
         verify(redisTemplate.opsForValue()).setIfAbsent(anyString(), anyString(), anyLong(), any());
         verify(redisTemplate.opsForValue()).increment(anyString(), anyLong());
@@ -99,7 +100,7 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
 
         Policy policy = new Policy();
         policy.setLimit(100L);
-        policy.setQuota(50L);
+        policy.setQuota(Duration.ofSeconds(50));
         target.consume(policy, "key", 0L);
         verify(redisTemplate.opsForValue(), times(2)).setIfAbsent(anyString(), anyString(), anyLong(), any());
         verify(redisTemplate.opsForValue(), times(2)).increment(anyString(), anyLong());
