@@ -6,11 +6,11 @@ import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateL
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING_QUOTA;
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_RESET;
 import static org.awaitility.Awaitility.await;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
@@ -20,22 +20,17 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.sp
 import com.marcosbarbero.tests.SpringDataApplication;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * @author Marcos Barbero
  * @since 2017-06-27
  */
-@AutoConfigureTestDatabase
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class SpringDataApplicationTestIT {
 
@@ -48,7 +43,7 @@ public class SpringDataApplicationTestIT {
 
     @Test
     public void testSpringDataRateLimiter() {
-        assertTrue("JpaRateLimiter", rateLimiter instanceof JpaRateLimiter);
+        assertTrue(rateLimiter instanceof JpaRateLimiter, "JpaRateLimiter");
     }
 
     @Test

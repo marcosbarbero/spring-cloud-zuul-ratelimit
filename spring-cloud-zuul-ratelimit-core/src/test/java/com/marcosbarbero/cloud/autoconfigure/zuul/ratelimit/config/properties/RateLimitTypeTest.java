@@ -1,8 +1,8 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.cloud.netflix.zuul.filters.Route;
@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 public class RateLimitTypeTest {
@@ -21,7 +22,7 @@ public class RateLimitTypeTest {
     private Route route = new Route("servicea", "/test", "servicea", "/servicea", null, Collections.emptySet());
     private DefaultRateLimitUtils rateLimitUtils;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         RateLimitProperties properties = new RateLimitProperties();
@@ -127,9 +128,9 @@ public class RateLimitTypeTest {
         assertThat(key).isEqualTo("/test");
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void doNotApplyRoleWithoutMatcher() {
-        RateLimitType.ROLE.apply(httpServletRequest, route, rateLimitUtils, null);
+        assertThrows(UnsupportedOperationException.class, () -> RateLimitType.ROLE.apply(httpServletRequest, route, rateLimitUtils, null));
     }
 
     @Test

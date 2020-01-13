@@ -36,13 +36,10 @@
         <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
         <jacoco.version>0.8.5</jacoco.version>
         <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
-        <mockito-all.version>1.10.19</mockito-all.version>
         <spring-cloud.version>Hoxton.SR1</spring-cloud.version>
         <awaitility.version>4.0.2</awaitility.version>
 
-        <jacoco.it.execution.data.file>
-            ${project.build.directory}/coverage-reports/jacoco.exec
-        </jacoco.it.execution.data.file>
+        <jacoco.it.execution.data.file>${project.build.directory}/coverage-reports/jacoco.exec</jacoco.it.execution.data.file>
         <jacoco.ut.execution.data.file>${jacoco.it.execution.data.file}</jacoco.ut.execution.data.file>
         <package.root.path>com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit</package.root.path>
     </properties>
@@ -116,28 +113,20 @@
 
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>${mockito-all.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.junit.vintage</groupId>
+                    <artifactId>junit-vintage-engine</artifactId>
+                </exclusion>
+            </exclusions>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
-            <version>${awaitility.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

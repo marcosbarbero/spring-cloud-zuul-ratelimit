@@ -9,8 +9,8 @@ import static org.mockito.Mockito.when;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -22,7 +22,7 @@ public class AbstractRateLimiterTest {
     @Mock
     private RateLimiterErrorHandler rateLimiterErrorHandler;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         target = Mockito.mock(AbstractRateLimiter.class, Mockito.CALLS_REAL_METHODS);
