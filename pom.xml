@@ -37,6 +37,7 @@
         <jacoco.version>0.8.5</jacoco.version>
         <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
         <spring-cloud.version>Hoxton.SR1</spring-cloud.version>
+        <awaitility.version>4.0.2</awaitility.version>
 
         <jacoco.it.execution.data.file>${project.build.directory}/coverage-reports/jacoco.exec</jacoco.it.execution.data.file>
         <jacoco.ut.execution.data.file>${jacoco.it.execution.data.file}</jacoco.ut.execution.data.file>
