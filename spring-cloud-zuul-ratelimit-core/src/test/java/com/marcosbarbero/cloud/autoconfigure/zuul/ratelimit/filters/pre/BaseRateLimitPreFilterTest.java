@@ -2,9 +2,9 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.pre;
 
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING;
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
 import com.google.common.collect.Lists;
@@ -26,8 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.cloud.netflix.zuul.filters.Route;
@@ -94,7 +94,7 @@ public abstract class BaseRateLimitPreFilterTest {
         this.rateLimiter = rateLimiter;
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         CounterFactory.initialize(new EmptyCounterFactory());
@@ -156,8 +156,8 @@ public abstract class BaseRateLimitPreFilterTest {
         }
 
         String exceeded = (String) this.context.get("rateLimitExceeded");
-        assertTrue("RateLimit Exceeded", Boolean.valueOf(exceeded));
-        assertEquals("Too many requests", TOO_MANY_REQUESTS.value(), this.context.getResponseStatusCode());
+        assertTrue(Boolean.valueOf(exceeded), "RateLimit Exceeded");
+        assertEquals(TOO_MANY_REQUESTS.value(), this.context.getResponseStatusCode(), "Too many requests");
     }
 
     @Test
@@ -177,7 +177,7 @@ public abstract class BaseRateLimitPreFilterTest {
         }
 
         String exceeded = (String) this.context.get("rateLimitExceeded");
-        assertFalse("RateLimit not exceeded", Boolean.valueOf(exceeded));
+        assertFalse(Boolean.valueOf(exceeded), "RateLimit not exceeded");
     }
 
     @Test

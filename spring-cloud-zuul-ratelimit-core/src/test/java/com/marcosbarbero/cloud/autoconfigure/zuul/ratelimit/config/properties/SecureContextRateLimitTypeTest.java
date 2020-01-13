@@ -1,25 +1,21 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
 
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
-import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.SecuredRateLimitUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.cloud.netflix.zuul.filters.Route;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.context.support.WithSecurityContextTestExecutionListener;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit4.SpringRunner;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringRunner.class)
-@TestExecutionListeners(WithSecurityContextTestExecutionListener.class)
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.RateLimitAutoConfiguration;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.SecuredRateLimitUtils;
+import java.util.Collections;
+import javax.servlet.http.HttpServletRequest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.netflix.zuul.filters.Route;
+import org.springframework.security.test.context.support.WithMockUser;
+
+@SpringBootTest(classes = RateLimitAutoConfiguration.class)
 public class SecureContextRateLimitTypeTest {
 
     @Mock
@@ -27,7 +23,7 @@ public class SecureContextRateLimitTypeTest {
     private Route route = new Route("servicea", "/test", "servicea", "/servicea", null, Collections.emptySet());
     private RateLimitUtils rateLimitUtils;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         RateLimitProperties properties = new RateLimitProperties();

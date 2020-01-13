@@ -5,16 +5,15 @@ import static org.mockito.Mockito.mock;
 
 import com.netflix.zuul.exception.ZuulException;
 import com.netflix.zuul.monitoring.CounterFactory;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 
 public class RateLimitExceededExceptionTest {
 
     private RateLimitExceededException target;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         CounterFactory counterFactory = mock(CounterFactory.class);
         MockitoAnnotations.initMocks(this);
