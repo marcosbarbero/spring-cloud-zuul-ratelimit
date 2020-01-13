@@ -1,17 +1,17 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.MatchType;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitType;
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class StringToMatchTypeConverterTest {
 
     private StringToMatchTypeConverter target;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         target = new StringToMatchTypeConverter();
     }

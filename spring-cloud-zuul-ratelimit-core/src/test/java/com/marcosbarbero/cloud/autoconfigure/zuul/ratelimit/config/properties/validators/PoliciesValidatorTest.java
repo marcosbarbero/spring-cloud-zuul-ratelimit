@@ -5,8 +5,8 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitRepository;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitType;
 import org.assertj.core.util.Lists;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import javax.validation.*;
@@ -30,7 +30,7 @@ public class PoliciesValidatorTest {
         return policy;
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         target = new PoliciesValidator();
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();

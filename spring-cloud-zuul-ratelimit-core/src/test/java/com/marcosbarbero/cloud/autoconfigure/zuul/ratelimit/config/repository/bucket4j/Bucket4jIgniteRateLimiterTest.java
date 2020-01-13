@@ -3,33 +3,33 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.b
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.BaseRateLimiterTest;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.Ignition;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.mockito.MockitoAnnotations;
 
 public class Bucket4jIgniteRateLimiterTest extends BaseRateLimiterTest {
 
     private static Ignite ignite;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         ignite = Ignition.start();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         target = new Bucket4jIgniteRateLimiter(ignite.createCache("rateLimit"));
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         ignite.destroyCache("rateLimit");
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownClass() {
         Ignition.stop(true);
     }

@@ -9,8 +9,7 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.Ba
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RateLimiterErrorHandler;
 import java.util.Map;
 import java.util.Optional;
-
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -21,7 +20,7 @@ public class JpaRateLimiterTest extends BaseRateLimiterTest {
     @Mock
     private RateLimiterRepository rateLimiterRepository;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         Map<String, Rate> repository = Maps.newHashMap();
