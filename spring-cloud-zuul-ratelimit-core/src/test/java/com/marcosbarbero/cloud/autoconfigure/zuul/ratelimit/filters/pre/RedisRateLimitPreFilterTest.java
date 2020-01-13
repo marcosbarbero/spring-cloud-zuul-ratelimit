@@ -3,14 +3,15 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.pre;
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RateLimiterErrorHandler;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RedisRateLimiter;
+
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -79,7 +80,7 @@ public class RedisRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
     @Test
     public void testShouldReturnCorrectRateRemainingValue() {
         String redisKey = "null:serviceA:10.0.0.100:anonymous:GET";
-        ValueOperations ops = mock(ValueOperations.class);
+        ValueOperations<String, String> ops = mock(ValueOperations.class);
         when(redisTemplate.opsForValue()).thenReturn(ops);
         when(ops.setIfAbsent(eq(redisKey), eq("1"), anyLong(), any())).thenReturn(true, false);
         when(ops.increment(eq(redisKey), anyLong())).thenReturn(2L);
@@ -92,10 +93,10 @@ public class RedisRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
 
         String key = "null_serviceA_10.0.0.100_anonymous_GET";
 
-        Long requestCounter = 2L;
+        long requestCounter = 2;
         for (int i = 0; i < 2; i++) {
             this.filter.run();
-            Long remaining = Long.valueOf(this.response.getHeader(HEADER_REMAINING + key));
+            Long remaining = Long.valueOf(Objects.requireNonNull(this.response.getHeader(HEADER_REMAINING + key)));
             assertEquals(--requestCounter, remaining);
         }
     }
