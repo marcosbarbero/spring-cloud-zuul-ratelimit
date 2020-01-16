@@ -36,8 +36,8 @@ zuul:
           type:
             - url
       serviceE:
-        - quota: 1
-          refresh-interval: 60
+        - quota: 1s
+          refresh-interval: 60s
           type:
             - origin
   strip-prefix: true
