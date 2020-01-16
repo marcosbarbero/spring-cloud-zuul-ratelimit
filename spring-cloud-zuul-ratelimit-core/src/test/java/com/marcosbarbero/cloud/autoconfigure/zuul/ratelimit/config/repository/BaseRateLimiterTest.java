@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
+import java.time.Duration;
 import org.junit.jupiter.api.Test;
 
 public abstract class BaseRateLimiterTest {
@@ -15,7 +16,7 @@ public abstract class BaseRateLimiterTest {
     public void testConsumeOnlyLimit() {
         Policy policy = new Policy();
         policy.setLimit(10L);
-        policy.setRefreshInterval(2L);
+        policy.setRefreshInterval(Duration.ofSeconds(2));
 
         Rate rate = target.consume(policy, "key", null);
         assertThat(rate.getRemaining()).isEqualTo(9L);
@@ -25,8 +26,8 @@ public abstract class BaseRateLimiterTest {
     @Test
     public void testConsumeOnlyQuota() {
         Policy policy = new Policy();
-        policy.setQuota(1L);
-        policy.setRefreshInterval(2L);
+        policy.setQuota(Duration.ofSeconds(1));
+        policy.setRefreshInterval(Duration.ofSeconds(2));
 
         Rate rate = target.consume(policy, "key", 800L);
         assertThat(rate.getRemainingQuota()).isEqualTo(200L);
@@ -37,8 +38,8 @@ public abstract class BaseRateLimiterTest {
     public void testConsume() {
         Policy policy = new Policy();
         policy.setLimit(10L);
-        policy.setQuota(1L);
-        policy.setRefreshInterval(2L);
+        policy.setQuota(Duration.ofSeconds(1));
+        policy.setRefreshInterval(Duration.ofSeconds(2));
 
         Rate rate = target.consume(policy, "key", null);
         assertThat(rate.getRemaining()).isEqualTo(9L);

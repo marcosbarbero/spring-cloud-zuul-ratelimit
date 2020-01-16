@@ -56,18 +56,16 @@ abstract class AbstractBucket4jRateLimiter<T extends AbstractBucketBuilder<T>, E
 
     protected abstract ProxyManager<String> getProxyManager(E extension);
 
-    private Bucket getQuotaBucket(String key, Long quota, Long refreshInterval) {
+    private Bucket getQuotaBucket(String key, Long quota, Duration refreshInterval) {
         return buckets.getProxy(key + QUOTA_SUFFIX, getBucketConfiguration(quota, refreshInterval));
     }
 
-    private Bucket getLimitBucket(String key, Long limit, Long refreshInterval) {
+    private Bucket getLimitBucket(String key, Long limit, Duration refreshInterval) {
         return buckets.getProxy(key, getBucketConfiguration(limit, refreshInterval));
     }
 
-    private Supplier<BucketConfiguration> getBucketConfiguration(Long capacity, Long period) {
-        return () -> Bucket4j.configurationBuilder()
-                .addLimit(Bandwidth.simple(capacity, Duration.ofSeconds(period)))
-                .build();
+    private Supplier<BucketConfiguration> getBucketConfiguration(Long capacity, Duration period) {
+        return () -> Bucket4j.configurationBuilder().addLimit(Bandwidth.simple(capacity, period)).build();
     }
 
     private void setRemaining(Rate rate, long remaining, boolean isQuota) {
@@ -98,7 +96,7 @@ abstract class AbstractBucket4jRateLimiter<T extends AbstractBucketBuilder<T>, E
     }
 
     @Override
-    protected void calcRemainingLimit(final Long limit, final Long refreshInterval, final Long requestTime,
+    protected void calcRemainingLimit(final Long limit, final Duration refreshInterval, final Long requestTime,
                                       final String key, final Rate rate) {
         if (limit == null) {
             return;
@@ -112,7 +110,7 @@ abstract class AbstractBucket4jRateLimiter<T extends AbstractBucketBuilder<T>, E
     }
 
     @Override
-    protected void calcRemainingQuota(final Long quota, final Long refreshInterval, final Long requestTime,
+    protected void calcRemainingQuota(final Long quota, final  Duration refreshInterval, final Long requestTime,
                                       final String key, final Rate rate) {
         if (quota == null) {
             return;

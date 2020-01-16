@@ -1,0 +1,16 @@
+zuul:
+  ratelimit:
+    enabled: true
+    repository: REDIS
+    policy-list:
+      defaultValues:
+        - limit: 2
+      withoutUnit:
+        - quota: PT2S
+          refresh-interval: 2
+      withSeconds:
+        - quota: PT30S
+          refresh-interval: 30s
+      withMinutes:
+        - quota: PT1M
+          refresh-interval: 1m
