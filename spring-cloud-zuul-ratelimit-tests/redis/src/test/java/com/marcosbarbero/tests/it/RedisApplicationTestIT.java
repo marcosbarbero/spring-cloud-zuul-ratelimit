@@ -19,11 +19,13 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.Re
 import com.marcosbarbero.tests.RedisApplication;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 
@@ -39,6 +41,14 @@ public class RedisApplicationTestIT {
 
     @Autowired
     private ApplicationContext context;
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    @BeforeEach
+    void resetStorage() {
+      redisTemplate.delete(redisTemplate.keys("*"));
+    }
 
     @Test
     public void testRedisRateLimiter() {
