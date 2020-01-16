@@ -18,6 +18,7 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPostFilter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitUtils;
 import com.netflix.zuul.context.RequestContext;
+import java.time.Duration;
 import javax.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -113,7 +114,7 @@ public class RateLimitPostFilterTest {
         rateLimitProperties.setEnabled(true);
         when(httpServletRequest.getAttribute(REQUEST_START_TIME)).thenReturn(System.currentTimeMillis());
         Policy defaultPolicy = new Policy();
-        defaultPolicy.setQuota(2L);
+        defaultPolicy.setQuota(Duration.ofSeconds(2));
         rateLimitProperties.setDefaultPolicyList(Lists.newArrayList(defaultPolicy));
         when(rateLimitKeyGenerator.key(any(), any(), any())).thenReturn("generatedKey");
 

@@ -16,27 +16,28 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
 
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORM_BODY_WRAPPER_FILTER_ORDER;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_RESPONSE_FILTER_ORDER;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.validators.Policies;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
+import org.springframework.boot.convert.DurationUnit;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.validation.annotation.Validated;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import java.util.List;
-import java.util.Map;
-
-import static java.util.concurrent.TimeUnit.MINUTES;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORM_BODY_WRAPPER_FILTER_ORDER;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_RESPONSE_FILTER_ORDER;
 
 /**
  * @author Marcos Barbero
@@ -155,15 +156,24 @@ public class RateLimitProperties {
     }
 
     public static class Policy {
-
+        /**
+         * Refresh interval window (in seconds).
+         */
         @NotNull
-        private Long refreshInterval = MINUTES.toSeconds(1L);
+        @DurationUnit(ChronoUnit.SECONDS)
+        private Duration refreshInterval = Duration.ofSeconds(60);
 
+        /**
+         * Request number limit per refresh interval window.
+         */
         private Long limit;
 
-        private Long quota;
+        /**
+         * Request time limit per refresh interval window (in seconds).
+         */
+        @DurationUnit(ChronoUnit.SECONDS)
+        private Duration quota;
 
-        @NotNull
         private boolean breakOnMatch;
 
         @Valid
@@ -171,11 +181,11 @@ public class RateLimitProperties {
         @NestedConfigurationProperty
         private List<MatchType> type = Lists.newArrayList();
 
-        public Long getRefreshInterval() {
+        public Duration getRefreshInterval() {
             return refreshInterval;
         }
 
-        public void setRefreshInterval(Long refreshInterval) {
+        public void setRefreshInterval(Duration refreshInterval) {
             this.refreshInterval = refreshInterval;
         }
 
@@ -187,11 +197,11 @@ public class RateLimitProperties {
             this.limit = limit;
         }
 
-        public Long getQuota() {
+        public Duration getQuota() {
             return quota;
         }
 
-        public void setQuota(Long quota) {
+        public void setQuota(Duration quota) {
             this.quota = quota;
         }
 

@@ -18,7 +18,7 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import org.springframework.data.redis.core.StringRedisTemplate;
-
+import java.time.Duration;
 import java.util.Objects;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -39,7 +39,7 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
     }
 
     @Override
-    protected void calcRemainingLimit(final Long limit, final Long refreshInterval,
+    protected void calcRemainingLimit(final Long limit, final Duration refreshInterval,
                                       final Long requestTime, final String key, final Rate rate) {
         if (Objects.nonNull(limit)) {
             long usage = requestTime == null ? 1L : 0L;
@@ -49,7 +49,7 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
     }
 
     @Override
-    protected void calcRemainingQuota(final Long quota, final Long refreshInterval,
+    protected void calcRemainingQuota(final Long quota, final Duration refreshInterval,
                                       final Long requestTime, final String key, final Rate rate) {
         if (Objects.nonNull(quota)) {
             String quotaKey = key + QUOTA_SUFFIX;
@@ -59,11 +59,11 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
         }
     }
 
-    private Long calcRemaining(Long limit, Long refreshInterval, long usage, String key, Rate rate) {
-        rate.setReset(SECONDS.toMillis(refreshInterval));
+    private Long calcRemaining(Long limit, Duration refreshInterval, long usage, String key, Rate rate) {
+        rate.setReset(refreshInterval.toMillis());
         Long current = 0L;
         try {
-            Boolean present = redisTemplate.opsForValue().setIfAbsent(key, Long.toString(usage), refreshInterval, SECONDS);
+            Boolean present = redisTemplate.opsForValue().setIfAbsent(key, Long.toString(usage), refreshInterval.getSeconds(), SECONDS);
             if (Boolean.FALSE.equals(present)) {
                 // Key already exists, increment
                 current = redisTemplate.opsForValue().increment(key, usage);

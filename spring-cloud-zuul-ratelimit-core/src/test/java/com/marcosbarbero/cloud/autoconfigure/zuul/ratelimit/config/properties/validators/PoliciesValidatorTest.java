@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
 import javax.validation.*;
+import java.time.Duration;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,7 +24,7 @@ public class PoliciesValidatorTest {
     private ConstraintValidatorContext constraintValidatorContext;
     private RateLimitProperties properties;
 
-    private Policy getPolicy(Long limit, Long quota) {
+    private Policy getPolicy(Long limit, Duration quota) {
         Policy policy = new Policy();
         policy.setLimit(limit);
         policy.setQuota(quota);
@@ -75,7 +76,7 @@ public class PoliciesValidatorTest {
     @Test
     public void testValidOnPolicyWithQuotaNoLimit() {
         properties.setKeyPrefix("prefix");
-        Policy policy = getPolicy(null, 1L);
+        Policy policy = getPolicy(null, Duration.ofSeconds(1));
         properties.getDefaultPolicyList().add(policy);
         properties.getPolicyList().put("key", Lists.newArrayList(policy));
         Set<ConstraintViolation<RateLimitProperties>> violations = validator.validate(properties);

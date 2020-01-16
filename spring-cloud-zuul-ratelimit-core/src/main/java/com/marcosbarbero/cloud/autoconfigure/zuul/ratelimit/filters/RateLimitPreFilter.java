@@ -29,6 +29,7 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitExceededEvent;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitExceededException;
 import com.netflix.zuul.context.RequestContext;
+import java.time.Duration;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -90,11 +91,11 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
                 responseHeaders.put(HEADER_REMAINING + httpHeaderKey, String.valueOf(Math.max(remaining, 0)));
             }
 
-            final Long quota = policy.getQuota();
+            final Duration quota = policy.getQuota();
             final Long remainingQuota = rate.getRemainingQuota();
             if (quota != null) {
                 request.setAttribute(REQUEST_START_TIME, System.currentTimeMillis());
-                responseHeaders.put(HEADER_QUOTA + httpHeaderKey, String.valueOf(quota));
+                responseHeaders.put(HEADER_QUOTA + httpHeaderKey, String.valueOf(quota.getSeconds()));
                 responseHeaders.put(HEADER_REMAINING_QUOTA + httpHeaderKey,
                     String.valueOf(MILLISECONDS.toSeconds(Math.max(remainingQuota, 0))));
             }

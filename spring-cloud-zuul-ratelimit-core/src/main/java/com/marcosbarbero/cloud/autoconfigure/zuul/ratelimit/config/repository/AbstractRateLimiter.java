@@ -19,10 +19,7 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
-
 import java.util.Date;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * Abstract implementation for {@link RateLimiter}.
@@ -68,8 +65,8 @@ public abstract class AbstractRateLimiter implements RateLimiter {
         }
 
         Long limit = policy.getLimit();
-        Long quota = policy.getQuota() != null ? SECONDS.toMillis(policy.getQuota()) : null;
-        Long refreshInterval = SECONDS.toMillis(policy.getRefreshInterval());
+        Long quota = policy.getQuota() != null ? policy.getQuota().toMillis() : null;
+        Long refreshInterval = policy.getRefreshInterval().toMillis();
         Date expiration = new Date(System.currentTimeMillis() + refreshInterval);
 
         return new Rate(key, limit, quota, refreshInterval, expiration);
