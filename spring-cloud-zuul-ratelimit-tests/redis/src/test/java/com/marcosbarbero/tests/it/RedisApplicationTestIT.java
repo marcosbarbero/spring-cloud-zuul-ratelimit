@@ -19,11 +19,13 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.Re
 import com.marcosbarbero.tests.RedisApplication;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 
@@ -39,6 +41,14 @@ public class RedisApplicationTestIT {
 
     @Autowired
     private ApplicationContext context;
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    @BeforeEach
+    void resetStorage() {
+      redisTemplate.delete(redisTemplate.keys("*"));
+    }
 
     @Test
     public void testRedisRateLimiter() {
@@ -114,6 +124,33 @@ public class RedisApplicationTestIT {
         headers = response.getHeaders();
         assertHeaders(headers, key, false, true);
         assertEquals(TOO_MANY_REQUESTS, response.getStatusCode());
+    }
+
+    @Test
+    public void testShouldReturnCorrectRateRemainingValue() {
+        String key = "rate-limit-application_serviceA_127.0.0.1";
+
+        Long rateLimit = 10L;
+        Long requestCounter = rateLimit;
+        do {
+            ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceA", String.class);
+            assertEquals(OK, response.getStatusCode());
+            HttpHeaders headers = response.getHeaders();
+            assertHeaders(headers, key, false, false);
+            Long limit = Long.valueOf(headers.getFirst(HEADER_LIMIT + key));
+            assertEquals(rateLimit, limit);
+            Long remaining = Long.valueOf(headers.getFirst(HEADER_REMAINING + key));
+            assertEquals(--requestCounter, remaining);
+        } while (requestCounter > 0);
+
+        ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceA", String.class);
+        assertEquals(TOO_MANY_REQUESTS, response.getStatusCode());
+        HttpHeaders headers = response.getHeaders();
+        assertHeaders(headers, key, false, false);
+        String limit = headers.getFirst(HEADER_LIMIT + key);
+        assertEquals("10", limit);
+        String remaining = headers.getFirst(HEADER_REMAINING + key);
+        assertEquals("0", remaining);
     }
 
     private void assertHeaders(HttpHeaders headers, String key, boolean nullable, boolean quotaHeaders) {
