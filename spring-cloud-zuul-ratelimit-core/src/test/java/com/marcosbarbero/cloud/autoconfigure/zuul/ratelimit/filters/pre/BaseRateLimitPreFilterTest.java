@@ -34,10 +34,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.cloud.netflix.zuul.filters.Route;
@@ -215,6 +219,32 @@ public abstract class BaseRateLimitPreFilterTest {
             this.filter.run();
             assertHeaders(key, verbosity);
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource("headersBackwardsCompatibility")
+    void testReturnHeadersBackwardsCompatibility(boolean addHeaderValue, ResponseHeadersVerbosity expected) {
+        request.setRequestURI("/serviceA");
+        request.setRemoteAddr("10.0.0.100");
+        request.setMethod("GET");
+
+        properties.setAddResponseHeaders(addHeaderValue);
+
+        assertTrue(this.filter.shouldFilter());
+
+        String key = "-null_serviceA_10.0.0.100_anonymous_GET";
+
+        for (int i = 0; i < 2; i++) {
+            this.filter.run();
+            assertHeaders(key, expected);
+        }
+    }
+
+    static Stream<Arguments> headersBackwardsCompatibility() {
+        return Stream.of(
+            Arguments.of(true, ResponseHeadersVerbosity.VERBOSE),
+            Arguments.of(false, ResponseHeadersVerbosity.NONE)
+        );
     }
 
     void assertHeaders(final String key, ResponseHeadersVerbosity headersVerbosity) {
