@@ -16,7 +16,14 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.*;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.ResponseHeadersVerbosity.VERBOSE;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_LIMIT;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_QUOTA;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING_QUOTA;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_RESET;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.RATE_LIMIT_EXCEEDED;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.REQUEST_START_TIME;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 
@@ -82,29 +89,29 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
 
             final String key = rateLimitKeyGenerator.key(request, route, policy);
             final Rate rate = rateLimiter.consume(policy, key, null);
-            final String httpHeaderKey = key.replaceAll("[^A-Za-z0-9-.]", "_").replaceAll("__", "_");
 
             final Long limit = policy.getLimit();
             final Long remaining = rate.getRemaining();
             if (limit != null) {
-                responseHeaders.put(HEADER_LIMIT + httpHeaderKey, String.valueOf(limit));
-                responseHeaders.put(HEADER_REMAINING + httpHeaderKey, String.valueOf(Math.max(remaining, 0)));
+                responseHeaders.put(HEADER_LIMIT, String.valueOf(limit));
+                responseHeaders.put(HEADER_REMAINING, String.valueOf(Math.max(remaining, 0)));
             }
 
             final Duration quota = policy.getQuota();
             final Long remainingQuota = rate.getRemainingQuota();
             if (quota != null) {
                 request.setAttribute(REQUEST_START_TIME, System.currentTimeMillis());
-                responseHeaders.put(HEADER_QUOTA + httpHeaderKey, String.valueOf(quota.getSeconds()));
-                responseHeaders.put(HEADER_REMAINING_QUOTA + httpHeaderKey,
-                    String.valueOf(MILLISECONDS.toSeconds(Math.max(remainingQuota, 0))));
+                responseHeaders.put(HEADER_QUOTA, String.valueOf(quota.getSeconds()));
+                responseHeaders.put(HEADER_REMAINING_QUOTA, String.valueOf(MILLISECONDS.toSeconds(Math.max(remainingQuota, 0))));
             }
 
-            responseHeaders.put(HEADER_RESET + httpHeaderKey, String.valueOf(rate.getReset()));
+            responseHeaders.put(HEADER_RESET, String.valueOf(rate.getReset()));
 
             if (properties.isAddResponseHeaders()) {
+                final String httpHeaderKey = key.replaceAll("[^A-Za-z0-9-.]", "_").replaceAll("__", "_");
                 for (Map.Entry<String, String> headersEntry : responseHeaders.entrySet()) {
-                    response.setHeader(headersEntry.getKey(), headersEntry.getValue());
+                    String header = VERBOSE.equals(properties.getResponseHeaders()) ? headersEntry.getKey() + "-" + httpHeaderKey : headersEntry.getKey();
+                    response.setHeader(header, headersEntry.getValue());
                 }
             }
 

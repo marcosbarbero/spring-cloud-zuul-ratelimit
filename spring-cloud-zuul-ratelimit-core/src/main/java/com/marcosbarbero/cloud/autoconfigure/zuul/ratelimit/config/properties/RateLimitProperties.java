@@ -16,6 +16,8 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
 
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.ResponseHeadersVerbosity.NONE;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.ResponseHeadersVerbosity.VERBOSE;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORM_BODY_WRAPPER_FILTER_ORDER;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_RESPONSE_FILTER_ORDER;
 
@@ -66,7 +68,8 @@ public class RateLimitProperties {
 
     private boolean enabled;
 
-    private boolean addResponseHeaders = true;
+    @NotNull
+    private ResponseHeadersVerbosity responseHeaders = VERBOSE;
 
     @NotNull
     @Value("${spring.application.name:rate-limit-application}")
@@ -115,12 +118,26 @@ public class RateLimitProperties {
         this.enabled = enabled;
     }
 
+    /**
+     * Tells if rate limit response headers should be added to response.
+     *
+     * @deprecated use {{@link #responseHeaders}
+     */
+    @Deprecated
     public boolean isAddResponseHeaders() {
-        return addResponseHeaders;
+        return !NONE.equals(responseHeaders);
     }
 
     public void setAddResponseHeaders(boolean addResponseHeaders) {
-        this.addResponseHeaders = addResponseHeaders;
+        setResponseHeaders(addResponseHeaders ? VERBOSE : NONE);
+    }
+
+    public ResponseHeadersVerbosity getResponseHeaders() {
+      return this.responseHeaders;
+    }
+
+    public void setResponseHeaders(ResponseHeadersVerbosity responseHeaders) {
+      this.responseHeaders = responseHeaders;
     }
 
     public String getKeyPrefix() {

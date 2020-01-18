@@ -3,14 +3,16 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.pre;
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RateLimiterErrorHandler;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RedisRateLimiter;
-
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,7 +67,7 @@ public class RedisRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
             this.filter.run();
         }
 
-        String key = "null_serviceA_10.0.0.100_anonymous";
+        String key = "-null_serviceA_10.0.0.100_anonymous";
         String remaining = this.response.getHeader(HEADER_REMAINING + key);
         assertEquals("0", remaining);
 
@@ -91,7 +93,7 @@ public class RedisRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
 
         assertTrue(this.filter.shouldFilter());
 
-        String key = "null_serviceA_10.0.0.100_anonymous_GET";
+        String key = "-null_serviceA_10.0.0.100_anonymous_GET";
 
         long requestCounter = 2;
         for (int i = 0; i < 2; i++) {
