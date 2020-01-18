@@ -123,6 +123,9 @@ public class Bucket4jHazelcastApplicationTestIT {
     }
 
     private void assertHeaders(HttpHeaders headers, String key, boolean nullable, boolean quotaHeaders) {
+        if (key != null && !key.startsWith("-")) {
+          key = "-" + key;
+        }
         String quota = headers.getFirst(HEADER_QUOTA + key);
         String remainingQuota = headers.getFirst(HEADER_REMAINING_QUOTA + key);
         String limit = headers.getFirst(HEADER_LIMIT + key);

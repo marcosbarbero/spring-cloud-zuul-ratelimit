@@ -128,7 +128,7 @@ public class RedisApplicationTestIT {
 
     @Test
     public void testShouldReturnCorrectRateRemainingValue() {
-        String key = "rate-limit-application_serviceA_127.0.0.1";
+        String key = "-rate-limit-application_serviceA_127.0.0.1";
 
         Long rateLimit = 10L;
         Long requestCounter = rateLimit;
