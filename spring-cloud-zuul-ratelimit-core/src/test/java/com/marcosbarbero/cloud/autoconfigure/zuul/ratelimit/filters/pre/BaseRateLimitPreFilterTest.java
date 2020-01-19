@@ -41,7 +41,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.cloud.netflix.zuul.filters.Route;
@@ -213,7 +212,7 @@ public abstract class BaseRateLimitPreFilterTest {
 
         assertTrue(this.filter.shouldFilter());
 
-        String key = "-null_serviceA_10.0.0.100_anonymous_GET";
+        String key = "null_serviceA_10.0.0.100_anonymous_GET";
 
         for (int i = 0; i < 2; i++) {
             this.filter.run();
@@ -232,7 +231,7 @@ public abstract class BaseRateLimitPreFilterTest {
 
         assertTrue(this.filter.shouldFilter());
 
-        String key = "-null_serviceA_10.0.0.100_anonymous_GET";
+        String key = "null_serviceA_10.0.0.100_anonymous_GET";
 
         for (int i = 0; i < 2; i++) {
             this.filter.run();
@@ -247,30 +246,37 @@ public abstract class BaseRateLimitPreFilterTest {
         );
     }
 
-    void assertHeaders(final String key, ResponseHeadersVerbosity headersVerbosity) {
+    void assertHeaders(String key, ResponseHeadersVerbosity headersVerbosity) {
+        final String headerKey;
+        if (key != null && !key.startsWith("-")) {
+            headerKey = "-" + key;
+        } else {
+            headerKey = "";
+        }
         Collection<String> headerNames = response.getHeaderNames();
 
         switch (headersVerbosity) {
         case NONE:
-          assertTrue(headerNames.stream().noneMatch(header -> header.startsWith("X-RateLimit-")), "There should be no rate-limit headers");
-          break;
+            assertTrue(headerNames.stream().noneMatch(header -> header.startsWith("X-RateLimit-")), "There should be no rate-limit headers");
+            break;
         case STANDARD:
-          assertAll("Rate-limit headers should not contain any other information",
-              () -> headerNames.contains(HEADER_QUOTA),
-              () -> headerNames.contains(HEADER_REMAINING_QUOTA),
-              () -> headerNames.contains(HEADER_LIMIT),
-              () -> headerNames.contains(HEADER_REMAINING),
-              () -> headerNames.contains(HEADER_RESET)
-          );
-          break;
+            assertAll("Rate-limit headers should not contain any other information",
+                () -> headerNames.contains(HEADER_QUOTA),
+                () -> headerNames.contains(HEADER_REMAINING_QUOTA),
+                () -> headerNames.contains(HEADER_LIMIT),
+                () -> headerNames.contains(HEADER_REMAINING),
+                () -> headerNames.contains(HEADER_RESET)
+            );
+            break;
         case VERBOSE:
-          assertAll("Rate-limit headers should contain key information",
-              () -> headerNames.contains(HEADER_QUOTA + key),
-              () -> headerNames.contains(HEADER_REMAINING_QUOTA + key),
-              () -> headerNames.contains(HEADER_LIMIT + key),
-              () -> headerNames.contains(HEADER_REMAINING + key),
-              () -> headerNames.contains(HEADER_RESET + key)
-          );
+            assertAll("Rate-limit headers should contain key information",
+                () -> headerNames.contains(HEADER_QUOTA + headerKey),
+                () -> headerNames.contains(HEADER_REMAINING_QUOTA + headerKey),
+                () -> headerNames.contains(HEADER_LIMIT + headerKey),
+                () -> headerNames.contains(HEADER_REMAINING + headerKey),
+                () -> headerNames.contains(HEADER_RESET + headerKey)
+            );
+            break;
         }
     }
 }
