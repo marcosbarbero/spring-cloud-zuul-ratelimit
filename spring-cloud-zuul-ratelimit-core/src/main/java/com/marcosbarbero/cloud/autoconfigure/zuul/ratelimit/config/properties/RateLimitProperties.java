@@ -35,6 +35,7 @@ import javax.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.boot.convert.DurationUnit;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -124,6 +125,7 @@ public class RateLimitProperties {
      * @deprecated use {{@link #responseHeaders}
      */
     @Deprecated
+    @DeprecatedConfigurationProperty(replacement = "zuul.ratelimit.response-headers")
     public boolean isAddResponseHeaders() {
         return !NONE.equals(responseHeaders);
     }
