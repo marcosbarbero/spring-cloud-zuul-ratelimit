@@ -128,7 +128,7 @@ public class RedisApplicationTestIT {
 
     @Test
     public void testShouldReturnCorrectRateRemainingValue() {
-        String key = "rate-limit-application_serviceA_127.0.0.1";
+        String key = "-rate-limit-application_serviceA_127.0.0.1";
 
         Long rateLimit = 10L;
         Long requestCounter = rateLimit;
@@ -154,6 +154,12 @@ public class RedisApplicationTestIT {
     }
 
     private void assertHeaders(HttpHeaders headers, String key, boolean nullable, boolean quotaHeaders) {
+        if (key != null && !key.startsWith("-")) {
+          key = "-" + key;
+        } else if (key == null) {
+          key = "";
+        }
+
         String quota = headers.getFirst(HEADER_QUOTA + key);
         String remainingQuota = headers.getFirst(HEADER_REMAINING_QUOTA + key);
         String limit = headers.getFirst(HEADER_LIMIT + key);
