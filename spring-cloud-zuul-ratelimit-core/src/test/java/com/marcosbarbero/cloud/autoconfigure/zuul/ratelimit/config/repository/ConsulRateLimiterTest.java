@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.ecwid.consul.v1.ConsulClient;
@@ -17,8 +17,8 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.Map;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -32,7 +32,7 @@ public class ConsulRateLimiterTest extends BaseRateLimiterTest {
     @Mock
     private ObjectMapper objectMapper;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         Map<String, String> repository = Maps.newHashMap();
@@ -58,7 +58,9 @@ public class ConsulRateLimiterTest extends BaseRateLimiterTest {
         GetValue getValue = new GetValue();
         getValue.setValue("");
         when(consulClient.getKVValue(any())).thenReturn(new Response<>(getValue, 1L, true, 1L));
-        when(objectMapper.readValue(anyString(), eq(Rate.class))).thenThrow(new IOException());
+        when(objectMapper.readValue(anyString(), eq(Rate.class))).thenAnswer(invocation -> {
+            throw new IOException();
+        });
         ConsulRateLimiter consulRateLimiter = new ConsulRateLimiter(rateLimiterErrorHandler, consulClient, objectMapper);
 
         Rate rate = consulRateLimiter.getRate("");
@@ -72,6 +74,6 @@ public class ConsulRateLimiterTest extends BaseRateLimiterTest {
         ConsulRateLimiter consulRateLimiter = new ConsulRateLimiter(rateLimiterErrorHandler, consulClient, objectMapper);
 
         consulRateLimiter.saveRate(null);
-        verifyZeroInteractions(consulClient);
+        verifyNoInteractions(consulClient);
     }
 }

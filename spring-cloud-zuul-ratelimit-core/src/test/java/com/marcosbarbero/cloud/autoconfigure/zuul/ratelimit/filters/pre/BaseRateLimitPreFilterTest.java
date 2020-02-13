@@ -1,10 +1,15 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.pre;
 
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_LIMIT;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_QUOTA;
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING_QUOTA;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_RESET;
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
 import com.google.common.collect.Lists;
@@ -15,24 +20,33 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.MatchType;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitType;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.ResponseHeadersVerbosity;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.commons.TestRouteLocator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitUtils;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.monitoring.CounterFactory;
+import java.time.Duration;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import org.junit.Before;
-import org.junit.Test;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.cloud.netflix.zuul.metrics.EmptyCounterFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.context.request.RequestAttributes;
@@ -44,14 +58,16 @@ import org.springframework.web.util.UrlPathHelper;
  * @since 2017-06-30
  */
 public abstract class BaseRateLimitPreFilterTest {
-
-    RateLimitPreFilter filter;
-
     @Mock
     private RequestAttributes requestAttributes;
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     MockHttpServletRequest request;
     MockHttpServletResponse response;
+
+    RateLimitPreFilter filter;
+    RateLimitProperties properties;
 
     private RequestContext context;
     private RateLimiter rateLimiter;
@@ -69,8 +85,8 @@ public abstract class BaseRateLimitPreFilterTest {
 
         Policy policy = new Policy();
         policy.setLimit(2L);
-        policy.setQuota(2L);
-        policy.setRefreshInterval(2L);
+        policy.setQuota(Duration.ofSeconds(2));
+        policy.setRefreshInterval(Duration.ofSeconds(2));
         policy.getType().add(new MatchType(RateLimitType.ORIGIN, null));
         policy.getType().add(new MatchType(RateLimitType.URL, null));
         policy.getType().add(new MatchType(RateLimitType.USER, null));
@@ -91,19 +107,19 @@ public abstract class BaseRateLimitPreFilterTest {
         this.rateLimiter = rateLimiter;
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         CounterFactory.initialize(new EmptyCounterFactory());
         this.request = new MockHttpServletRequest();
         this.response = new MockHttpServletResponse();
-        RateLimitProperties properties = this.properties();
+        properties = this.properties();
         RateLimitUtils rateLimitUtils = new DefaultRateLimitUtils(properties);
         RateLimitKeyGenerator rateLimitKeyGenerator = new DefaultRateLimitKeyGenerator(properties,
             rateLimitUtils);
         UrlPathHelper urlPathHelper = new UrlPathHelper();
         this.filter = new RateLimitPreFilter(properties, this.routeLocator(), urlPathHelper, this.rateLimiter,
-            rateLimitKeyGenerator, rateLimitUtils);
+            rateLimitKeyGenerator, rateLimitUtils, eventPublisher);
         this.context = new RequestContext();
         RequestContext.testSetCurrentContext(this.context);
         RequestContextHolder.setRequestAttributes(requestAttributes);
@@ -124,7 +140,7 @@ public abstract class BaseRateLimitPreFilterTest {
             this.filter.run();
         }
 
-        String key = "null_serviceA_10.0.0.100_anonymous_GET";
+        String key = "-null_serviceA_10.0.0.100_anonymous_GET";
         String remaining = this.response.getHeader(HEADER_REMAINING + key);
         assertEquals("0", remaining);
 
@@ -153,8 +169,8 @@ public abstract class BaseRateLimitPreFilterTest {
         }
 
         String exceeded = (String) this.context.get("rateLimitExceeded");
-        assertTrue("RateLimit Exceeded", Boolean.valueOf(exceeded));
-        assertEquals("Too many requests", TOO_MANY_REQUESTS.value(), this.context.getResponseStatusCode());
+        assertTrue(Boolean.valueOf(exceeded), "RateLimit Exceeded");
+        assertEquals(TOO_MANY_REQUESTS.value(), this.context.getResponseStatusCode(), "Too many requests");
     }
 
     @Test
@@ -174,7 +190,7 @@ public abstract class BaseRateLimitPreFilterTest {
         }
 
         String exceeded = (String) this.context.get("rateLimitExceeded");
-        assertFalse("RateLimit not exceeded", Boolean.valueOf(exceeded));
+        assertFalse(Boolean.valueOf(exceeded), "RateLimit not exceeded");
     }
 
     @Test
@@ -183,5 +199,84 @@ public abstract class BaseRateLimitPreFilterTest {
         this.request.setRemoteAddr("127.0.0.1");
         this.request.setMethod("GET");
         assertFalse(this.filter.shouldFilter());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ResponseHeadersVerbosity.class)
+    void testReturnHeaders(ResponseHeadersVerbosity verbosity) {
+        request.setRequestURI("/serviceA");
+        request.setRemoteAddr("10.0.0.100");
+        request.setMethod("GET");
+
+        properties.setResponseHeaders(verbosity);
+
+        assertTrue(this.filter.shouldFilter());
+
+        String key = "null_serviceA_10.0.0.100_anonymous_GET";
+
+        for (int i = 0; i < 2; i++) {
+            this.filter.run();
+            assertHeaders(key, verbosity);
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("headersBackwardsCompatibility")
+    void testReturnHeadersBackwardsCompatibility(boolean addHeaderValue, ResponseHeadersVerbosity expected) {
+        request.setRequestURI("/serviceA");
+        request.setRemoteAddr("10.0.0.100");
+        request.setMethod("GET");
+
+        properties.setAddResponseHeaders(addHeaderValue);
+
+        assertTrue(this.filter.shouldFilter());
+
+        String key = "null_serviceA_10.0.0.100_anonymous_GET";
+
+        for (int i = 0; i < 2; i++) {
+            this.filter.run();
+            assertHeaders(key, expected);
+        }
+    }
+
+    static Stream<Arguments> headersBackwardsCompatibility() {
+        return Stream.of(
+            Arguments.of(true, ResponseHeadersVerbosity.VERBOSE),
+            Arguments.of(false, ResponseHeadersVerbosity.NONE)
+        );
+    }
+
+    void assertHeaders(String key, ResponseHeadersVerbosity headersVerbosity) {
+        final String headerKey;
+        if (key != null && !key.startsWith("-")) {
+            headerKey = "-" + key;
+        } else {
+            headerKey = "";
+        }
+        Collection<String> headerNames = response.getHeaderNames();
+
+        switch (headersVerbosity) {
+        case NONE:
+            assertTrue(headerNames.stream().noneMatch(header -> header.startsWith("X-RateLimit-")), "There should be no rate-limit headers");
+            break;
+        case STANDARD:
+            assertAll("Rate-limit headers should not contain any other information",
+                () -> headerNames.contains(HEADER_QUOTA),
+                () -> headerNames.contains(HEADER_REMAINING_QUOTA),
+                () -> headerNames.contains(HEADER_LIMIT),
+                () -> headerNames.contains(HEADER_REMAINING),
+                () -> headerNames.contains(HEADER_RESET)
+            );
+            break;
+        case VERBOSE:
+            assertAll("Rate-limit headers should contain key information",
+                () -> headerNames.contains(HEADER_QUOTA + headerKey),
+                () -> headerNames.contains(HEADER_REMAINING_QUOTA + headerKey),
+                () -> headerNames.contains(HEADER_LIMIT + headerKey),
+                () -> headerNames.contains(HEADER_REMAINING + headerKey),
+                () -> headerNames.contains(HEADER_RESET + headerKey)
+            );
+            break;
+        }
     }
 }

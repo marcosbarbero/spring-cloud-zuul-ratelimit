@@ -8,13 +8,13 @@ import org.infinispan.functional.FunctionalMap;
 import org.infinispan.functional.impl.FunctionalMapImpl;
 import org.infinispan.functional.impl.ReadWriteMapImpl;
 import org.infinispan.manager.DefaultCacheManager;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.mockito.MockitoAnnotations;
 
 public class Bucket4jInfinispanRateLimiterTest extends BaseRateLimiterTest {
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         DefaultCacheManager cacheManager = new DefaultCacheManager();
@@ -25,7 +25,7 @@ public class Bucket4jInfinispanRateLimiterTest extends BaseRateLimiterTest {
         target = new Bucket4jInfinispanRateLimiter(readWriteMap);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         DefaultCacheManager cacheManager = new DefaultCacheManager();
         cacheManager.removeCache("rateLimit");

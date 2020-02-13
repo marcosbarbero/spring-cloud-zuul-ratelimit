@@ -17,8 +17,8 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
-import org.springframework.data.redis.core.RedisTemplate;
-
+import org.springframework.data.redis.core.StringRedisTemplate;
+import java.time.Duration;
 import java.util.Objects;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -27,19 +27,19 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  * @author Marcos Barbero
  * @author Liel Chayoun
  */
-@SuppressWarnings("unchecked")
 public class RedisRateLimiter extends AbstractCacheRateLimiter {
 
     private final RateLimiterErrorHandler rateLimiterErrorHandler;
-    private final RedisTemplate redisTemplate;
+    private final StringRedisTemplate redisTemplate;
 
-    public RedisRateLimiter(RateLimiterErrorHandler rateLimiterErrorHandler, RedisTemplate redisTemplate) {
+    public RedisRateLimiter(final RateLimiterErrorHandler rateLimiterErrorHandler,
+                            final StringRedisTemplate redisTemplate) {
         this.rateLimiterErrorHandler = rateLimiterErrorHandler;
         this.redisTemplate = redisTemplate;
     }
 
     @Override
-    protected void calcRemainingLimit(final Long limit, final Long refreshInterval,
+    protected void calcRemainingLimit(final Long limit, final Duration refreshInterval,
                                       final Long requestTime, final String key, final Rate rate) {
         if (Objects.nonNull(limit)) {
             long usage = requestTime == null ? 1L : 0L;
@@ -49,7 +49,7 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
     }
 
     @Override
-    protected void calcRemainingQuota(final Long quota, final Long refreshInterval,
+    protected void calcRemainingQuota(final Long quota, final Duration refreshInterval,
                                       final Long requestTime, final String key, final Rate rate) {
         if (Objects.nonNull(quota)) {
             String quotaKey = key + QUOTA_SUFFIX;
@@ -59,29 +59,21 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
         }
     }
 
-    private Long calcRemaining(Long limit, Long refreshInterval, long usage,
-                               String key, Rate rate) {
-        rate.setReset(SECONDS.toMillis(refreshInterval));
+    private Long calcRemaining(Long limit, Duration refreshInterval, long usage, String key, Rate rate) {
+        rate.setReset(refreshInterval.toMillis());
         Long current = 0L;
         try {
-            current = redisTemplate.opsForValue().increment(key, usage);
-            // Redis returns the value of key after the increment, check for the first increment, and the expiration time is set
-            if (current != null && current.equals(usage)) {
-                handleExpiration(key, refreshInterval);
+            Boolean present = redisTemplate.opsForValue().setIfAbsent(key, Long.toString(usage), refreshInterval.getSeconds(), SECONDS);
+            if (Boolean.FALSE.equals(present)) {
+                // Key already exists, increment
+                current = redisTemplate.opsForValue().increment(key, usage);
+            } else {
+                current = usage;
             }
         } catch (RuntimeException e) {
             String msg = "Failed retrieving rate for " + key + ", will return the current value";
             rateLimiterErrorHandler.handleError(msg, e);
         }
         return Math.max(-1, limit - (current != null ? current : 0L));
-    }
-
-    private void handleExpiration(String key, Long refreshInterval) {
-        try {
-            this.redisTemplate.expire(key, refreshInterval, SECONDS);
-        } catch (RuntimeException e) {
-            String msg = "Failed retrieving expiration for " + key + ", will reset now";
-            rateLimiterErrorHandler.handleError(msg, e);
-        }
     }
 }

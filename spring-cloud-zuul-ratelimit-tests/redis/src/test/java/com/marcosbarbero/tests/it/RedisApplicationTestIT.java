@@ -6,11 +6,11 @@ import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateL
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING_QUOTA;
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_RESET;
 import static org.awaitility.Awaitility.await;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
@@ -19,21 +19,20 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.Re
 import com.marcosbarbero.tests.RedisApplication;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  * @author Marcos Barbero
  * @since 2017-06-27
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class RedisApplicationTestIT {
 
@@ -43,10 +42,18 @@ public class RedisApplicationTestIT {
     @Autowired
     private ApplicationContext context;
 
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    @BeforeEach
+    void resetStorage() {
+      redisTemplate.delete(redisTemplate.keys("*"));
+    }
+
     @Test
     public void testRedisRateLimiter() {
         RateLimiter rateLimiter = context.getBean(RateLimiter.class);
-        assertTrue("RedisRateLimiter", rateLimiter instanceof RedisRateLimiter);
+        assertTrue(rateLimiter instanceof RedisRateLimiter, "RedisRateLimiter");
     }
 
     @Test
@@ -119,7 +126,40 @@ public class RedisApplicationTestIT {
         assertEquals(TOO_MANY_REQUESTS, response.getStatusCode());
     }
 
+    @Test
+    public void testShouldReturnCorrectRateRemainingValue() {
+        String key = "-rate-limit-application_serviceA_127.0.0.1";
+
+        Long rateLimit = 10L;
+        Long requestCounter = rateLimit;
+        do {
+            ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceA", String.class);
+            assertEquals(OK, response.getStatusCode());
+            HttpHeaders headers = response.getHeaders();
+            assertHeaders(headers, key, false, false);
+            Long limit = Long.valueOf(headers.getFirst(HEADER_LIMIT + key));
+            assertEquals(rateLimit, limit);
+            Long remaining = Long.valueOf(headers.getFirst(HEADER_REMAINING + key));
+            assertEquals(--requestCounter, remaining);
+        } while (requestCounter > 0);
+
+        ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceA", String.class);
+        assertEquals(TOO_MANY_REQUESTS, response.getStatusCode());
+        HttpHeaders headers = response.getHeaders();
+        assertHeaders(headers, key, false, false);
+        String limit = headers.getFirst(HEADER_LIMIT + key);
+        assertEquals("10", limit);
+        String remaining = headers.getFirst(HEADER_REMAINING + key);
+        assertEquals("0", remaining);
+    }
+
     private void assertHeaders(HttpHeaders headers, String key, boolean nullable, boolean quotaHeaders) {
+        if (key != null && !key.startsWith("-")) {
+          key = "-" + key;
+        } else if (key == null) {
+          key = "";
+        }
+
         String quota = headers.getFirst(HEADER_QUOTA + key);
         String remainingQuota = headers.getFirst(HEADER_REMAINING_QUOTA + key);
         String limit = headers.getFirst(HEADER_LIMIT + key);

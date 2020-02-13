@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.marcosbarbero.cloud</groupId>
         <artifactId>spring-cloud-zuul-ratelimit-parent</artifactId>
-        <version>2.2.6.RELEASE</version>
+        <version>2.3.0.RELEASE</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -21,10 +21,10 @@
 
     <properties>
         <main.basedir>${basedir}/..</main.basedir>
-        <bucket4j.version>4.4.1</bucket4j.version>
-        <hazelcast.version>3.12.3</hazelcast.version>
+        <bucket4j.version>4.8.0</bucket4j.version>
+        <hazelcast.version>3.12.6</hazelcast.version>
         <ignite.version>2.7.6</ignite.version>
-        <infinispan.version>9.4.16.Final</infinispan.version>
+        <infinispan.version>10.1.2.Final</infinispan.version>
     </properties>
 
     <dependencies>

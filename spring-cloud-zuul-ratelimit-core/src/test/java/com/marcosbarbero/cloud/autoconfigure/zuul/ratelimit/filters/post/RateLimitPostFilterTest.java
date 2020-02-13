@@ -6,7 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Lists;
@@ -18,9 +18,10 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPostFilter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitUtils;
 import com.netflix.zuul.context.RequestContext;
+import java.time.Duration;
 import javax.servlet.http.HttpServletRequest;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
@@ -46,7 +47,7 @@ public class RateLimitPostFilterTest {
 
     private RateLimitProperties rateLimitProperties = new RateLimitProperties();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         when(httpServletRequest.getContextPath()).thenReturn("/servicea/test");
@@ -105,7 +106,7 @@ public class RateLimitPostFilterTest {
     @Test
     public void testRunNoPolicy() {
         target.run();
-        verifyZeroInteractions(rateLimiter);
+        verifyNoInteractions(rateLimiter);
     }
 
     @Test
@@ -113,7 +114,7 @@ public class RateLimitPostFilterTest {
         rateLimitProperties.setEnabled(true);
         when(httpServletRequest.getAttribute(REQUEST_START_TIME)).thenReturn(System.currentTimeMillis());
         Policy defaultPolicy = new Policy();
-        defaultPolicy.setQuota(2L);
+        defaultPolicy.setQuota(Duration.ofSeconds(2));
         rateLimitProperties.setDefaultPolicyList(Lists.newArrayList(defaultPolicy));
         when(rateLimitKeyGenerator.key(any(), any(), any())).thenReturn("generatedKey");
 

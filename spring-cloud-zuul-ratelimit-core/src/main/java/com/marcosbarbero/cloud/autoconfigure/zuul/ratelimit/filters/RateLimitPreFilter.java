@@ -16,7 +16,14 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters;
 
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.*;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.ResponseHeadersVerbosity.VERBOSE;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_LIMIT;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_QUOTA;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING_QUOTA;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_RESET;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.RATE_LIMIT_EXCEEDED;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.REQUEST_START_TIME;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 
@@ -26,16 +33,18 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyG
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitExceededEvent;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitExceededException;
 import com.netflix.zuul.context.RequestContext;
+import java.time.Duration;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.util.UrlPathHelper;
-
-import java.util.Map;
 
 /**
  * @author Marcos Barbero
@@ -44,17 +53,18 @@ import java.util.Map;
  */
 public class RateLimitPreFilter extends AbstractRateLimitFilter {
 
-    private final RateLimitProperties properties;
     private final RateLimiter rateLimiter;
     private final RateLimitKeyGenerator rateLimitKeyGenerator;
+    private final ApplicationEventPublisher eventPublisher;
 
     public RateLimitPreFilter(final RateLimitProperties properties, final RouteLocator routeLocator,
                               final UrlPathHelper urlPathHelper, final RateLimiter rateLimiter,
-                              final RateLimitKeyGenerator rateLimitKeyGenerator, final RateLimitUtils rateLimitUtils) {
+                              final RateLimitKeyGenerator rateLimitKeyGenerator, final RateLimitUtils rateLimitUtils,
+                              final ApplicationEventPublisher eventPublisher) {
         super(properties, routeLocator, urlPathHelper, rateLimitUtils);
-        this.properties = properties;
         this.rateLimiter = rateLimiter;
         this.rateLimitKeyGenerator = rateLimitKeyGenerator;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -79,29 +89,29 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
 
             final String key = rateLimitKeyGenerator.key(request, route, policy);
             final Rate rate = rateLimiter.consume(policy, key, null);
-            final String httpHeaderKey = key.replaceAll("[^A-Za-z0-9-.]", "_").replaceAll("__", "_");
 
             final Long limit = policy.getLimit();
             final Long remaining = rate.getRemaining();
             if (limit != null) {
-                responseHeaders.put(HEADER_LIMIT + httpHeaderKey, String.valueOf(limit));
-                responseHeaders.put(HEADER_REMAINING + httpHeaderKey, String.valueOf(Math.max(remaining, 0)));
+                responseHeaders.put(HEADER_LIMIT, String.valueOf(limit));
+                responseHeaders.put(HEADER_REMAINING, String.valueOf(Math.max(remaining, 0)));
             }
 
-            final Long quota = policy.getQuota();
+            final Duration quota = policy.getQuota();
             final Long remainingQuota = rate.getRemainingQuota();
             if (quota != null) {
                 request.setAttribute(REQUEST_START_TIME, System.currentTimeMillis());
-                responseHeaders.put(HEADER_QUOTA + httpHeaderKey, String.valueOf(quota));
-                responseHeaders.put(HEADER_REMAINING_QUOTA + httpHeaderKey,
-                    String.valueOf(MILLISECONDS.toSeconds(Math.max(remainingQuota, 0))));
+                responseHeaders.put(HEADER_QUOTA, String.valueOf(quota.getSeconds()));
+                responseHeaders.put(HEADER_REMAINING_QUOTA, String.valueOf(MILLISECONDS.toSeconds(Math.max(remainingQuota, 0))));
             }
 
-            responseHeaders.put(HEADER_RESET + httpHeaderKey, String.valueOf(rate.getReset()));
+            responseHeaders.put(HEADER_RESET, String.valueOf(rate.getReset()));
 
             if (properties.isAddResponseHeaders()) {
+                final String httpHeaderKey = key.replaceAll("[^A-Za-z0-9-.]", "_").replaceAll("__", "_");
                 for (Map.Entry<String, String> headersEntry : responseHeaders.entrySet()) {
-                    response.setHeader(headersEntry.getKey(), headersEntry.getValue());
+                    String header = VERBOSE.equals(properties.getResponseHeaders()) ? headersEntry.getKey() + "-" + httpHeaderKey : headersEntry.getKey();
+                    response.setHeader(header, headersEntry.getValue());
                 }
             }
 
@@ -109,6 +119,9 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
                 ctx.setResponseStatusCode(HttpStatus.TOO_MANY_REQUESTS.value());
                 ctx.put(RATE_LIMIT_EXCEEDED, "true");
                 ctx.setSendZuulResponse(false);
+
+                eventPublisher.publishEvent(new RateLimitExceededEvent(this, policy, rateLimitUtils.getRemoteAddress(request)));
+
                 throw new RateLimitExceededException();
             }
         });

@@ -16,11 +16,10 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimiter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
+import java.time.Duration;
 
 /**
  * Bucket4j rate limiter configuration.
@@ -32,8 +31,8 @@ public abstract class AbstractCacheRateLimiter implements RateLimiter {
 
     @Override
     public synchronized Rate consume(Policy policy, String key, Long requestTime) {
-        final Long refreshInterval = policy.getRefreshInterval();
-        final Long quota = policy.getQuota() != null ? SECONDS.toMillis(policy.getQuota()) : null;
+        final Duration refreshInterval = policy.getRefreshInterval();
+        final Long quota = policy.getQuota() != null ? policy.getQuota().toMillis() : null;
         final Rate rate = new Rate(key, policy.getLimit(), quota, null, null);
 
         calcRemainingLimit(policy.getLimit(), refreshInterval, requestTime, key, rate);
@@ -42,7 +41,7 @@ public abstract class AbstractCacheRateLimiter implements RateLimiter {
         return rate;
     }
 
-    protected abstract void calcRemainingLimit(Long limit, Long refreshInterval, Long requestTime, String key, Rate rate);
+    protected abstract void calcRemainingLimit(Long limit, Duration refreshInterval, Long requestTime, String key, Rate rate);
 
-    protected abstract void calcRemainingQuota(Long quota, Long refreshInterval, Long requestTime, String key, Rate rate);
+    protected abstract void calcRemainingQuota(Long quota, Duration refreshInterval, Long requestTime, String key, Rate rate);
 }

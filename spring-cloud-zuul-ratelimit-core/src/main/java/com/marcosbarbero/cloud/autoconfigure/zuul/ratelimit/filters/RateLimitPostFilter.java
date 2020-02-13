@@ -36,7 +36,6 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
  */
 public class RateLimitPostFilter extends AbstractRateLimitFilter {
 
-    private final RateLimitProperties properties;
     private final RateLimiter rateLimiter;
     private final RateLimitKeyGenerator rateLimitKeyGenerator;
 
@@ -44,7 +43,6 @@ public class RateLimitPostFilter extends AbstractRateLimitFilter {
                                final UrlPathHelper urlPathHelper, final RateLimiter rateLimiter,
                                final RateLimitKeyGenerator rateLimitKeyGenerator, final RateLimitUtils rateLimitUtils) {
         super(properties, routeLocator, urlPathHelper, rateLimitUtils);
-        this.properties = properties;
         this.rateLimiter = rateLimiter;
         this.rateLimitKeyGenerator = rateLimitKeyGenerator;
     }

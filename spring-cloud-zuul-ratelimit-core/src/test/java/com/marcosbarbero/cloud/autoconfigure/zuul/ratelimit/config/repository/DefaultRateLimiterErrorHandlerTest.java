@@ -1,13 +1,13 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class DefaultRateLimiterErrorHandlerTest {
 
     private DefaultRateLimiterErrorHandler target;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         target = new DefaultRateLimiterErrorHandler();
     }

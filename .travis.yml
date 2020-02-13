@@ -4,11 +4,11 @@ dist: trusty
 
 sudo: false
 
-addons:
-  sonarcloud:
-    organization: marcosbarbero-github
-    token:
-      secure: bvw/c//IhNlSDnC7RS2HvzwKO1vXaW1c7FWudiiiRF2UNc7iwPyyT7pdTkFZB0DALKVeCowmh5uW3kZr5bCfOthRfXYtJ6UcD98BzkVSBdoDdpuKGC/En2nhOIHUMJe8kv4SYW3ulqNI76sjkG8GduR4fwF+uH5biHs9OrihA8OMuJ71hw09TSdqNIANmi5hjakH4DLeGFtrV8i5yMYvXsfGENmIwWSIBmfRmmQ0ksDwG/2JB1B2aeOzR4O/WTUj7TFpXvoyJ7/ccJCnMJ4zeXbizriFiuO+Db/BZvhTeTlu02wu0Is9xjl3y8ohmERffgXv4C0uWgTEBW0SA0rYcmvc83xHVtaLPSPDgmGo9WtkiXYcfMOvI8U07eGne86eL0gHkTNt7y55H98OWi4T2MT1yKov3c0sd5ejcBxoZIIM/bfQuqVM/EWTocu/JBrtAxO5zUX01m3uyLxe17ghTmO2Grryilhz2MA+a8PgfrNQMZL8s/RCUW5S+iUfyRcsC88H4OSUqKA6txp2OR5UcCVhcNx5QtVvapwGm6yvm7WSHc0iq62OHgB8ec6N2hV+lfZecSNn4eULs2sjwCoD9GHk4d5N1zw4iOarKaGgjp5qqizjxVKa3JkY8cTajYsfQGboCTDIpLF87drLtnwth9naqLHVTNHF9RElHwWWAl0=
+#addons:
+#  sonarcloud:
+#    organization: marcosbarbero-github
+#    token:
+#      secure: bvw/c//IhNlSDnC7RS2HvzwKO1vXaW1c7FWudiiiRF2UNc7iwPyyT7pdTkFZB0DALKVeCowmh5uW3kZr5bCfOthRfXYtJ6UcD98BzkVSBdoDdpuKGC/En2nhOIHUMJe8kv4SYW3ulqNI76sjkG8GduR4fwF+uH5biHs9OrihA8OMuJ71hw09TSdqNIANmi5hjakH4DLeGFtrV8i5yMYvXsfGENmIwWSIBmfRmmQ0ksDwG/2JB1B2aeOzR4O/WTUj7TFpXvoyJ7/ccJCnMJ4zeXbizriFiuO+Db/BZvhTeTlu02wu0Is9xjl3y8ohmERffgXv4C0uWgTEBW0SA0rYcmvc83xHVtaLPSPDgmGo9WtkiXYcfMOvI8U07eGne86eL0gHkTNt7y55H98OWi4T2MT1yKov3c0sd5ejcBxoZIIM/bfQuqVM/EWTocu/JBrtAxO5zUX01m3uyLxe17ghTmO2Grryilhz2MA+a8PgfrNQMZL8s/RCUW5S+iUfyRcsC88H4OSUqKA6txp2OR5UcCVhcNx5QtVvapwGm6yvm7WSHc0iq62OHgB8ec6N2hV+lfZecSNn4eULs2sjwCoD9GHk4d5N1zw4iOarKaGgjp5qqizjxVKa3JkY8cTajYsfQGboCTDIpLF87drLtnwth9naqLHVTNHF9RElHwWWAl0=
 
 jdk:
  - oraclejdk9
@@ -24,12 +24,12 @@ before_install:
   - if [ ! -z "$GPG_OWNERTRUST" ]; then echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust; fi
 
 after_success:
- - ./mvnw -pl '!spring-cloud-zuul-ratelimit-dependencies' clean org.jacoco:jacoco-maven-plugin:prepare-agent verify jacoco:report sonar:sonar coveralls:report -q -Dlogging.level.root=ERROR
+ - ./mvnw -pl '!spring-cloud-zuul-ratelimit-dependencies' clean org.jacoco:jacoco-maven-plugin:prepare-agent verify jacoco:report coveralls:report -q -Dlogging.level.root=ERROR
 
 cache:
   directories:
     - $HOME/.m2/repository
-    - $HOME/.sonar/cache
+#    - $HOME/.sonar/cache
 
 notifications:
   email:

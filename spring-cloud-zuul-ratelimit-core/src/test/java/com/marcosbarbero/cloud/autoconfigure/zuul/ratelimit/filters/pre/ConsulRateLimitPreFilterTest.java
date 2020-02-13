@@ -2,8 +2,8 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.pre;
 
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -17,8 +17,8 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.Co
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RateLimiterErrorHandler;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Marcos Barbero
@@ -33,7 +33,7 @@ public class ConsulRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
         return new Rate("key", remaining, 2000L, 100L, new Date(System.currentTimeMillis() + SECONDS.toMillis(2)));
     }
 
-    @Before
+    @BeforeEach
     @Override
     public void setUp() {
         RateLimiterErrorHandler rateLimiterErrorHandler = mock(RateLimiterErrorHandler.class);
@@ -73,7 +73,7 @@ public class ConsulRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
             this.filter.run();
         }
 
-        String key = "null_serviceA_10.0.0.100_anonymous";
+        String key = "-null_serviceA_10.0.0.100_anonymous";
         String remaining = this.response.getHeader(HEADER_REMAINING + key);
         assertEquals("0", remaining);
 
