@@ -64,7 +64,16 @@
                 <role>Project Lead</role>
             </roles>
         </developer>
-
+             
+         <developer>
+            <id>dimitribelfor</id>
+            <email>dimitri.belfor@gmail.com</email>
+            <name>Dimitri Belfor</name>
+            <timezone>Europe/Amsterdam</timezone>
+            <roles>
+                <role>Maintainer</role>
+            </roles>
+        </developer>
     </developers>
 
     <scm>
