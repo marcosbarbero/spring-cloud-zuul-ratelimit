@@ -271,7 +271,7 @@ There are eight implementations provided:
 Bucket4j implementations require the relevant bean with `@Qualifier("RateLimit")`:
 
  * `JCache` - javax.cache.Cache
- * `Hazelcast` - com.hazelcast.core.IMap
+ * `Hazelcast` - com.hazelcast.map.IMap
  * `Ignite` - org.apache.ignite.IgniteCache
  * `Infinispan` - org.infinispan.functional.ReadWriteMap
 

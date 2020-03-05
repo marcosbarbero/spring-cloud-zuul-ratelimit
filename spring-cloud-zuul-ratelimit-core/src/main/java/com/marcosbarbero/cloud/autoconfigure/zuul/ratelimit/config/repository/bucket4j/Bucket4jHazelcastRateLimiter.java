@@ -16,7 +16,7 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j;
 
-import com.hazelcast.core.IMap;
+import com.hazelcast.map.IMap;
 import io.github.bucket4j.grid.GridBucketState;
 import io.github.bucket4j.grid.ProxyManager;
 import io.github.bucket4j.grid.hazelcast.Hazelcast;
