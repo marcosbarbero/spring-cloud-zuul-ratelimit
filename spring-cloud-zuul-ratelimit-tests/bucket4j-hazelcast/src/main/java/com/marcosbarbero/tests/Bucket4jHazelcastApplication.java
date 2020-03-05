@@ -1,7 +1,7 @@
 package com.marcosbarbero.tests;
 
 import com.hazelcast.core.Hazelcast;
-import com.hazelcast.core.IMap;
+import com.hazelcast.map.IMap;
 import io.github.bucket4j.grid.GridBucketState;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
