@@ -3,6 +3,11 @@
 
 :imagesdir: ./assets/images
 
+== Spring Cloud Zuul Rate Limit EOL
+*All good things must come to an end, and as the 1.7.x line of Spring Cloud Zuul Rate Limit is built on top of https://spring.io/blog/2018/07/30/spring-boot-1-x-eol-aug-1st-2019[Spring Boot 1.x (unmaintained version)] it will no longer receive updates of fixes.*
+
+*Please upgrade your application to the latest Spring Boot version and so the latest Spring Cloud Rate Limit version.*
+
 == Overview
 Module to enable rate limit per service in Netflix Zuul.
 
