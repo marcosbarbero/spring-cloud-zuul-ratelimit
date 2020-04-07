@@ -68,10 +68,10 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
                 // Key already exists, increment
                 current = redisTemplate.opsForValue().increment(key, usage);
                 // in case the key went expired before increment, which will create a new key without expiration
-				// implicitly
-				if (redisTemplate.getExpire(key) == -1) {
-					redisTemplate.expire(key, refreshInterval.getSeconds(), SECONDS);
-				}
+                // implicitly
+                if (redisTemplate.getExpire(key) == -1) {
+                    redisTemplate.expire(key, refreshInterval.getSeconds(), SECONDS);
+                }
             } else {
                 current = usage;
             }
