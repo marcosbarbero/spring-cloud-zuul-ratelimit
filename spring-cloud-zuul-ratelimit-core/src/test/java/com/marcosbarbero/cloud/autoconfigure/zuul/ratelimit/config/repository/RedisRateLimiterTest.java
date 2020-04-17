@@ -1,5 +1,7 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -13,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Maps;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import java.time.Duration;
 import java.util.Map;
@@ -133,5 +136,21 @@ public class RedisRateLimiterTest extends BaseRateLimiterTest {
         verify(redisTemplate.opsForValue()).setIfAbsent(anyString(), anyString(), anyLong(), any());
         verify(redisTemplate.opsForValue(), never()).increment(any(), anyLong());
         verify(rateLimiterErrorHandler, never()).handleError(any(), any());
+    }
+
+    @Test // https://github.com/marcosbarbero/spring-cloud-zuul-ratelimit/issues/311
+    public void testConsume_negativeTTL() {
+        when(redisTemplate.getExpire("key")).thenReturn(-1L);
+
+        Policy policy = new Policy();
+        policy.setLimit(10L);
+        policy.setQuota(Duration.ofSeconds(1));
+        policy.setRefreshInterval(Duration.ofSeconds(2));
+
+        Rate rate = target.consume(policy, "key", null);
+        assertThat(rate.getRemaining()).isEqualTo(9L);
+        assertThat(rate.getRemainingQuota()).isEqualTo(1000L);
+
+        verify(redisTemplate).expire("key", 1, SECONDS);
     }
 }
