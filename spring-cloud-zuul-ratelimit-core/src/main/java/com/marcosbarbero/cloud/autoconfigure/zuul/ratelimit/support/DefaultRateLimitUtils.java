@@ -20,7 +20,6 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtil
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Set;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_FOR_HEADER;
 
@@ -52,8 +51,4 @@ public class DefaultRateLimitUtils implements RateLimitUtils {
         return request.getRemoteAddr();
     }
 
-    @Override
-    public Set<String> getUserRoles() {
-        throw new UnsupportedOperationException("Not supported");
-    }
 }

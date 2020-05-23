@@ -73,4 +73,20 @@ public class StringToMatchTypeConverterTest {
         assertThat(matchType.getType()).isEqualByComparingTo(RateLimitType.HTTP_METHOD);
         assertThat(matchType.getMatcher()).isEqualTo("get");
     }
+
+    @Test
+    public void testConvertStringTypeClientId() {
+        MatchType matchType = target.convert("client_id");
+        assertThat(matchType).isNotNull();
+        assertThat(matchType.getType()).isEqualByComparingTo(RateLimitType.CLIENT_ID);
+        assertThat(matchType.getMatcher()).isNull();
+    }
+
+    @Test
+    public void testConvertStringTypeClientIdWithMatcher() {
+        MatchType matchType = target.convert("client_id=optimus_prime");
+        assertThat(matchType).isNotNull();
+        assertThat(matchType.getType()).isEqualByComparingTo(RateLimitType.CLIENT_ID);
+        assertThat(matchType.getMatcher()).isEqualTo("optimus_prime");
+    }
 }

@@ -45,6 +45,12 @@ public interface RateLimitUtils {
      *
      * @return The authenticated user's roles or empty
      */
-    Set<String> getUserRoles();
+    default Set<String> getUserRoles() {
+        throw new UnsupportedOperationException("Not supported");
+    }
+
+    default String getClientId() {
+        throw new UnsupportedOperationException("Not supported");
+    }
 
 }

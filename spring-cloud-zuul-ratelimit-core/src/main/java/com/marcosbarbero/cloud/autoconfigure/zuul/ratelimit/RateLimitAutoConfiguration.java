@@ -37,6 +37,8 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPos
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitUtils;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.OAuth2OnClassPath;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.OAuth2SecuredRateLimitUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.SecuredRateLimitUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.StringToMatchTypeConverter;
 import com.netflix.zuul.ZuulFilter;
@@ -59,6 +61,7 @@ import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -120,13 +123,23 @@ public class RateLimitAutoConfiguration {
     public static class RateLimitUtilsConfiguration {
 
         @Bean
+        @Conditional(OAuth2OnClassPath.class)
+        public RateLimitUtils oauth2SecuredRateLimitUtils(final RateLimitProperties rateLimitProperties) {
+            return new OAuth2SecuredRateLimitUtils(rateLimitProperties);
+        }
+
+        @Bean
         @ConditionalOnClass(name = "org.springframework.security.core.Authentication")
+        @ConditionalOnMissingClass("org.springframework.security.oauth2.provider.OAuth2Authentication")
         public RateLimitUtils securedRateLimitUtils(final RateLimitProperties rateLimitProperties) {
             return new SecuredRateLimitUtils(rateLimitProperties);
         }
 
         @Bean
-        @ConditionalOnMissingClass("org.springframework.security.core.Authentication")
+        @ConditionalOnMissingClass({
+                "org.springframework.security.core.Authentication",
+                "org.springframework.security.oauth2.provider.OAuth2Authentication"
+        })
         public RateLimitUtils rateLimitUtils(final RateLimitProperties rateLimitProperties) {
             return new DefaultRateLimitUtils(rateLimitProperties);
         }
