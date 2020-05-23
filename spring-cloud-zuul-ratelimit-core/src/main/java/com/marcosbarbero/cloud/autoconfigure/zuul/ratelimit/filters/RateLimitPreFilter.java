@@ -107,7 +107,7 @@ public class RateLimitPreFilter extends AbstractRateLimitFilter {
 
             responseHeaders.put(HEADER_RESET, String.valueOf(rate.getReset()));
 
-            if (properties.isAddResponseHeaders()) {
+            if (VERBOSE.equals(properties.getResponseHeaders())) {
                 final String httpHeaderKey = key.replaceAll("[^A-Za-z0-9-.]", "_").replaceAll("__", "_");
                 for (Map.Entry<String, String> headersEntry : responseHeaders.entrySet()) {
                     String header = VERBOSE.equals(properties.getResponseHeaders()) ? headersEntry.getKey() + "-" + httpHeaderKey : headersEntry.getKey();
