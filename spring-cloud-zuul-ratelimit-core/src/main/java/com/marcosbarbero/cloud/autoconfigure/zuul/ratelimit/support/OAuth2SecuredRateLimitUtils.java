@@ -3,7 +3,7 @@ package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 public class OAuth2SecuredRateLimitUtils extends SecuredRateLimitUtils {
@@ -18,9 +18,8 @@ public class OAuth2SecuredRateLimitUtils extends SecuredRateLimitUtils {
     public String getClientId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication instanceof OAuth2Authentication) {
-            return ((OAuth2Authentication) authentication).getOAuth2Request().getClientId();
-        } else if (authentication instanceof JwtAuthenticationToken) {
+        if (authentication instanceof OAuth2AuthenticationToken
+                || authentication instanceof JwtAuthenticationToken) {
             return authentication.getName();
         }
 

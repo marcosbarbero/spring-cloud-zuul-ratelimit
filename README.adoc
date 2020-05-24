@@ -199,6 +199,8 @@ zuul:
             - http_method=get #case insensitive
         - type:
             - url_pattern=/api/*/payment
+        - type:
+            - client_id=380d7fd3-617a
 ----
 
 Sample Properties configuration
@@ -302,7 +304,7 @@ Policy properties:
 |limit           |number of calls      |  -
 |quota           |time of calls        |  -
 |refresh-interval|seconds              | 60
-|type            | [ORIGIN, USER, URL, URL_PATTERN, ROLE, HTTP_METHOD] | []
+|type            | [ORIGIN, USER, URL, URL_PATTERN, ROLE, HTTP_METHOD, CLIENT_ID] | []
 |breakOnMatch    |true/false           |false
 
 |===

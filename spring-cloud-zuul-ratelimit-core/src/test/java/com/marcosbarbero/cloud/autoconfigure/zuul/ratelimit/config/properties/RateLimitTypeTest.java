@@ -134,6 +134,11 @@ public class RateLimitTypeTest {
     }
 
     @Test
+    public void doNotApplyClientId() {
+        assertThrows(UnsupportedOperationException.class, () -> RateLimitType.CLIENT_ID.apply(httpServletRequest, route, rateLimitUtils, null));
+    }
+
+    @Test
     public void applyMethod() {
         when(httpServletRequest.getMethod()).thenReturn("GET");
 

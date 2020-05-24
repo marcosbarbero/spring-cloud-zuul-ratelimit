@@ -177,4 +177,12 @@ public class DefaultRateLimitKeyGeneratorTest {
         String key = target.key(httpServletRequest, route, policy);
         assertThat(key).isEqualTo("key-prefix:id:http-method:GET");
     }
+
+    @Test
+    public void testClientIdWithMatcher() {
+        Policy policy = new Policy();
+        policy.getType().add(new MatchType(RateLimitType.CLIENT_ID, "optimus_prime"));
+        String key = target.key(httpServletRequest, route, policy);
+        assertThat(key).isEqualTo("key-prefix:id:optimus_prime:optimus_prime");
+    }
 }

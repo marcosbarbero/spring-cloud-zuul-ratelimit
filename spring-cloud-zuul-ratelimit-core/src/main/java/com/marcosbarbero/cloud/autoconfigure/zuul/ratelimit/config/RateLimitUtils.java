@@ -28,7 +28,7 @@ public interface RateLimitUtils {
      * Returns the authenticated user from {@link HttpServletRequest}.
      *
      * @param request The {@link HttpServletRequest}
-     * @return The authenticated user or annonymous
+     * @return The authenticated user or anonymous
      */
     String getUser(HttpServletRequest request);
 
@@ -49,6 +49,11 @@ public interface RateLimitUtils {
         throw new UnsupportedOperationException("Not supported");
     }
 
+    /**
+     * Returns the OAuth2's clientId.
+     *
+     * @return The clientId
+     */
     default String getClientId() {
         throw new UnsupportedOperationException("Not supported");
     }
