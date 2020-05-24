@@ -1,5 +1,6 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.Ordered;
@@ -10,11 +11,11 @@ import org.springframework.util.ClassUtils;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public final class OAuth2OnClassPath implements Condition {
 
-    private static final String OAUTH2_AUTHENTICATION = "org.springframework.security.oauth2.provider.OAuth2Authentication";
+    private static final String OAUTH2_AUTHENTICATION = "org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken";
     private static final String JWT_AUTHENTICATION = "org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken";
 
     @Override
-    public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+    public boolean matches(@NotNull ConditionContext context, @NotNull AnnotatedTypeMetadata metadata) {
         return isPresent(OAUTH2_AUTHENTICATION) || isPresent(JWT_AUTHENTICATION);
     }
 

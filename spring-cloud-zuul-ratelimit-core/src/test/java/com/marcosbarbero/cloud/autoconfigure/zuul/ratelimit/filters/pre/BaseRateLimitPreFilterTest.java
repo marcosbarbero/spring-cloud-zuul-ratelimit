@@ -169,7 +169,7 @@ public abstract class BaseRateLimitPreFilterTest {
         }
 
         String exceeded = (String) this.context.get("rateLimitExceeded");
-        assertTrue(Boolean.valueOf(exceeded), "RateLimit Exceeded");
+        assertTrue(Boolean.parseBoolean(exceeded), "RateLimit Exceeded");
         assertEquals(TOO_MANY_REQUESTS.value(), this.context.getResponseStatusCode(), "Too many requests");
     }
 
@@ -190,7 +190,7 @@ public abstract class BaseRateLimitPreFilterTest {
         }
 
         String exceeded = (String) this.context.get("rateLimitExceeded");
-        assertFalse(Boolean.valueOf(exceeded), "RateLimit not exceeded");
+        assertFalse(Boolean.parseBoolean(exceeded), "RateLimit not exceeded");
     }
 
     @Test

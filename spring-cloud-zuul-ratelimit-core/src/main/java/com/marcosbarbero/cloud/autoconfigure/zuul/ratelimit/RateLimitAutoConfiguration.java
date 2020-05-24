@@ -130,7 +130,7 @@ public class RateLimitAutoConfiguration {
 
         @Bean
         @ConditionalOnClass(name = "org.springframework.security.core.Authentication")
-        @ConditionalOnMissingClass("org.springframework.security.oauth2.provider.OAuth2Authentication")
+        @ConditionalOnMissingClass("org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken")
         public RateLimitUtils securedRateLimitUtils(final RateLimitProperties rateLimitProperties) {
             return new SecuredRateLimitUtils(rateLimitProperties);
         }
@@ -138,7 +138,7 @@ public class RateLimitAutoConfiguration {
         @Bean
         @ConditionalOnMissingClass({
                 "org.springframework.security.core.Authentication",
-                "org.springframework.security.oauth2.provider.OAuth2Authentication"
+                "org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken"
         })
         public RateLimitUtils rateLimitUtils(final RateLimitProperties rateLimitProperties) {
             return new DefaultRateLimitUtils(rateLimitProperties);
