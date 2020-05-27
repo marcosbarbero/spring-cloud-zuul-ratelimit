@@ -1,24 +1,20 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.pre;
 
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RateLimiterErrorHandler;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.RedisRateLimiter;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
+
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Marcos Barbero
@@ -41,10 +37,9 @@ public class RedisRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
     @Override
     @SuppressWarnings("unchecked")
     public void testRateLimitExceedCapacity() throws Exception {
-        ValueOperations ops = mock(ValueOperations.class);
-        doReturn(ops).when(redisTemplate).opsForValue();
+        doReturn(3L)
+                .when(redisTemplate).execute(any(), anyList(), anyString(), anyString());
 
-        when(ops.increment(anyString(), anyLong())).thenReturn(3L);
         super.testRateLimitExceedCapacity();
     }
 
@@ -52,10 +47,8 @@ public class RedisRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
     @Override
     @SuppressWarnings("unchecked")
     public void testRateLimit() throws Exception {
-        ValueOperations ops = mock(ValueOperations.class);
-        when(ops.increment(anyString(), anyLong())).thenReturn(1L);
-        doReturn(ops).when(redisTemplate).opsForValue();
-        when(ops.increment(anyString(), anyLong())).thenReturn(2L);
+        doReturn(1L, 2L)
+                .when(redisTemplate).execute(any(), anyList(), anyString(), anyString());
 
 
         this.request.setRequestURI("/serviceA");
@@ -73,7 +66,9 @@ public class RedisRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
 
         TimeUnit.SECONDS.sleep(2);
 
-        when(ops.increment(anyString(), anyLong())).thenReturn(1L);
+        doReturn(1L)
+                .when(redisTemplate).execute(any(), anyList(), anyString(), anyString());
+
         this.filter.run();
         remaining = this.response.getHeader(HEADER_REMAINING + key);
         assertEquals("1", remaining);
@@ -81,11 +76,8 @@ public class RedisRateLimitPreFilterTest extends BaseRateLimitPreFilterTest {
 
     @Test
     public void testShouldReturnCorrectRateRemainingValue() {
-        String redisKey = "null:serviceA:10.0.0.100:anonymous:GET";
-        ValueOperations<String, String> ops = mock(ValueOperations.class);
-        when(redisTemplate.opsForValue()).thenReturn(ops);
-        when(ops.setIfAbsent(eq(redisKey), eq("1"), anyLong(), any())).thenReturn(true, false);
-        when(ops.increment(eq(redisKey), anyLong())).thenReturn(2L);
+        doReturn(1L, 2L)
+                .when(redisTemplate).execute(any(), anyList(), anyString(), anyString());
 
         this.request.setRequestURI("/serviceA");
         this.request.setRemoteAddr("10.0.0.100");
