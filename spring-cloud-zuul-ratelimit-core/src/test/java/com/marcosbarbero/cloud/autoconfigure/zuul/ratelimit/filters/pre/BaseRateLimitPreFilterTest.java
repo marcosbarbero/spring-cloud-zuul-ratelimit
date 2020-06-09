@@ -190,7 +190,7 @@ public abstract class BaseRateLimitPreFilterTest {
         }
 
         String exceeded = (String) this.context.get("rateLimitExceeded");
-        assertFalse(Boolean.valueOf(exceeded), "RateLimit not exceeded");
+        assertFalse(Boolean.parseBoolean(exceeded), "RateLimit not exceeded");
     }
 
     @Test
