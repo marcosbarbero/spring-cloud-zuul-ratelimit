@@ -58,13 +58,13 @@
         <dependency>
             <groupId>org.infinispan</groupId>
             <artifactId>infinispan-core</artifactId>
-            <version>11.0.0.Dev05</version>
+            <version>11.0.0.Final</version>
         </dependency>
 
         <dependency>
             <groupId>org.infinispan</groupId>
             <artifactId>infinispan-commons</artifactId>
-            <version>11.0.0.Dev05</version>
+            <version>11.0.0.Final</version>
         </dependency>
     </dependencies>
 
