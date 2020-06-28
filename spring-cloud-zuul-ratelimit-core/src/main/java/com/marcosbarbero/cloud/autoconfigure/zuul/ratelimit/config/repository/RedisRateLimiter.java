@@ -37,11 +37,13 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
 
     private final RateLimiterErrorHandler rateLimiterErrorHandler;
     private final StringRedisTemplate redisTemplate;
+    private final RedisScript<Long> redisScript;
 
     public RedisRateLimiter(final RateLimiterErrorHandler rateLimiterErrorHandler,
                             final StringRedisTemplate redisTemplate) {
         this.rateLimiterErrorHandler = rateLimiterErrorHandler;
         this.redisTemplate = redisTemplate;
+        this.redisScript = getScript();
     }
 
     @Override
@@ -69,7 +71,7 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
         rate.setReset(refreshInterval.toMillis());
         Long current = 0L;
         try {
-            current = redisTemplate.execute(getScript(), Collections.singletonList(key), Long.toString(usage),
+            current = redisTemplate.execute(redisScript, Collections.singletonList(key), Long.toString(usage),
                     Long.toString(refreshInterval.getSeconds()));
         } catch (RuntimeException e) {
             String msg = "Failed retrieving rate for " + key + ", will return the current value";
