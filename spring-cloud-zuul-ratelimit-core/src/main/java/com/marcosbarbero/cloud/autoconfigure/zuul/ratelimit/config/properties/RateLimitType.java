@@ -17,13 +17,12 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
+import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.util.SubnetUtils;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.util.AntPathMatcher;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
 
 public enum RateLimitType {
     /**
@@ -144,10 +143,29 @@ public enum RateLimitType {
         public boolean isValid(String matcher) {
             return StringUtils.isNotEmpty(matcher);
         }
+    },
+
+    /**
+     * Rate limit policy considering an URL Pattern
+     */
+    HTTP_HEADER {
+        public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
+            return StringUtils.isNotEmpty(request.getHeader(matcher));
+        }
+
+        @Override
+        public String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
+            return request.getHeader(matcher);
+        }
+
+        @Override
+        public boolean isValid(String matcher) {
+            return StringUtils.isNotEmpty(matcher);
+        }
     };
 
-    public abstract boolean apply(HttpServletRequest request, Route route,
-                                  RateLimitUtils rateLimitUtils, String matcher);
+    public abstract boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils,
+        String matcher);
 
     public abstract String key(HttpServletRequest request, Route route,
                                RateLimitUtils rateLimitUtils, String matcher);

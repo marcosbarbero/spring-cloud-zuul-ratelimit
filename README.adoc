@@ -8,33 +8,33 @@ Module to enable rate limit per service in Netflix Zuul.
 
 There are five built-in rate limit approaches:
 
- * Authenticated User
- ** Uses the authenticated username or 'anonymous'
- * Request Origin
- ** Uses the user origin request
- * URL
- ** Uses the request path of the downstream service
- * URL Pattern
- ** Uses the request Ant path pattern to the downstream service
- * ROLE
- ** Uses the authenticated user roles
- * Request method
- ** Uses the HTTP request method
- * Global configuration per service:
- ** This one does not validate the request Origin, Authenticated User or URI
- ** To use this approach just don't set param 'type'
+* Authenticated User
+** Uses the authenticated username or 'anonymous'
+* Request Origin
+** Uses the user origin request
+* URL
+** Uses the request path of the downstream service
+* URL Pattern
+** Uses the request Ant path pattern to the downstream service
+* ROLE
+** Uses the authenticated user roles
+* Request method
+** Uses the HTTP request method
+* Request header
+** Uses the HTTP request header
+* Global configuration per service:
+** This one does not validate the request Origin, Authenticated User or URI
+** To use this approach just don't set param 'type'
 
 [NOTE]
 ====
-It is possible to combine Authenticated User, Request Origin, URL, ROLE and Request Method just adding
-multiple values to the list
-====
+It is possible to combine Authenticated User, Request Origin, URL, ROLE and Request Method just adding multiple values to the list ====
 
 == Usage
 
 [NOTE]
 ====
-Latest version: image:https://maven-badges.herokuapp.com/maven-central/com.marcosbarbero.cloud/spring-cloud-zuul-ratelimit/badge.svg["Maven Central", link="https://maven-badges.herokuapp.com/maven-central/com.marcosbarbero.cloud/spring-cloud-zuul-ratelimit"]
+Latest version: image:https://maven-badges.herokuapp.com/maven-central/com.marcosbarbero.cloud/spring-cloud-zuul-ratelimit/badge.svg["Maven Central",link="https://maven-badges.herokuapp.com/maven-central/com.marcosbarbero.cloud/spring-cloud-zuul-ratelimit"]
 ====
 
 [NOTE]
@@ -197,6 +197,7 @@ zuul:
             - url=/api #url prefix
             - role=user
             - http_method=get #case insensitive
+            - http_header=customHeader
         - type:
             - url_pattern=/api/*/payment
 ----
@@ -234,13 +235,14 @@ zuul.ratelimit.policy-list.myServiceId[1].type[1]=origin=somemachine.com
 zuul.ratelimit.policy-list.myServiceId[1].type[2]=url_pattern=/api/*/payment
 zuul.ratelimit.policy-list.myServiceId[1].type[3]=role=user
 zuul.ratelimit.policy-list.myServiceId[1].type[4]=http_method=get
+zuul.ratelimit.policy-list.myServiceId[1].type[5]=http_header=customHeader
 ----
 
 Both 'quota' and 'refresh-interval', can be expressed with https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-external-config-conversion-duration[Spring Boot's duration formats]:
 
- * A regular long representation (using seconds as the default unit)
- * The standard ISO-8601 format used by java.time.Duration (e.g. PT30M means 30 minutes)
- * A more readable format where the value and the unit are coupled (e.g. 10s means 10 seconds)
+* A regular long representation (using seconds as the default unit)
+* The standard ISO-8601 format used by java.time.Duration (e.g. PT30M means 30 minutes)
+* A more readable format where the value and the unit are coupled (e.g. 10s means 10 seconds)
 
 == Available implementations
 
@@ -302,7 +304,7 @@ Policy properties:
 |limit           |number of calls      |  -
 |quota           |time of calls        |  -
 |refresh-interval|seconds              | 60
-|type            | [ORIGIN, USER, URL, URL_PATTERN, ROLE, HTTP_METHOD] | []
+|type            | [ORIGIN, USER, URL, URL_PATTERN, ROLE, HTTP_METHOD, HTTP_HEADER] | []
 |breakOnMatch    |true/false           |false
 
 |===
