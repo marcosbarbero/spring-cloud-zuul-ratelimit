@@ -23,6 +23,8 @@ There are five built-in rate limit approaches:
  ** Uses the authenticated user roles
  * Request method
  ** Uses the HTTP request method
+ * Request header
+ ** Uses the HTTP request header
  * Global configuration per service:
  ** This one does not validate the request Origin, Authenticated User or URI
  ** To use this approach just don't set param 'type'
@@ -177,6 +179,7 @@ zuul:
             - url=/api #url prefix
             - role=user
             - httpmethod=get #case insensitive
+            - http_header=customHeader
 ----
 
 == Available implementations
@@ -238,7 +241,7 @@ Policy properties:
 |limit           |number of calls      |  -
 |quota           |time of calls        |  -
 |refresh-interval|seconds              | 60
-|type            | [ORIGIN, USER, URL, ROLE] | []
+|type            | [ORIGIN, USER, URL, ROLE, HTTP_HEADER] | []
 |breakOnMatch    |true/false           |false
 
 |===
