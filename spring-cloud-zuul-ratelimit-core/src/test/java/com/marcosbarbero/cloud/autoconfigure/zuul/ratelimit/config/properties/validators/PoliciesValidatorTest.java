@@ -131,6 +131,17 @@ public class PoliciesValidatorTest {
     }
 
     @Test
+    public void testValidOnPolicyWithLimitAndMethodWithoutMatcher() {
+        properties.setKeyPrefix("prefix");
+        Policy policy = getPolicy(1L, null);
+        policy.getType().add(new Policy.MatchType(RateLimitType.ROLE, null));
+        properties.getDefaultPolicyList().add(policy);
+        properties.getPolicyList().put("key", Lists.newArrayList(policy));
+        Set<ConstraintViolation<RateLimitProperties>> violations = validator.validate(properties);
+        assertThat(violations).hasSize(2);
+    }
+    
+    @Test
     public void testValidOnPolicyWithLimitAndHeader() {
         properties.setKeyPrefix("prefix");
         Policy policy = getPolicy(1L, null);
@@ -140,12 +151,13 @@ public class PoliciesValidatorTest {
         Set<ConstraintViolation<RateLimitProperties>> violations = validator.validate(properties);
         assertThat(violations).isEmpty();
     }
-
+    
+    
     @Test
-    public void testValidOnPolicyWithLimitAndMethodWithoutMatcher() {
+    public void testValidOnPolicyWithLimitAndHeaderWithoutMatcher() {
         properties.setKeyPrefix("prefix");
         Policy policy = getPolicy(1L, null);
-        policy.getType().add(new Policy.MatchType(RateLimitType.ROLE, null));
+        policy.getType().add(new Policy.MatchType(RateLimitType.HTTP_HEADER, null));
         properties.getDefaultPolicyList().add(policy);
         properties.getPolicyList().put("key", Lists.newArrayList(policy));
         Set<ConstraintViolation<RateLimitProperties>> violations = validator.validate(properties);
