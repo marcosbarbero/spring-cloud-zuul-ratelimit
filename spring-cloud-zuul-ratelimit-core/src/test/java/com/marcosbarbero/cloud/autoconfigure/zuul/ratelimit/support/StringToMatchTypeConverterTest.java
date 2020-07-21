@@ -1,11 +1,11 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.MatchType;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitType;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class StringToMatchTypeConverterTest {
 
@@ -46,5 +46,13 @@ public class StringToMatchTypeConverterTest {
         assertThat(matchType).isNotNull();
         assertThat(matchType.getType()).isEqualByComparingTo(RateLimitType.HTTPMETHOD);
         assertThat(matchType.getMatcher()).isEqualTo("get");
+    }
+
+    @Test
+    public void testConvertStringTypeHttpHeaderWithMatcher() {
+        MatchType matchType = target.convert("http_header=customHeader");
+        assertThat(matchType).isNotNull();
+        assertThat(matchType.getType()).isEqualByComparingTo(RateLimitType.HTTP_HEADER);
+        assertThat(matchType.getMatcher()).isEqualTo("customHeader");
     }
 }

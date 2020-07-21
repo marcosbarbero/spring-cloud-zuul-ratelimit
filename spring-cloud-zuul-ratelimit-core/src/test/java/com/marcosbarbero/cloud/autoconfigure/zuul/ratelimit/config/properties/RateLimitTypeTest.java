@@ -1,17 +1,16 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitUtils;
+import java.util.Collections;
+import javax.servlet.http.HttpServletRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.cloud.netflix.zuul.filters.Route;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 public class RateLimitTypeTest {
 
@@ -139,5 +138,29 @@ public class RateLimitTypeTest {
 
         String key = RateLimitType.HTTPMETHOD.key(httpServletRequest, route, rateLimitUtils, null);
         assertThat(key).isEqualTo("GET");
+    }
+
+    @Test
+    public void applyHeader() {
+        when(httpServletRequest.getHeader("customHeader")).thenReturn("customValue");
+
+        boolean apply = RateLimitType.HTTP_HEADER.apply(httpServletRequest, route, rateLimitUtils, "customHeader");
+        assertThat(apply).isTrue();
+    }
+
+    @Test
+    public void applyHeaderNoMatch() {
+        when(httpServletRequest.getHeader("customHeader")).thenReturn("customValue");
+
+        boolean apply = RateLimitType.HTTP_HEADER.apply(httpServletRequest, route, rateLimitUtils, "customHeader2");
+        assertThat(apply).isFalse();
+    }
+
+    @Test
+    public void keyHeader() {
+        when(httpServletRequest.getHeader("customHeader")).thenReturn("customValue");
+
+        String key = RateLimitType.HTTP_HEADER.key(httpServletRequest, route, rateLimitUtils, "customHeader");
+        assertThat(key).isEqualTo("customValue");
     }
 }

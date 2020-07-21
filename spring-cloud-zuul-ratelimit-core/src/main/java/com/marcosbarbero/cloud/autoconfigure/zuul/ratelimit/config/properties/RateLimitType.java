@@ -17,12 +17,11 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
+import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.util.SubnetUtils;
 import org.springframework.cloud.netflix.zuul.filters.Route;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
 
 
 public enum RateLimitType {
@@ -32,12 +31,11 @@ public enum RateLimitType {
     ORIGIN {
         @Override
         public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
-            if(matcher.contains("/")) {
+            if (matcher.contains("/")) {
                 try {
                     SubnetUtils cidr = new SubnetUtils(matcher);
                     return cidr.getInfo().isInRange(rateLimitUtils.getRemoteAddress(request));
-                }
-                catch(Exception e) {
+                } catch (Exception e) {
                     return false;
                 }
             }
@@ -100,7 +98,8 @@ public enum RateLimitType {
      */
     HTTPMETHOD {
         @Override
-        public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils,/*not null*/ String matcher) {
+        public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils,/*not null*/
+            String matcher) {
             return request.getMethod().equalsIgnoreCase(matcher);
         }
 
@@ -109,11 +108,35 @@ public enum RateLimitType {
             return StringUtils.isEmpty(matcher) ? request.getMethod() : "http-method";
         }
     },
-    ;
 
-    public abstract boolean apply(HttpServletRequest request, Route route,
-                                  RateLimitUtils rateLimitUtils, String matcher);
+    HTTP_HEADER {
+        public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
+            return StringUtils.isNotEmpty(request.getHeader(matcher));
+        }
 
-    public abstract String key(HttpServletRequest request, Route route,
-                               RateLimitUtils rateLimitUtils, String matcher);
+        @Override
+        public String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
+            return request.getHeader(matcher);
+        }
+
+        @Override
+        public boolean isValid(String matcher) {
+            return StringUtils.isNotEmpty(matcher);
+        }
+    };
+
+    public abstract boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils,
+        String matcher);
+
+    public abstract String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher);
+
+    /**
+     * Helper method to validate specific cases per type.
+     *
+     * @param matcher The type matcher
+     * @return The default behavior will always return true.
+     */
+    public boolean isValid(String matcher) {
+        return true;
+    }
 }
