@@ -25,7 +25,7 @@ public class DefaultRateLimitKeyGeneratorTest {
     @Mock
     private HttpServletRequest httpServletRequest;
 
-    private Route route = new Route("id", "/**", null, "/id", null, Collections.emptySet());
+    private final Route route = new Route("id", "/**", null, "/id", null, Collections.emptySet());
     private RateLimitProperties properties;
 
     @BeforeEach
@@ -176,5 +176,23 @@ public class DefaultRateLimitKeyGeneratorTest {
         when(httpServletRequest.getMethod()).thenReturn("GET");
         String key = target.key(httpServletRequest, route, policy);
         assertThat(key).isEqualTo("key-prefix:id:http-method:GET");
+    }
+
+    @Test
+    public void testKeyHeader() {
+        Policy policy = new Policy();
+        when(httpServletRequest.getHeader("customHeader")).thenReturn("customValue");
+        String key = target.key(httpServletRequest, route, policy);
+        assertThat(key).isEqualTo("key-prefix:id");
+    }
+
+    @Test
+    public void testKeyHeaderWithMatcher() {
+        Policy policy = new Policy();
+        String headerName = "customHeader";
+        policy.getType().add(new MatchType(RateLimitType.HTTP_HEADER, headerName));
+        when(httpServletRequest.getHeader(headerName)).thenReturn("customValue");
+        String key = target.key(httpServletRequest, route, policy);
+        assertThat(key).isEqualTo("key-prefix:id:customValue:customHeader");
     }
 }
