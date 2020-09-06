@@ -5,7 +5,7 @@
     <parent>
         <artifactId>spring-cloud-zuul-ratelimit-parent</artifactId>
         <groupId>com.marcosbarbero.cloud</groupId>
-        <version>1.7.5.RELEASE</version>
+        <version>1.7.6.RELEASE</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
