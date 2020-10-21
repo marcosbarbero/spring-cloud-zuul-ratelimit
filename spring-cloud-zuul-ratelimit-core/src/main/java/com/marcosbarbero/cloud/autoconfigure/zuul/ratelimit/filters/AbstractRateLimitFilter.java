@@ -20,6 +20,7 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtil
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.MatchType;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitType;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import org.springframework.cloud.netflix.zuul.filters.Route;
@@ -30,9 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.ALREADY_LIMITED;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.CURRENT_REQUEST_POLICY;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.CURRENT_REQUEST_ROUTE;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.*;
 
 
 /**
@@ -57,7 +56,15 @@ abstract class AbstractRateLimitFilter extends ZuulFilter {
 
     @Override
     public boolean shouldFilter() {
-        HttpServletRequest request = RequestContext.getCurrentContext().getRequest();
+        RequestContext context = RequestContext.getCurrentContext();
+        HttpServletRequest request = context.getRequest();
+
+        if (originIsOnDenyList(request)) {
+            context.setResponseStatusCode(properties.getDenyList().getStatusCode());
+            context.setSendZuulResponse(false);
+            return false;
+        }
+
         return properties.isEnabled() && !policy(route(request), request).isEmpty();
     }
 
@@ -93,6 +100,12 @@ abstract class AbstractRateLimitFilter extends ZuulFilter {
         addObjectToCurrentRequestContext(CURRENT_REQUEST_POLICY, policies);
 
         return policies;
+    }
+
+    private boolean originIsOnDenyList(HttpServletRequest request) {
+        RateLimitProperties.DenyList denyList = properties.getDenyList();
+        return denyList.getOrigins().stream()
+                .anyMatch(origin -> RateLimitType.ORIGIN.apply(request, null, rateLimitUtils, origin));
     }
 
     private void addObjectToCurrentRequestContext(String key, Object object) {

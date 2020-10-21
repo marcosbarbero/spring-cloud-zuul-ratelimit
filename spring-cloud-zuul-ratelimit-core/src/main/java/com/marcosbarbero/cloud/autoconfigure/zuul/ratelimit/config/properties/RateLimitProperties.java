@@ -27,6 +27,7 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtil
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.validators.Policies;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -40,6 +41,7 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.boot.convert.DurationUnit;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.netflix.zuul.filters.Route;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 
 /**
@@ -82,6 +84,9 @@ public class RateLimitProperties {
     private int postFilterOrder = SEND_RESPONSE_FILTER_ORDER - 10;
 
     private int preFilterOrder = FORM_BODY_WRAPPER_FILTER_ORDER;
+
+    @NestedConfigurationProperty
+    private DenyList denyList = new DenyList();
 
     public List<Policy> getPolicies(String key) {
         return policyList.getOrDefault(key, defaultPolicyList);
@@ -172,6 +177,44 @@ public class RateLimitProperties {
 
     public void setPreFilterOrder(int preFilterOrder) {
         this.preFilterOrder = preFilterOrder;
+    }
+
+    public DenyList getDenyList() {
+        return denyList;
+    }
+
+    public void setDenyList(DenyList denyList) {
+        this.denyList = denyList;
+    }
+
+    public static class DenyList {
+
+        /**
+         * List of origins that will have the request denied.
+         */
+        @NotNull
+        private List<String> origins = Lists.newArrayList();
+
+        /**
+         * Status code returned when a blocked origin tries to reach the server.
+         */
+        private int statusCode = HttpStatus.FORBIDDEN.value();
+
+        public List<String> getOrigins() {
+            return origins;
+        }
+
+        public void setOrigins(List<String> origins) {
+            this.origins = origins;
+        }
+
+        public int getStatusCode() {
+            return statusCode;
+        }
+
+        public void setStatusCode(int statusCode) {
+            this.statusCode = statusCode;
+        }
     }
 
     public static class Policy {
