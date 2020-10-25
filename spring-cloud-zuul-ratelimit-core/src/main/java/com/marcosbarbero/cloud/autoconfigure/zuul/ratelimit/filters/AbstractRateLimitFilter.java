@@ -21,10 +21,12 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.MatchType;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitType;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitExceededException;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.util.UrlPathHelper;
 
 import javax.servlet.http.HttpServletRequest;
@@ -56,16 +58,22 @@ abstract class AbstractRateLimitFilter extends ZuulFilter {
 
     @Override
     public boolean shouldFilter() {
-        RequestContext context = RequestContext.getCurrentContext();
-        HttpServletRequest request = context.getRequest();
+        RequestContext ctx = RequestContext.getCurrentContext();
+        HttpServletRequest request = ctx.getRequest();
 
-        if (originIsOnDenyList(request)) {
-            context.setResponseStatusCode(properties.getDenyList().getStatusCode());
-            context.setSendZuulResponse(false);
+        if (!properties.isEnabled()) {
             return false;
         }
 
-        return properties.isEnabled() && !policy(route(request), request).isEmpty();
+        if (originIsOnDefaultDenyList(request)) {
+            int responseStatusCode = properties.getDefaultDenyList().getResponseStatusCode();
+            ctx.setResponseStatusCode(responseStatusCode);
+            ctx.setSendZuulResponse(false);
+
+            throw new RateLimitExceededException(HttpStatus.valueOf(responseStatusCode));
+        }
+
+        return !policy(route(request), request).isEmpty();
     }
 
     Route route(HttpServletRequest request) {
@@ -102,8 +110,8 @@ abstract class AbstractRateLimitFilter extends ZuulFilter {
         return policies;
     }
 
-    private boolean originIsOnDenyList(HttpServletRequest request) {
-        RateLimitProperties.DenyList denyList = properties.getDenyList();
+    private boolean originIsOnDefaultDenyList(HttpServletRequest request) {
+        RateLimitProperties.DenyList denyList = properties.getDefaultDenyList();
         return denyList.getOrigins().stream()
                 .anyMatch(origin -> RateLimitType.ORIGIN.apply(request, null, rateLimitUtils, origin));
     }

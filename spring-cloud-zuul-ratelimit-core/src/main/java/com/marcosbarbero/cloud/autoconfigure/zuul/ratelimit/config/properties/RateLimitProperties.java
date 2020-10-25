@@ -16,23 +16,10 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
 
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.ResponseHeadersVerbosity.NONE;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.ResponseHeadersVerbosity.VERBOSE;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORM_BODY_WRAPPER_FILTER_ORDER;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_RESPONSE_FILTER_ORDER;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.validators.Policies;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -43,6 +30,19 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Map;
+
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.ResponseHeadersVerbosity.NONE;
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.ResponseHeadersVerbosity.VERBOSE;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORM_BODY_WRAPPER_FILTER_ORDER;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_RESPONSE_FILTER_ORDER;
 
 /**
  * @author Marcos Barbero
@@ -86,7 +86,7 @@ public class RateLimitProperties {
     private int preFilterOrder = FORM_BODY_WRAPPER_FILTER_ORDER;
 
     @NestedConfigurationProperty
-    private DenyList denyList = new DenyList();
+    private DenyList defaultDenyList = new DenyList();
 
     public List<Policy> getPolicies(String key) {
         return policyList.getOrDefault(key, defaultPolicyList);
@@ -140,11 +140,11 @@ public class RateLimitProperties {
     }
 
     public ResponseHeadersVerbosity getResponseHeaders() {
-      return this.responseHeaders;
+        return this.responseHeaders;
     }
 
     public void setResponseHeaders(ResponseHeadersVerbosity responseHeaders) {
-      this.responseHeaders = responseHeaders;
+        this.responseHeaders = responseHeaders;
     }
 
     public String getKeyPrefix() {
@@ -179,42 +179,12 @@ public class RateLimitProperties {
         this.preFilterOrder = preFilterOrder;
     }
 
-    public DenyList getDenyList() {
-        return denyList;
+    public DenyList getDefaultDenyList() {
+        return defaultDenyList;
     }
 
-    public void setDenyList(DenyList denyList) {
-        this.denyList = denyList;
-    }
-
-    public static class DenyList {
-
-        /**
-         * List of origins that will have the request denied.
-         */
-        @NotNull
-        private List<String> origins = Lists.newArrayList();
-
-        /**
-         * Status code returned when a blocked origin tries to reach the server.
-         */
-        private int statusCode = HttpStatus.FORBIDDEN.value();
-
-        public List<String> getOrigins() {
-            return origins;
-        }
-
-        public void setOrigins(List<String> origins) {
-            this.origins = origins;
-        }
-
-        public int getStatusCode() {
-            return statusCode;
-        }
-
-        public void setStatusCode(int statusCode) {
-            this.statusCode = statusCode;
-        }
+    public void setDefaultDenyList(DenyList defaultDenyList) {
+        this.defaultDenyList = defaultDenyList;
     }
 
     public static class Policy {
@@ -320,6 +290,36 @@ public class RateLimitProperties {
             public void setMatcher(String matcher) {
                 this.matcher = matcher;
             }
+        }
+    }
+
+    public static class DenyList {
+
+        /**
+         * List of origins that will have the request denied.
+         */
+        @NotNull
+        private List<String> origins = Lists.newArrayList();
+
+        /**
+         * Status code returned when a blocked origin tries to reach the server.
+         */
+        private int responseStatusCode = HttpStatus.FORBIDDEN.value();
+
+        public List<String> getOrigins() {
+            return origins;
+        }
+
+        public void setOrigins(List<String> origins) {
+            this.origins = origins;
+        }
+
+        public int getResponseStatusCode() {
+            return responseStatusCode;
+        }
+
+        public void setResponseStatusCode(int responseStatusCode) {
+            this.responseStatusCode = responseStatusCode;
         }
     }
 }
