@@ -103,7 +103,6 @@ zuul:
           refresh-interval: 60
           type:
             - origin=127.0.0.0/22
-          breakOnMatch: true
         - limit: 1
           refresh-interval: 60
           type:
