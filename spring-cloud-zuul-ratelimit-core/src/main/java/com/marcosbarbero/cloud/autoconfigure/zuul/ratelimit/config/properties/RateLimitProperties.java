@@ -128,6 +128,7 @@ public class RateLimitProperties {
      * Tells if rate limit response headers should be added to response.
      *
      * @deprecated use {{@link #responseHeaders}
+     * @return Whether the response headers should be added
      */
     @Deprecated
     @DeprecatedConfigurationProperty(replacement = "zuul.ratelimit.response-headers")
