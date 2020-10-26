@@ -86,7 +86,7 @@ public class RateLimitProperties {
     private int preFilterOrder = FORM_BODY_WRAPPER_FILTER_ORDER;
 
     @NestedConfigurationProperty
-    private DenyList defaultDenyList = new DenyList();
+    private DenyRequest denyRequest = new DenyRequest();
 
     public List<Policy> getPolicies(String key) {
         return policyList.getOrDefault(key, defaultPolicyList);
@@ -179,12 +179,12 @@ public class RateLimitProperties {
         this.preFilterOrder = preFilterOrder;
     }
 
-    public DenyList getDefaultDenyList() {
-        return defaultDenyList;
+    public DenyRequest getDenyRequest() {
+        return denyRequest;
     }
 
-    public void setDefaultDenyList(DenyList defaultDenyList) {
-        this.defaultDenyList = defaultDenyList;
+    public void setDenyRequest(DenyRequest denyRequest) {
+        this.denyRequest = denyRequest;
     }
 
     public static class Policy {
@@ -293,7 +293,7 @@ public class RateLimitProperties {
         }
     }
 
-    public static class DenyList {
+    public static class DenyRequest {
 
         /**
          * List of origins that will have the request denied.

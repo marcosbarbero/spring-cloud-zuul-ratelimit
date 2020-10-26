@@ -174,7 +174,7 @@ zuul:
     repository: REDIS
     behind-proxy: true
     add-response-headers: true
-    default-deny-list:
+    deny-request:
       response-status-code: 404 #default value is 403 (FORBIDDEN)
       origins:
         - 200.187.10.25
@@ -217,9 +217,9 @@ zuul.ratelimit.repository=REDIS
 zuul.ratelimit.behind-proxy=true
 zuul.ratelimit.add-response-headers=true
 
-zuul.ratelimit.default-deny-list.response-status-code=404
-zuul.ratelimit.default-deny-list.origins[0]=200.187.10.25
-zuul.ratelimit.default-deny-list.origins[1]=somedomain.com
+zuul.ratelimit.deny-request.response-status-code=404
+zuul.ratelimit.deny-request.origins[0]=200.187.10.25
+zuul.ratelimit.deny-request.origins[1]=somedomain.com
 
 zuul.ratelimit.default-policy-list[0].limit=10
 zuul.ratelimit.default-policy-list[0].quota=1000
@@ -299,7 +299,7 @@ Property namespace: __zuul.ratelimit__
 |response-headers    |NONE, STANDARD, VERBOSE      |VERBOSE
 |key-prefix          |String                       |${spring.application.name:rate-limit-application}
 |repository          |CONSUL, REDIS, JPA, BUCKET4J_JCACHE, BUCKET4J_HAZELCAST, BUCKET4J_INFINISPAN, BUCKET4J_IGNITE| -
-|default-deny-list   |List of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L296[DenyList]| -
+|deny-request        |link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L296[DenyRequest]| -
 |default-policy-list |List of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L190[Policy]| -
 |policy-list         |Map of Lists of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L82[Policy]| -
 |postFilterOrder     |int                          |FilterConstants.SEND_RESPONSE_FILTER_ORDER - 10
@@ -307,7 +307,7 @@ Property namespace: __zuul.ratelimit__
 
 |===
 
-Deny List properties
+Deny Request properties
 
 |===
 |Property name| Values |Default Value

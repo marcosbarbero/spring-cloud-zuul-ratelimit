@@ -65,8 +65,8 @@ abstract class AbstractRateLimitFilter extends ZuulFilter {
             return false;
         }
 
-        if (originIsOnDefaultDenyList(request)) {
-            int responseStatusCode = properties.getDefaultDenyList().getResponseStatusCode();
+        if (originIsOnDenyRequest(request)) {
+            int responseStatusCode = properties.getDenyRequest().getResponseStatusCode();
             ctx.setResponseStatusCode(responseStatusCode);
             ctx.setSendZuulResponse(false);
 
@@ -110,9 +110,9 @@ abstract class AbstractRateLimitFilter extends ZuulFilter {
         return policies;
     }
 
-    private boolean originIsOnDefaultDenyList(HttpServletRequest request) {
-        RateLimitProperties.DenyList denyList = properties.getDefaultDenyList();
-        return denyList.getOrigins().stream()
+    private boolean originIsOnDenyRequest(HttpServletRequest request) {
+        RateLimitProperties.DenyRequest denyRequest = properties.getDenyRequest();
+        return denyRequest.getOrigins().stream()
                 .anyMatch(origin -> RateLimitType.ORIGIN.apply(request, null, rateLimitUtils, origin));
     }
 
