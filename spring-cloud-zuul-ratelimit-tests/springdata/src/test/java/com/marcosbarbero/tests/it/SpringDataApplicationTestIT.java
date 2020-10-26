@@ -10,6 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -24,12 +26,9 @@ import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
  * @author Marcos Barbero
  * @since 2017-06-27
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
-//        properties = {
-                // just making sure the test on SpringDataDenyOriginTestIT does not mess with the tests on this class
-//                "zuul.ratelimit.deny-request.origins[0]=10.0.0.1"
-//        })
-)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestPropertySource(locations = "classpath:/override-deny-request.properties")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class SpringDataApplicationTestIT {
 
     @Autowired
