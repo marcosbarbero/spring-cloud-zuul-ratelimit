@@ -11,8 +11,8 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {
-                "zuul.ratelimit.default-deny-list.origins[0]=127.0.0.1",
-                "zuul.ratelimit.default-deny-list.response-status-code=404"
+                "zuul.ratelimit.deny-request.origins[0]=127.0.0.1",
+                "zuul.ratelimit.deny-request.response-status-code=404"
         }
 )
 public class SpringDataDenyOriginTestIT {
