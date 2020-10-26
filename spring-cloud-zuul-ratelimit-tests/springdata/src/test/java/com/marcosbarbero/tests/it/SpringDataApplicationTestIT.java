@@ -24,11 +24,12 @@ import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
  * @author Marcos Barbero
  * @since 2017-06-27
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
+//        properties = {
                 // just making sure the test on SpringDataDenyOriginTestIT does not mess with the tests on this class
-                "zuul.ratelimit.deny-request.origins[0]=10.0.0.1"
-        })
+//                "zuul.ratelimit.deny-request.origins[0]=10.0.0.1"
+//        })
+)
 public class SpringDataApplicationTestIT {
 
     @Autowired
