@@ -299,10 +299,21 @@ Property namespace: __zuul.ratelimit__
 |response-headers    |NONE, STANDARD, VERBOSE      |VERBOSE
 |key-prefix          |String                       |${spring.application.name:rate-limit-application}
 |repository          |CONSUL, REDIS, JPA, BUCKET4J_JCACHE, BUCKET4J_HAZELCAST, BUCKET4J_INFINISPAN, BUCKET4J_IGNITE| -
-|default-policy-list |List of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L82[Policy]| -
+|default-deny-list   |List of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L296[DenyList]| -
+|default-policy-list |List of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L190[Policy]| -
 |policy-list         |Map of Lists of link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/properties/RateLimitProperties.java#L82[Policy]| -
 |postFilterOrder     |int                          |FilterConstants.SEND_RESPONSE_FILTER_ORDER - 10
 |preFilterOrder      |int                          |FilterConstants.FORM_BODY_WRAPPER_FILTER_ORDER
+
+|===
+
+Deny List properties
+
+|===
+|Property name| Values |Default Value
+
+|origins              |list of origins to have the access denied | -
+|response-status-code |the http status code to be returned on a denied request | 403 (FORBIDDEN)
 
 |===
 
@@ -311,11 +322,11 @@ Policy properties:
 |===
 |Property name| Values |Default Value
 
-|limit           |number of calls      |  -
-|quota           |time of calls        |  -
-|refresh-interval|seconds              | 60
+|limit           |number of requests      |  -
+|quota           |time of requests        |  -
+|refresh-interval|seconds                 | 60
 |type            | [ORIGIN, USER, URL, URL_PATTERN, ROLE, HTTP_METHOD, HTTP_HEADER] | []
-|breakOnMatch    |true/false           |false
+|breakOnMatch    |true/false              |false
 
 |===
 
