@@ -36,6 +36,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -86,7 +88,7 @@ public class RateLimitProperties {
     private int preFilterOrder = FORM_BODY_WRAPPER_FILTER_ORDER;
 
     @NestedConfigurationProperty
-    private DenyRequest denyRequest = new DenyRequest();
+    private Location location = new Location();
 
     public List<Policy> getPolicies(String key) {
         return policyList.getOrDefault(key, defaultPolicyList);
@@ -127,8 +129,8 @@ public class RateLimitProperties {
     /**
      * Tells if rate limit response headers should be added to response.
      *
-     * @deprecated use {{@link #responseHeaders}
      * @return Whether the response headers should be added
+     * @deprecated use {{@link #responseHeaders}
      */
     @Deprecated
     @DeprecatedConfigurationProperty(replacement = "zuul.ratelimit.response-headers")
@@ -136,6 +138,7 @@ public class RateLimitProperties {
         return !NONE.equals(responseHeaders);
     }
 
+    @Deprecated
     public void setAddResponseHeaders(boolean addResponseHeaders) {
         setResponseHeaders(addResponseHeaders ? VERBOSE : NONE);
     }
@@ -180,12 +183,29 @@ public class RateLimitProperties {
         this.preFilterOrder = preFilterOrder;
     }
 
-    public DenyRequest getDenyRequest() {
-        return denyRequest;
+    public Location getLocation() {
+        return location;
     }
 
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    /**
+     * Tells if rate limit response headers should be added to response.
+     *
+     * @return Whether a {@link DenyRequest}
+     * @deprecated use {{@link #location}
+     */
+    @Deprecated
+    @DeprecatedConfigurationProperty(replacement = "zuul.ratelimit.location.deny")
+    public DenyRequest getDenyRequest() {
+        return new DenyRequest(this.location.getDeny());
+    }
+
+    @Deprecated
     public void setDenyRequest(DenyRequest denyRequest) {
-        this.denyRequest = denyRequest;
+        getLocation().setDeny(denyRequest.origins);
     }
 
     public static class Policy {
@@ -294,18 +314,29 @@ public class RateLimitProperties {
         }
     }
 
+    /**
+     * @see Location
+     */
+    @Deprecated
     public static class DenyRequest {
 
         /**
          * List of origins that will have the request denied.
          */
         @NotNull
-        private List<String> origins = Lists.newArrayList();
+        private List<String> origins = new ArrayList<>();
 
         /**
          * Status code returned when a blocked origin tries to reach the server.
          */
         private int responseStatusCode = HttpStatus.FORBIDDEN.value();
+
+        public DenyRequest() {
+        }
+
+        public DenyRequest(@NotNull List<String> origins) {
+            this.origins = origins;
+        }
 
         public List<String> getOrigins() {
             return origins;
@@ -323,4 +354,42 @@ public class RateLimitProperties {
             this.responseStatusCode = responseStatusCode;
         }
     }
+
+    public static class Location {
+
+        /**
+         * List of origins that will have the request denied.
+         */
+        private List<String> deny = new ArrayList<>();
+
+        /**
+         * List of origins that will have the request by-passed.
+         */
+        private List<String> bypass = new ArrayList<>();
+
+        public Location() {
+        }
+
+        public Location(List<String> deny, List<String> bypass) {
+            this.deny = deny;
+            this.bypass = bypass;
+        }
+
+        public List<String> getDeny() {
+            return deny;
+        }
+
+        public void setDeny(List<String> deny) {
+            this.deny = deny;
+        }
+
+        public List<String> getBypass() {
+            return bypass;
+        }
+
+        public void setBypass(List<String> bypass) {
+            this.bypass = bypass;
+        }
+    }
+
 }

@@ -65,12 +65,15 @@ abstract class AbstractRateLimitFilter extends ZuulFilter {
             return false;
         }
 
-        if (originIsOnDenyRequest(request)) {
-            int responseStatusCode = properties.getDenyRequest().getResponseStatusCode();
-            ctx.setResponseStatusCode(responseStatusCode);
-            ctx.setSendZuulResponse(false);
+        if (shouldBypassRequestLocation(request)) {
+            return false;
+        }
 
-            throw new RateLimitExceededException(HttpStatus.valueOf(responseStatusCode));
+        if (shouldDenyRequestLocation(request)) {
+            ctx.setResponseStatusCode(HttpStatus.FORBIDDEN.value());
+            ctx.put(RATE_LIMIT_EXCEEDED, "true");
+
+            throw new RateLimitExceededException(HttpStatus.FORBIDDEN);
         }
 
         return !policy(route(request), request).isEmpty();
@@ -110,9 +113,13 @@ abstract class AbstractRateLimitFilter extends ZuulFilter {
         return policies;
     }
 
-    private boolean originIsOnDenyRequest(HttpServletRequest request) {
-        RateLimitProperties.DenyRequest denyRequest = properties.getDenyRequest();
-        return denyRequest.getOrigins().stream()
+    private boolean shouldDenyRequestLocation(HttpServletRequest request) {
+        return properties.getLocation().getDeny().stream()
+                .anyMatch(origin -> RateLimitType.ORIGIN.apply(request, null, rateLimitUtils, origin));
+    }
+
+    private boolean shouldBypassRequestLocation(HttpServletRequest request) {
+        return properties.getLocation().getBypass().stream()
                 .anyMatch(origin -> RateLimitType.ORIGIN.apply(request, null, rateLimitUtils, origin));
     }
 

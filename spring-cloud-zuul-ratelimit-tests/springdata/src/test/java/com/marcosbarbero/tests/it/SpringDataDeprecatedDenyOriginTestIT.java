@@ -9,12 +9,12 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 
-@TestPropertySource(locations = "classpath:/deny-request.properties")
+@TestPropertySource(locations = "classpath:/deprecated-deny-request.properties")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class SpringDataDenyOriginTestIT {
+public class SpringDataDeprecatedDenyOriginTestIT {
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -22,7 +22,7 @@ public class SpringDataDenyOriginTestIT {
     @Test
     void testDeniedOrigin() {
         ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceC", String.class);
-        assertEquals(NOT_FOUND, response.getStatusCode());
+        assertEquals(FORBIDDEN, response.getStatusCode());
     }
 
 }
