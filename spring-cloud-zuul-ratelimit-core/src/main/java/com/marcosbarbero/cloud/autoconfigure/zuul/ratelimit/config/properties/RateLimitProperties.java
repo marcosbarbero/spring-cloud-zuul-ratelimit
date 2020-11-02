@@ -37,7 +37,6 @@ import javax.validation.constraints.NotNull;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -366,14 +365,6 @@ public class RateLimitProperties {
          * List of origins that will have the request by-passed.
          */
         private List<String> bypass = new ArrayList<>();
-
-        public Location() {
-        }
-
-        public Location(List<String> deny, List<String> bypass) {
-            this.deny = deny;
-            this.bypass = bypass;
-        }
 
         public List<String> getDeny() {
             return deny;

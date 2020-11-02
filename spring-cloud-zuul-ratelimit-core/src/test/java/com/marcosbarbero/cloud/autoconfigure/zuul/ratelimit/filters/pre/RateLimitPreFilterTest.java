@@ -43,6 +43,8 @@ import static org.mockito.Mockito.when;
 
 public class RateLimitPreFilterTest {
 
+    final static String LOCALHOST = "127.0.0.1";
+
     private RateLimitPreFilter target;
 
     @Mock
@@ -69,7 +71,7 @@ public class RateLimitPreFilterTest {
 
         when(httpServletRequest.getContextPath()).thenReturn("");
         when(httpServletRequest.getRequestURI()).thenReturn("/servicea/test");
-        when(httpServletRequest.getRemoteAddr()).thenReturn("127.0.0.1");
+        when(httpServletRequest.getRemoteAddr()).thenReturn(LOCALHOST);
         RequestContext requestContext = new RequestContext();
         requestContext.setRequest(httpServletRequest);
         requestContext.setResponse(httpServletResponse);
@@ -124,6 +126,27 @@ public class RateLimitPreFilterTest {
         rateLimitProperties.setDefaultPolicyList(Lists.newArrayList(defaultPolicy));
 
         assertThat(target.shouldFilter()).isEqualTo(true);
+    }
+
+    @Test
+    public void testShouldNotFilterWhenByPassLocation() {
+        rateLimitProperties.setEnabled(true);
+        rateLimitProperties.getLocation().getBypass().add(LOCALHOST);
+        assertThat(target.shouldFilter()).isEqualTo(false);
+    }
+
+    @Test
+    public void testShouldDenyRequestLocation() {
+        rateLimitProperties.setEnabled(true);
+        rateLimitProperties.getLocation().getDeny().add(LOCALHOST);
+        assertThrows(RateLimitExceededException.class, () -> target.shouldFilter());
+    }
+
+    @Test
+    public void testShouldDeprecatedDenyRequest() {
+        rateLimitProperties.setEnabled(true);
+        rateLimitProperties.getDenyRequest().getOrigins().add(LOCALHOST);
+        assertThrows(RateLimitExceededException.class, () -> target.shouldFilter());
     }
 
     @Test
