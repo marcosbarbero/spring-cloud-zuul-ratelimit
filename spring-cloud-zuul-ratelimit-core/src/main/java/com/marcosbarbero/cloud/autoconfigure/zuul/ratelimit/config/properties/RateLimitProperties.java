@@ -28,7 +28,6 @@ import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.boot.convert.DurationUnit;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.netflix.zuul.filters.Route;
-import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 
 import javax.servlet.http.HttpServletRequest;
@@ -323,15 +322,7 @@ public class RateLimitProperties {
          * List of origins that will have the request denied.
          */
         @NotNull
-        private List<String> origins = new ArrayList<>();
-
-        /**
-         * Status code returned when a blocked origin tries to reach the server.
-         */
-        private int responseStatusCode = HttpStatus.FORBIDDEN.value();
-
-        public DenyRequest() {
-        }
+        private List<String> origins;
 
         public DenyRequest(@NotNull List<String> origins) {
             this.origins = origins;
@@ -345,13 +336,6 @@ public class RateLimitProperties {
             this.origins = origins;
         }
 
-        public int getResponseStatusCode() {
-            return responseStatusCode;
-        }
-
-        public void setResponseStatusCode(int responseStatusCode) {
-            this.responseStatusCode = responseStatusCode;
-        }
     }
 
     public static class Location {
