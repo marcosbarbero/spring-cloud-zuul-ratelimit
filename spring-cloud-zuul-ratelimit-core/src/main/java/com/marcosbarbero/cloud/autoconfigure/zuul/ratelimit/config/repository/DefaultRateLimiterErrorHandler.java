@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultRateLimiterErrorHandler implements RateLimiterErrorHandler {
 
-    private static Logger log = LoggerFactory.getLogger(DefaultRateLimiterErrorHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(DefaultRateLimiterErrorHandler.class);
 
     @Override
     public void handleSaveError(String key, Exception e) {

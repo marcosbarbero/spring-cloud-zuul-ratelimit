@@ -22,7 +22,6 @@ public class SpringDataDenyOriginTestIT {
     @Test
     void testDeniedOrigin() {
         ResponseEntity<String> response = this.restTemplate.getForEntity("/serviceC", String.class);
-//        assertEquals(FORBIDDEN, response.getStatusCode());
         assertEquals(NOT_FOUND, response.getStatusCode());
     }
 

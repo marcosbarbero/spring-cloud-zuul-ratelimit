@@ -4,7 +4,9 @@ import static org.springframework.boot.SpringApplication.run;
 
 import com.pszymczyk.consul.ConsulProcess;
 import com.pszymczyk.consul.ConsulStarterBuilder;
+
 import javax.annotation.PreDestroy;
+
 import org.springframework.cloud.client.SpringCloudApplication;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +29,7 @@ public class ConsulApplication {
     }
 
     @RestController
-    public class ServiceController {
+    public static class ServiceController {
 
         public static final String RESPONSE_BODY = "ResponseBody";
 
@@ -57,7 +59,6 @@ public class ConsulApplication {
             return ResponseEntity.ok(RESPONSE_BODY);
         }
     }
-
 
     @Configuration
     static class ConsulConfig {
