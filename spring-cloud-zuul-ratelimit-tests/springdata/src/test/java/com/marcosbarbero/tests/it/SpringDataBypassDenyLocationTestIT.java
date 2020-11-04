@@ -1,12 +1,17 @@
 package com.marcosbarbero.tests.it;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
+
+import java.util.stream.Stream;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -20,30 +25,21 @@ public class SpringDataBypassDenyLocationTestIT {
     @Autowired
     MockMvc mockMvc;
 
-    @Test
-    void testBypassRequestOrigin() throws Exception {
-        for (int i = 0; i < 5; i++) {
-            mockMvc.perform(get("/serviceB")
-                    .with(location("127.0.0.1"))
-            ).andDo(print())
-                    .andExpect(status().isOk());
-        }
+    @ParameterizedTest
+    @MethodSource("locationAndResponseCode")
+    void testDenyOrBypassLocationRequest(String location, HttpStatus httpStatus) throws Exception {
+        mockMvc.perform(get("/serviceB")
+                .with(location(location))
+        ).andDo(print())
+                .andExpect(status().is(httpStatus.value()));
     }
 
-    @Test
-    void testDeniedOrigin() throws Exception {
-        mockMvc.perform(get("/serviceB")
-                .with(location("126.0.0.1"))
-        ).andDo(print())
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void testDeniedOriginWithDeprecatedConfiguration() throws Exception {
-        mockMvc.perform(get("/serviceB")
-                .with(location("125.0.0.1"))
-        ).andDo(print())
-                .andExpect(status().isNotFound());
+    private static Stream<Arguments> locationAndResponseCode() {
+        return Stream.of(
+                Arguments.arguments("127.0.0.1", HttpStatus.OK),
+                Arguments.arguments("126.0.0.1", HttpStatus.NOT_FOUND),
+                Arguments.arguments("125.0.0.1", HttpStatus.NOT_FOUND)
+        );
     }
 
     private static RequestPostProcessor location(String location) {
