@@ -23,11 +23,11 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.va
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.boot.convert.DurationUnit;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.netflix.zuul.filters.Route;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.ResponseHeadersVerbosity.NONE;
 import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.ResponseHeadersVerbosity.VERBOSE;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORM_BODY_WRAPPER_FILTER_ORDER;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_RESPONSE_FILTER_ORDER;
@@ -124,23 +123,6 @@ public class RateLimitProperties {
         this.enabled = enabled;
     }
 
-    /**
-     * Tells if rate limit response headers should be added to response.
-     *
-     * @return Whether the response headers should be added
-     * @deprecated use {{@link #responseHeaders}
-     */
-    @Deprecated
-    @DeprecatedConfigurationProperty(replacement = "zuul.ratelimit.response-headers")
-    public boolean isAddResponseHeaders() {
-        return !NONE.equals(responseHeaders);
-    }
-
-    @Deprecated
-    public void setAddResponseHeaders(boolean addResponseHeaders) {
-        setResponseHeaders(addResponseHeaders ? VERBOSE : NONE);
-    }
-
     public ResponseHeadersVerbosity getResponseHeaders() {
         return this.responseHeaders;
     }
@@ -187,23 +169,6 @@ public class RateLimitProperties {
 
     public void setLocation(Location location) {
         this.location = location;
-    }
-
-    /**
-     * Tells if rate limit response headers should be added to response.
-     *
-     * @return Whether a {@link DenyRequest}
-     * @deprecated use {{@link #location}
-     */
-    @Deprecated
-    @DeprecatedConfigurationProperty(replacement = "zuul.ratelimit.location.deny")
-    public DenyRequest getDenyRequest() {
-        return new DenyRequest(this.location.getDeny());
-    }
-
-    @Deprecated
-    public void setDenyRequest(DenyRequest denyRequest) {
-        getLocation().setDeny(denyRequest.origins);
     }
 
     public static class Policy {
@@ -312,33 +277,13 @@ public class RateLimitProperties {
         }
     }
 
-    /**
-     * @see Location
-     */
-    @Deprecated
-    public static class DenyRequest {
+    public static class Location {
 
         /**
-         * List of origins that will have the request denied.
+         * The {@link HttpStatus} that will be returned when a blocked location performs a request.
+         * Default value FORBIDDEN
          */
-        @NotNull
-        private List<String> origins;
-
-        public DenyRequest(@NotNull List<String> origins) {
-            this.origins = origins;
-        }
-
-        public List<String> getOrigins() {
-            return origins;
-        }
-
-        public void setOrigins(List<String> origins) {
-            this.origins = origins;
-        }
-
-    }
-
-    public static class Location {
+        private HttpStatus responseStatusCodeOnDeny = HttpStatus.FORBIDDEN;
 
         /**
          * List of origins that will have the request denied.
@@ -349,6 +294,14 @@ public class RateLimitProperties {
          * List of origins that will have the request by-passed.
          */
         private List<String> bypass = new ArrayList<>();
+
+        public HttpStatus getResponseStatusCodeOnDeny() {
+            return responseStatusCodeOnDeny;
+        }
+
+        public void setResponseStatusCodeOnDeny(HttpStatus responseStatusCodeOnDeny) {
+            this.responseStatusCodeOnDeny = responseStatusCodeOnDeny;
+        }
 
         public List<String> getDeny() {
             return deny;

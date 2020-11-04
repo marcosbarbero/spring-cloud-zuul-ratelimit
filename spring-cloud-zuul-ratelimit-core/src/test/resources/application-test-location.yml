@@ -1,0 +1,9 @@
+zuul:
+  ratelimit:
+    enabled: true
+    repository: REDIS
+    location:
+      bypass: 127.0.0.1
+      deny:
+        - 126.0.0.1
+        - 125.0.0.1

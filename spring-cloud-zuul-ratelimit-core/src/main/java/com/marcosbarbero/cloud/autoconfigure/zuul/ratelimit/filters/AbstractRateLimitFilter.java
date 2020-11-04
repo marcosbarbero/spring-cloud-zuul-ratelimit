@@ -70,10 +70,10 @@ abstract class AbstractRateLimitFilter extends ZuulFilter {
         }
 
         if (shouldDenyRequestLocation(request)) {
-            ctx.setResponseStatusCode(HttpStatus.FORBIDDEN.value());
+            ctx.setResponseStatusCode(properties.getLocation().getResponseStatusCodeOnDeny().value());
             ctx.put(RATE_LIMIT_EXCEEDED, "true");
 
-            throw new RateLimitExceededException(HttpStatus.FORBIDDEN);
+            throw new RateLimitExceededException(properties.getLocation().getResponseStatusCodeOnDeny());
         }
 
         return !policy(route(request), request).isEmpty();

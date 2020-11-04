@@ -9,6 +9,7 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.Ra
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitProperties.Policy.MatchType;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.RateLimitType;
+import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties.ResponseHeadersVerbosity;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.RateLimitPreFilter;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.commons.TestRouteLocator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitUtils;
@@ -78,7 +79,7 @@ public class RateLimitPreFilterTest {
         RequestContext.testSetCurrentContext(requestContext);
         RequestContextHolder.setRequestAttributes(requestAttributes);
         rateLimitProperties = new RateLimitProperties();
-        rateLimitProperties.setAddResponseHeaders(false);
+        rateLimitProperties.setResponseHeaders(ResponseHeadersVerbosity.NONE);
         UrlPathHelper urlPathHelper = new UrlPathHelper();
         RateLimitUtils rateLimitUtils = new DefaultRateLimitUtils(rateLimitProperties);
         Route route = new Route("servicea", "/test", "servicea", "/servicea", null, Collections.emptySet());
@@ -139,13 +140,6 @@ public class RateLimitPreFilterTest {
     public void testShouldDenyRequestLocation() {
         rateLimitProperties.setEnabled(true);
         rateLimitProperties.getLocation().getDeny().add(LOCALHOST);
-        assertThrows(RateLimitExceededException.class, () -> target.shouldFilter());
-    }
-
-    @Test
-    public void testShouldDeprecatedDenyRequest() {
-        rateLimitProperties.setEnabled(true);
-        rateLimitProperties.getDenyRequest().getOrigins().add(LOCALHOST);
         assertThrows(RateLimitExceededException.class, () -> target.shouldFilter());
     }
 

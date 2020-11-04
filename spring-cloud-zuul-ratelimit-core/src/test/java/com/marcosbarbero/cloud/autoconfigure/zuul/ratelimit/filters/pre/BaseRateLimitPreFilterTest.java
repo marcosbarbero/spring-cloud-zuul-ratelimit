@@ -1,17 +1,5 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.filters.pre;
 
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_LIMIT;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_QUOTA;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_REMAINING_QUOTA;
-import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.HEADER_RESET;
-import static java.util.Arrays.asList;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
-
 import com.google.common.collect.Lists;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
@@ -27,14 +15,6 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateL
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitUtils;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.monitoring.CounterFactory;
-import java.time.Duration;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -52,6 +32,16 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.util.UrlPathHelper;
+
+import java.time.Duration;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
+
+import static com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.RateLimitConstants.*;
+import static java.util.Arrays.asList;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
 /**
  * @author Marcos Barbero
@@ -169,7 +159,7 @@ public abstract class BaseRateLimitPreFilterTest {
         }
 
         String exceeded = (String) this.context.get("rateLimitExceeded");
-        assertTrue(Boolean.valueOf(exceeded), "RateLimit Exceeded");
+        assertTrue(Boolean.parseBoolean(exceeded), "RateLimit Exceeded");
         assertEquals(TOO_MANY_REQUESTS.value(), this.context.getResponseStatusCode(), "Too many requests");
     }
 
@@ -222,12 +212,12 @@ public abstract class BaseRateLimitPreFilterTest {
 
     @ParameterizedTest
     @MethodSource("headersBackwardsCompatibility")
-    void testReturnHeadersBackwardsCompatibility(boolean addHeaderValue, ResponseHeadersVerbosity expected) {
+    void testReturnHeadersBackwardsCompatibility(ResponseHeadersVerbosity addHeaderValue, ResponseHeadersVerbosity expected) {
         request.setRequestURI("/serviceA");
         request.setRemoteAddr("10.0.0.100");
         request.setMethod("GET");
 
-        properties.setAddResponseHeaders(addHeaderValue);
+        properties.setResponseHeaders(addHeaderValue);
 
         assertTrue(this.filter.shouldFilter());
 
@@ -241,8 +231,8 @@ public abstract class BaseRateLimitPreFilterTest {
 
     static Stream<Arguments> headersBackwardsCompatibility() {
         return Stream.of(
-            Arguments.of(true, ResponseHeadersVerbosity.VERBOSE),
-            Arguments.of(false, ResponseHeadersVerbosity.NONE)
+            Arguments.of(ResponseHeadersVerbosity.VERBOSE),
+            Arguments.of(ResponseHeadersVerbosity.NONE)
         );
     }
 
