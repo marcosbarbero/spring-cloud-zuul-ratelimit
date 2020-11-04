@@ -210,32 +210,6 @@ public abstract class BaseRateLimitPreFilterTest {
         }
     }
 
-    @ParameterizedTest
-    @MethodSource("headersBackwardsCompatibility")
-    void testReturnHeadersBackwardsCompatibility(ResponseHeadersVerbosity addHeaderValue, ResponseHeadersVerbosity expected) {
-        request.setRequestURI("/serviceA");
-        request.setRemoteAddr("10.0.0.100");
-        request.setMethod("GET");
-
-        properties.setResponseHeaders(addHeaderValue);
-
-        assertTrue(this.filter.shouldFilter());
-
-        String key = "null_serviceA_10.0.0.100_anonymous_GET";
-
-        for (int i = 0; i < 2; i++) {
-            this.filter.run();
-            assertHeaders(key, expected);
-        }
-    }
-
-    static Stream<Arguments> headersBackwardsCompatibility() {
-        return Stream.of(
-            Arguments.of(ResponseHeadersVerbosity.VERBOSE),
-            Arguments.of(ResponseHeadersVerbosity.NONE)
-        );
-    }
-
     void assertHeaders(String key, ResponseHeadersVerbosity headersVerbosity) {
         final String headerKey;
         if (key != null && !key.startsWith("-")) {
