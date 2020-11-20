@@ -1,4 +1,4 @@
-name: Mark stale issues and pull requests
+name: Mark and close stale issues and pull requests
 
 on:
   schedule:
@@ -10,10 +10,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/stale@v1
+    - uses: actions/stale@v3
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
-        stale-issue-message: 'Marked as stale due inactivity'
-        stale-pr-message: 'Marked as stale due inactivity'
+        stale-issue-message: 'This issue is stale because it has been open 30 days with no activity. Remove stale label or comment or this will be closed in 1 day'
+        stale-pr-message: 'This issue is stale because it has been open 30 days with no activity. Remove stale label or comment or this will be closed in 1 day'
         stale-issue-label: 'stale'
         stale-pr-label: 'stale'
+        days-before-stale: 30
+        days-before-close: 1
