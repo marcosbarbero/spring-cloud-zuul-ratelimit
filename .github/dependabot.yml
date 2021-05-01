@@ -1,0 +1,22 @@
+version: 2
+updates:
+- package-ecosystem: maven
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "04:00"
+  open-pull-requests-limit: 10
+  reviewers:
+  - marcosbarbero
+  labels:
+  - dependencies
+  ignore:
+  - dependency-name: org.springframework.boot:spring-boot-starter-parent
+    versions:
+    - "> 2.4.4, < 2.5"
+  - dependency-name: org.springframework.boot:spring-boot-starter-parent
+    versions:
+    - "> 2.4.4, < 3"
+  - dependency-name: org.springframework.boot:spring-boot-starter-parent
+    versions:
+    - ">= 2.4.a, < 2.5"
