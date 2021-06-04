@@ -89,4 +89,12 @@ public class StringToMatchTypeConverterTest {
         assertThat(matchType.getType()).isEqualByComparingTo(RateLimitType.CLIENT_ID);
         assertThat(matchType.getMatcher()).isEqualTo("optimus_prime");
     }
+
+    @Test
+    public void testConvertStringTypeHttpHeaderWithMatcher() {
+        MatchType matchType = target.convert("http_header=customHeader");
+        assertThat(matchType).isNotNull();
+        assertThat(matchType.getType()).isEqualByComparingTo(RateLimitType.HTTP_HEADER);
+        assertThat(matchType.getMatcher()).isEqualTo("customHeader");
+    }
 }

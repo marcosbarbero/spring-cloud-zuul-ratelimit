@@ -17,8 +17,14 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
+import org.springframework.data.redis.core.script.RedisScript;
+
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Objects;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -31,11 +37,13 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
 
     private final RateLimiterErrorHandler rateLimiterErrorHandler;
     private final StringRedisTemplate redisTemplate;
+    private final RedisScript<Long> redisScript;
 
     public RedisRateLimiter(final RateLimiterErrorHandler rateLimiterErrorHandler,
                             final StringRedisTemplate redisTemplate) {
         this.rateLimiterErrorHandler = rateLimiterErrorHandler;
         this.redisTemplate = redisTemplate;
+        this.redisScript = getScript();
     }
 
     @Override
@@ -63,17 +71,19 @@ public class RedisRateLimiter extends AbstractCacheRateLimiter {
         rate.setReset(refreshInterval.toMillis());
         Long current = 0L;
         try {
-            Boolean present = redisTemplate.opsForValue().setIfAbsent(key, Long.toString(usage), refreshInterval.getSeconds(), SECONDS);
-            if (Boolean.FALSE.equals(present)) {
-                // Key already exists, increment
-                current = redisTemplate.opsForValue().increment(key, usage);
-            } else {
-                current = usage;
-            }
+            current = redisTemplate.execute(redisScript, Collections.singletonList(key), Long.toString(usage),
+                    Long.toString(refreshInterval.getSeconds()));
         } catch (RuntimeException e) {
             String msg = "Failed retrieving rate for " + key + ", will return the current value";
             rateLimiterErrorHandler.handleError(msg, e);
         }
-        return Math.max(-1, limit - (current != null ? current : 0L));
+        return Math.max(-1, limit - (current != null ? current.intValue() : 0));
+    }
+
+    private RedisScript<Long> getScript() {
+        DefaultRedisScript<Long> redisScript = new DefaultRedisScript<>();
+        redisScript.setLocation(new ClassPathResource("/scripts/ratelimit.lua"));
+        redisScript.setResultType(Long.class);
+        return redisScript;
     }
 }

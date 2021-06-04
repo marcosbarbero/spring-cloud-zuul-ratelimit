@@ -25,7 +25,7 @@ public class OAuth2SecureContextRateLimitTypeTest {
 
     @Mock
     private HttpServletRequest httpServletRequest;
-    private Route route = new Route("servicea", "/test", "servicea", "/servicea", null, Collections.emptySet());
+    private final Route route = new Route("servicea", "/test", "servicea", "/servicea", null, Collections.emptySet());
     private RateLimitUtils rateLimitUtils;
 
     @BeforeEach

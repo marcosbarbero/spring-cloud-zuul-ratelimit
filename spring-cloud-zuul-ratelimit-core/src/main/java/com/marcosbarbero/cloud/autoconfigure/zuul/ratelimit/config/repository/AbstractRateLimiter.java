@@ -66,7 +66,7 @@ public abstract class AbstractRateLimiter implements RateLimiter {
 
         Long limit = policy.getLimit();
         Long quota = policy.getQuota() != null ? policy.getQuota().toMillis() : null;
-        Long refreshInterval = policy.getRefreshInterval().toMillis();
+        long refreshInterval = policy.getRefreshInterval().toMillis();
         Date expiration = new Date(System.currentTimeMillis() + refreshInterval);
 
         return new Rate(key, limit, quota, refreshInterval, expiration);

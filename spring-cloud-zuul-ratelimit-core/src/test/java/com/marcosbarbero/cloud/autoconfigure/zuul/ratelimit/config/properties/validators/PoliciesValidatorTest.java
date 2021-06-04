@@ -9,11 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
+import javax.validation.*;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Set;
@@ -131,4 +127,26 @@ public class PoliciesValidatorTest {
         executeValidations(policy, 0);
     }
 
+
+    @Test
+    public void testValidOnPolicyWithLimitAndHeader() {
+        properties.setKeyPrefix("prefix");
+        Policy policy = getPolicy(1L, null, null);
+        policy.getType().add(new Policy.MatchType(RateLimitType.HTTP_HEADER, "customHeader"));
+        properties.getDefaultPolicyList().add(policy);
+        properties.getPolicyList().put("key", Lists.newArrayList(policy));
+        Set<ConstraintViolation<RateLimitProperties>> violations = validator.validate(properties);
+        assertThat(violations).isEmpty();
+    }
+
+    @Test
+    public void testValidOnPolicyWithLimitAndHeaderWithoutMatcher() {
+        properties.setKeyPrefix("prefix");
+        Policy policy = getPolicy(1L, null, null);
+        policy.getType().add(new Policy.MatchType(RateLimitType.HTTP_HEADER, null));
+        properties.getDefaultPolicyList().add(policy);
+        properties.getPolicyList().put("key", Lists.newArrayList(policy));
+        Set<ConstraintViolation<RateLimitProperties>> violations = validator.validate(properties);
+        assertThat(violations).hasSize(2);
+    }
 }

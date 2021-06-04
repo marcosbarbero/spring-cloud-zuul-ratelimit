@@ -147,6 +147,25 @@ public enum RateLimitType {
     },
 
     /**
+     * Rate limit policy considering an URL Pattern
+     */
+    HTTP_HEADER {
+        public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
+            return StringUtils.isNotEmpty(request.getHeader(matcher));
+        }
+
+        @Override
+        public String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
+            return request.getHeader(matcher);
+        }
+
+        @Override
+        public boolean isValid(String matcher) {
+            return StringUtils.isNotEmpty(matcher);
+        }
+    },
+
+    /**
      * Rate limit policy considering Oauth2's clientId.
      */
     CLIENT_ID {
@@ -162,8 +181,8 @@ public enum RateLimitType {
     }
     ;
 
-    public abstract boolean apply(HttpServletRequest request, Route route,
-                                  RateLimitUtils rateLimitUtils, String matcher);
+    public abstract boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils,
+        String matcher);
 
     public abstract String key(HttpServletRequest request, Route route,
                                RateLimitUtils rateLimitUtils, String matcher);
