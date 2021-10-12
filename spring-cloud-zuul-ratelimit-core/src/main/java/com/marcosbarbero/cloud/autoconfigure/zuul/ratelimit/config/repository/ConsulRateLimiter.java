@@ -34,6 +34,7 @@ import static org.springframework.util.StringUtils.hasText;
  *
  * @author Liel Chayoun
  * @author Marcos Barbero
+ * @author Mohamed Fawzy
  * @since 2017-08-15
  */
 public class ConsulRateLimiter extends AbstractRateLimiter {
