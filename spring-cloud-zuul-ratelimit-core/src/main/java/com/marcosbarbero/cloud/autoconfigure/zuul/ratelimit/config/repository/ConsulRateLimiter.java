@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.util.StringUtils.hasText;
 
 /**
@@ -33,6 +34,7 @@ import static org.springframework.util.StringUtils.hasText;
  *
  * @author Liel Chayoun
  * @author Marcos Barbero
+ * @author Mohamed Fawzy
  * @since 2017-08-15
  */
 public class ConsulRateLimiter extends AbstractRateLimiter {
@@ -50,9 +52,9 @@ public class ConsulRateLimiter extends AbstractRateLimiter {
     }
 
     @Override
-    protected Rate getRate(String key) {
+    protected Rate getRate(final String key) {
         Rate rate = null;
-        GetValue value = this.consulClient.getKVValue(key).getValue();
+        GetValue value = this.consulClient.getKVValue(buildValidConsulKey(key)).getValue();
         if (value != null && value.getDecodedValue() != null) {
             try {
                 rate = this.objectMapper.readValue(value.getDecodedValue(), Rate.class);
@@ -73,8 +75,16 @@ public class ConsulRateLimiter extends AbstractRateLimiter {
         }
 
         if (hasText(value)) {
-            this.consulClient.setKVValue(rate.getKey(), value);
+            this.consulClient.setKVValue(buildValidConsulKey(rate.getKey()), value);
         }
+    }
+
+    // Slash will corrupt Consul Call , to be changed to _
+    private String buildValidConsulKey(String key){
+        if(isNotBlank(key)){
+            return key.replaceAll("/", "_");
+        }
+        return key;
     }
 
 }
