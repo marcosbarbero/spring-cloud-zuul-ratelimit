@@ -1,50 +1,39 @@
 language: java
-
 dist: trusty
-
 sudo: false
-
-#addons:
-#  sonarcloud:
-#    organization: marcosbarbero-github
-#    token:
-#      secure: bvw/c//IhNlSDnC7RS2HvzwKO1vXaW1c7FWudiiiRF2UNc7iwPyyT7pdTkFZB0DALKVeCowmh5uW3kZr5bCfOthRfXYtJ6UcD98BzkVSBdoDdpuKGC/En2nhOIHUMJe8kv4SYW3ulqNI76sjkG8GduR4fwF+uH5biHs9OrihA8OMuJ71hw09TSdqNIANmi5hjakH4DLeGFtrV8i5yMYvXsfGENmIwWSIBmfRmmQ0ksDwG/2JB1B2aeOzR4O/WTUj7TFpXvoyJ7/ccJCnMJ4zeXbizriFiuO+Db/BZvhTeTlu02wu0Is9xjl3y8ohmERffgXv4C0uWgTEBW0SA0rYcmvc83xHVtaLPSPDgmGo9WtkiXYcfMOvI8U07eGne86eL0gHkTNt7y55H98OWi4T2MT1yKov3c0sd5ejcBxoZIIM/bfQuqVM/EWTocu/JBrtAxO5zUX01m3uyLxe17ghTmO2Grryilhz2MA+a8PgfrNQMZL8s/RCUW5S+iUfyRcsC88H4OSUqKA6txp2OR5UcCVhcNx5QtVvapwGm6yvm7WSHc0iq62OHgB8ec6N2hV+lfZecSNn4eULs2sjwCoD9GHk4d5N1zw4iOarKaGgjp5qqizjxVKa3JkY8cTajYsfQGboCTDIpLF87drLtnwth9naqLHVTNHF9RElHwWWAl0=
-
 jdk:
- - oraclejdk11
-
+- oraclejdk11
 script:
- - ./mvnw --settings .ci/settings.xml install -Dmaven.test.skip=true -Dgpg.skip -Dmaven.javadoc.skip=true -B -V -q
- 
+- "./mvnw --settings .ci/settings.xml install -Dmaven.test.skip=true -Dgpg.skip -Dmaven.javadoc.skip=true
+  -B -V -q"
 install:
- - ./mvnw --settings .ci/settings.xml install -Dmaven.test.skip=true -Dgpg.skip -Dmaven.javadoc.skip=true -B -V -q
-
+- "./mvnw --settings .ci/settings.xml install -Dmaven.test.skip=true -Dgpg.skip -Dmaven.javadoc.skip=true
+  -B -V -q"
 before_install:
-  - if [ ! -z "$GPG_SECRET_KEYS" ]; then echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import; fi
-  - if [ ! -z "$GPG_OWNERTRUST" ]; then echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust; fi
-
+- openssl aes-256-cbc -K $encrypted_b7bda4e4f1ab_key -iv $encrypted_b7bda4e4f1ab_iv
+  -in .ci/signingkey.asc.enc -out .ci/signingkey.asc -d
+- if [ ! -z "$GPG_SECRET_KEYS" ]; then echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE
+  --import; fi
+- if [ ! -z "$GPG_OWNERTRUST" ]; then echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE
+  --import-ownertrust; fi
 after_success:
- - ./mvnw -pl '!spring-cloud-zuul-ratelimit-dependencies' clean org.jacoco:jacoco-maven-plugin:prepare-agent verify jacoco:report coveralls:report -q -Dlogging.level.root=ERROR
-
+- "./mvnw -pl '!spring-cloud-zuul-ratelimit-dependencies' clean org.jacoco:jacoco-maven-plugin:prepare-agent
+  verify jacoco:report coveralls:report -q -Dlogging.level.root=ERROR"
 cache:
   directories:
-    - $HOME/.m2/repository
-#    - $HOME/.sonar/cache
-
+  - "$HOME/.m2/repository"
 notifications:
   email:
-    - marcos.hgb@gmail.com
-    - lchayoun@gmail.com
-
+  - marcos.hgb@gmail.com
+  - lchayoun@gmail.com
 deploy:
- - provider: script
-   script: bash .ci/deploy.sh
-   skip_cleanup: true
-   on:
-     branch: master
-     repo: marcosbarbero/spring-cloud-zuul-ratelimit
-     jdk: oraclejdk11
-
+- provider: script
+  script: bash .ci/deploy.sh
+  skip_cleanup: true
+  on:
+    branch: master
+    repo: marcosbarbero/spring-cloud-zuul-ratelimit
+    jdk: oraclejdk11
 env:
   global:
   - secure: B5QVZ6SWzgQmlKmStQCHg0RcQPVbkti2Z3s5vi1gR0Oef6KYxBpkzP87yES08OvHG7Ha6XfJ28feML8URtTcdhBtkr4aKMGy9R+VvY9i7hykPLGnuejip89oTt4k8SlWkqmvzx4G6qB1YbooVdAbvaqARlS+t1RjSfOJU5kIBMyyrBshxPlavfzDp55tUcBrfbDEbQmdnRY84gXng+gz+ceJTzg/vxNPyKCcG5Ap/2qW0lH+ZRcJTUgtmNZZIpiw56YD3T/ltc3wVIHEgFzCGUiZAaRtHJW3PGComDKd9Z3JPaZO1nuJlD999Kok4I9IEZjpu7g1mXlaioYsAwholJTsugoinEZ6JChaeT/92ZWY1Ua0vT5YJjz0QCGzlhJ12I751QFk1Lam9hwlhZ7LafDi1p8vhQuN1I5NOulgnoXwZboZ9/2jbNp63o1nq773jULJiAsMXY+Pv8SLCNKzVANyEK9ECYKG3DSxuVLIpX/j1cYWf/UH5FxQ5aiDYnZpBVblWfsQxPuyVjHnIyaAvw4LsTq4DfRG8JMqjjGr0IUGV6Xa/6/hCfx5ojvWFQ17YJeGHJMGAfPwvsTPhLTNl6Wm1Iw6Lt3N9KJ6VaGnJDuza/mJuTrTAdGhZ28bcevNq03vW3bFenLh0EC8zamBBA9eNuqqDak6Q1OzV3z6dRo=
@@ -52,3 +41,4 @@ env:
   - secure: o1YQz4eyYlx6r/vO3SXwvQsY/fANpShiALMuPaUewd6d78oUX9E+1hW82NP8hznV62gkRxllgQV+frkyxAD1PaWyAyyWnbIDqJP/mV4QZ7xyNKxXzsynAhJsbH/NGRceQ7Nyk03ytFxU3VfdJ//m4Qnk9GQgnCfcnv7GcGrzlWW6Y/U8idEGFlYgNH1bLdhM50iJdN4iZsv69woT1fgd3LvmgMEcgZiAHe0HdcSa7XSPvaHGHn4Axj0fKp1Ydop+usYWBkwqL3Zp1gdPFCRZ7ZtTGx0XSQ/9f15mOgvbi9ZbTJUiCZUNTgCwRG+qDeFHk44R6HDzh2tpEKK+/rM6HEllqUdSnjgQPuBSPAzheEWz1WbeyI14rxbrBU44HXDE+HWR3XgF5ZD+waftwtLFz+J+YEgJ5564/rtRpH45OPig9JJ6qD958xTOOG+oW+aDwCCPi3aGTzFbEE5jlVbTzqqg8AVtKPZQqL7AncxdjxXeVhP4nwUKpNxGfU/SmoB4XvX7zmxvLuXIIS8ixpANm07Digqeg9iVst3EedkYkV+LwP69VD/x9/7MxVEer0Mkp0LKwlS8tRw8EBZ063DJm1RkhLwdCt2kTVwB4FX7eIB/7JUGdSuTw1emiPKNtjfYzyiT2JLa6Zd+2OWE9+tcKXeW4PcIjPvIFAUy6Z9Jksc=
   - secure: f0uCLszlxpYD5yuqpI9OESi6MnGt/c3guy3RmF6AcjimpG2hrkaZ3F1/TZg8FqR6gl1MC5pd/AQL7CH4O5wO0GLOFhWfZXGlgoFsY6vMObQx6hWvyzBHadIKiY6rW306aG1vAR5142pKilNErNnxMNs+H4+RYUoiwu+YoQwRXdwTRoHuO/aSVL4FA9seb83jxDh3IS9jNDynEzZN7ONJcOollMMjF9T7350VKCYYT1sXRqHPnglzJZxg7Vl6oZzvz3n1LbojHJxkBkCOpD/TJgbsky/4fOe56NXr7niIpZOZsspFdiIlkEEZnkY3IC/ntEfNecxvElbZ0orVmGUcGHVD7JqANwtdk+wML44/Q+t4Qpgc+InMVS98W0wGemq/XPpvzkLo6iW97AKW4C7Zetytb0IREeTd6MFl3BL6sn39nTURgF1ipWPXt6QwA0Wgc1gpXvOQ2NHRfPyoGxNswvGdNKoAkSyTRd5kb6mkhUjrZcsXzqw3KjE6+mf4m3KmOcOSoG1Y+WCU2D3sFVct9W3pNtM6v5TVn5VZSOHpWpDndSWOJdm6fVS3srzsqoWPi4Y/4lgbuae9iHMQQz0Bvv2xAQDrAFb+dAtUPeJJCJ+mTzk+BsToDQ+Z8ZG/2LNe8YIDMmOExUk6ROUO+SKu0xHdL6kSa8bPuTHCkceI8Mw=
   - secure: rqYoUIgzuOjm58iIntu+szFzUmTHJ0tqNVV7sOxs3649PLkpAbvwlaf1Ldg/B/+WTYw6mtOO+oyqHNvOBTWYjjpkjmLPN5MtwTAnH1/hi1IwnqHzWsldD1vLqEBfIvmnRBBefyQref1ynGbLYkPP6B8pj796KOC3H2RffUyIs2fStN0GNLCBLkTeKinAoQFYzyfAAHLDEvxb7UsEml/3EKbptj4LfJ59KuCMaX2p9iEZ1vWxkSsHNINcgeiTjHLEqFbAxkwA2/xsuzm43RRVNfQU5lFmkdM0tEeqCRsMpDKALuO5qQlcDdt6LjaFYWq1cUXOGLbX0yMXtTQFvKgZ7B9NTo6AjFc8ioR9NMf3ihVhJtyl2FX7KUvnY0DVyRMdsKxP6UcryrXkRr80P+Zn3TdbJaDE/p1OS/8Lvlz8W7pxP0aZas7z4GS5qMYb4hdH0D2eNVFTSkZERumv6iqCOhbtAgWpRmPVsywAqx5v7DbsezJaZtgeg08H+rFhwIBPSrBJmhhKV8vrypmS6a02CIZSJKSwmBskHZ7WixVQmi6BU92ngxMOYqy9bLt80DXGLF60KNzemaPgN/p45n5fZGewA0eKH0yX3CzOrM4FhQ8KbMdspJcm2JR57ISjN8MlphRfi9MSKoZEzXU0+f5qWpekMyLxDZ8Lg8dR6lKtN4k=
+  - secure: ggX7LFZd0rROgnXhxz5J+7QPrFLZwArYRjJ6pXExm1wXssZSxLRkVqVHSYOvPJmA/RjKt1zUESbaLhk5s5h8B13RxrYGREUQHiZCJ7SCfxWjEvWS8srfuwK+nEK7S6F/cwWpwzgjy4wR8grZ51bPa55H9zAwg+l3712ttcL4SHcjCP1gGauXkueX4OS080ET+xzVPZ6jftUnwBbinrmoRDU4LDG/L05fGlCieDb2WV4tBpq4JWou6T9NlTLkLkEJZ6nyvK12xq8dFkmeN4mPJiV+qHPFblU5+RsXi3YD9bq+8JGhZIjb+7TBQKNECoXe/RKvmshHstkJZm0V4PHwz2hR/YaVWCP+Q72sw0yYcsbOkI/vXFfqBBPN7fgFbbuiBGm/NrWyvTVQOeDcEqkeZDAszkWpmlkCKAvK5XtZVumrTx3wupE77H+xX+mONxKaZo+Rar1JSW4z8c2z49GovoKrtj6/e/iiffnHTTvRFVpN4UjL9WVA5Y0PKoNSuWVXoZsSgzPOX5I4Y139C34jcakPADXj7Vm8VoWU9lIm+5ScrCWcw5MG4jdd3o9EFV4UjfocHGDVT4ar3VEpkCXWLFV6KqCqYlWoiaYAqJELWJOZJAqg2y+YYtCfr8MQoSBhufddaJ3w+VoSCHwmvqTGXn410sQQ0qL5bvdUxmcuazw=
