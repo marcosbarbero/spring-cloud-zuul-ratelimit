@@ -10,7 +10,7 @@ install:
 - "./mvnw --settings .ci/settings.xml install -Dmaven.test.skip=true -Dgpg.skip -Dmaven.javadoc.skip=true
   -B -V -q"
 after_success:
-- .ci/before-deploy.sh
+- bash .ci/before-deploy.sh
 - "./mvnw -pl '!spring-cloud-zuul-ratelimit-dependencies' clean org.jacoco:jacoco-maven-plugin:prepare-agent
   verify jacoco:report coveralls:report -q -Dlogging.level.root=ERROR"
 cache:
