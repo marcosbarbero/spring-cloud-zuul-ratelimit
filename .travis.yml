@@ -7,7 +7,8 @@ script:
 - "./mvnw --settings .ci/settings.xml install -Dmaven.test.skip=true -Dgpg.skip -Dmaven.javadoc.skip=true
   -B -V -q"
 before_install:
-  - openssl aes-256-cbc -K $encrypted_01edcdfe89aa_key -iv $encrypted_01edcdfe89aa_iv -in .ci/secret.asc.enc -out .ci/secret.asc -d
+  - chmod -R ug+x .ci
+  - .ci/install.sh
 install:
 - "./mvnw --settings .ci/settings.xml install -Dmaven.test.skip=true -Dgpg.skip -Dmaven.javadoc.skip=true
   -B -V -q"

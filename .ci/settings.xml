@@ -20,6 +20,7 @@
                 <gpg.executable>gpg</gpg.executable>
                 <gpg.keyname>${env.GPG_KEY_NAME}</gpg.keyname>
                 <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
+                <gpg.secretKeyring>.ci/secret.asc</gpg.secretKeyring>
             </properties>
         </profile>
     </profiles>
