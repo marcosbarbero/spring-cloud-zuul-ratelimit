@@ -6,11 +6,12 @@ jdk:
 script:
 - "./mvnw --settings .ci/settings.xml install -Dmaven.test.skip=true -Dgpg.skip -Dmaven.javadoc.skip=true
   -B -V -q"
+before_install:
+  - openssl aes-256-cbc -K $encrypted_01edcdfe89aa_key -iv $encrypted_01edcdfe89aa_iv -in .ci/secret.asc.enc -out .ci/secret.asc -d
 install:
 - "./mvnw --settings .ci/settings.xml install -Dmaven.test.skip=true -Dgpg.skip -Dmaven.javadoc.skip=true
   -B -V -q"
 after_success:
-- bash .ci/before-deploy.sh
 - "./mvnw -pl '!spring-cloud-zuul-ratelimit-dependencies' clean org.jacoco:jacoco-maven-plugin:prepare-agent
   verify jacoco:report coveralls:report -q -Dlogging.level.root=ERROR"
 cache:
