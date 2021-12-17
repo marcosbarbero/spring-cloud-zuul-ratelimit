@@ -17,10 +17,8 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j;
 
 import com.hazelcast.map.IMap;
-import io.github.bucket4j.grid.GridBucketState;
-import io.github.bucket4j.grid.ProxyManager;
-import io.github.bucket4j.grid.hazelcast.Hazelcast;
-import io.github.bucket4j.grid.hazelcast.HazelcastBucketBuilder;
+import io.github.bucket4j.distributed.proxy.ProxyManager;
+import io.github.bucket4j.grid.hazelcast.HazelcastProxyManager;
 
 /**
  * Bucket4j rate limiter configuration.
@@ -28,18 +26,17 @@ import io.github.bucket4j.grid.hazelcast.HazelcastBucketBuilder;
  * @author Liel Chayoun
  * @since 2018-04-06
  */
-public class Bucket4jHazelcastRateLimiter extends AbstractBucket4jRateLimiter<HazelcastBucketBuilder, Hazelcast> {
+public class Bucket4jHazelcastRateLimiter extends AbstractBucket4jRateLimiter {
 
-    private final IMap<String, GridBucketState> rateLimit;
+    private final IMap<String, byte[]> rateLimit;
 
-    public Bucket4jHazelcastRateLimiter(final IMap<String, GridBucketState> rateLimit) {
-        super(io.github.bucket4j.grid.hazelcast.Hazelcast.class);
+    public Bucket4jHazelcastRateLimiter(final IMap<String, byte[]> rateLimit) {
         this.rateLimit = rateLimit;
         super.init();
     }
 
     @Override
-    protected ProxyManager<String> getProxyManager(io.github.bucket4j.grid.hazelcast.Hazelcast extension) {
-        return extension.proxyManagerForMap(rateLimit);
+    protected ProxyManager<String> getProxyManager() {
+        return new HazelcastProxyManager<>(rateLimit);
     }
 }

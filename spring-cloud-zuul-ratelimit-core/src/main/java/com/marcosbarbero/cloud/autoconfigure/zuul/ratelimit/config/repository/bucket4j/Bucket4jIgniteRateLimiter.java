@@ -16,10 +16,8 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j;
 
-import io.github.bucket4j.grid.GridBucketState;
-import io.github.bucket4j.grid.ProxyManager;
-import io.github.bucket4j.grid.ignite.Ignite;
-import io.github.bucket4j.grid.ignite.IgniteBucketBuilder;
+import io.github.bucket4j.distributed.proxy.ProxyManager;
+import io.github.bucket4j.grid.ignite.thick.IgniteProxyManager;
 import org.apache.ignite.IgniteCache;
 
 /**
@@ -28,18 +26,17 @@ import org.apache.ignite.IgniteCache;
  * @author Liel Chayoun
  * @since 2018-04-06
  */
-public class Bucket4jIgniteRateLimiter extends AbstractBucket4jRateLimiter<IgniteBucketBuilder, Ignite> {
+public class Bucket4jIgniteRateLimiter extends AbstractBucket4jRateLimiter {
 
-    private final IgniteCache<String, GridBucketState> cache;
+    private final IgniteCache<String, byte[]> cache;
 
-    public Bucket4jIgniteRateLimiter(final IgniteCache<String, GridBucketState> cache) {
-        super(io.github.bucket4j.grid.ignite.Ignite.class);
+    public Bucket4jIgniteRateLimiter(final IgniteCache<String, byte[]> cache) {
         this.cache = cache;
         super.init();
     }
 
     @Override
-    protected ProxyManager<String> getProxyManager(io.github.bucket4j.grid.ignite.Ignite extension) {
-        return extension.proxyManagerForCache(cache);
+    protected ProxyManager<String> getProxyManager() {
+        return new IgniteProxyManager<>(cache);
     }
 }

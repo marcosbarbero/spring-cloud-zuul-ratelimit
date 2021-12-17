@@ -21,7 +21,6 @@ import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bu
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitKeyGenerator;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.StringToMatchTypeConverter;
 import com.netflix.zuul.ZuulFilter;
-import io.github.bucket4j.grid.GridBucketState;
 import java.util.List;
 import java.util.Map;
 import org.apache.ignite.IgniteCache;
@@ -159,21 +158,21 @@ public class RateLimitAutoConfigurationTest {
         @Bean
         @Qualifier("RateLimit")
         @SuppressWarnings("unchecked")
-        public IMap<String, GridBucketState> hazelcastMap() {
+        public IMap<String, byte[]> hazelcastMap() {
             return mock(IMap.class);
         }
 
         @Bean
         @Qualifier("RateLimit")
         @SuppressWarnings("unchecked")
-        public IgniteCache<String, GridBucketState> igniteCache() {
+        public IgniteCache<String, byte[]> igniteCache() {
             return mock(IgniteCache.class);
         }
 
         @Bean
         @Qualifier("RateLimit")
         @SuppressWarnings("unchecked")
-        public ReadWriteMap<String, GridBucketState> infinispanMap() {
+        public ReadWriteMap<String, byte[]> infinispanMap() {
             return mock(ReadWriteMap.class);
         }
 

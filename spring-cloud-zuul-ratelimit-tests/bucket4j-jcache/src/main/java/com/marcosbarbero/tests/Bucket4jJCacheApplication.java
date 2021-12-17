@@ -1,6 +1,5 @@
 package com.marcosbarbero.tests;
 
-import io.github.bucket4j.grid.GridBucketState;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
 import org.apache.ignite.Ignition;
@@ -33,7 +32,7 @@ public class Bucket4jJCacheApplication {
 
     @Bean
     @Qualifier("RateLimit")
-    public IgniteCache<String, GridBucketState> cache() {
+    public IgniteCache<String, byte[]> cache() {
         ignite = Ignition.getOrStart(new IgniteConfiguration());
         return ignite.getOrCreateCache("rateLimit");
     }

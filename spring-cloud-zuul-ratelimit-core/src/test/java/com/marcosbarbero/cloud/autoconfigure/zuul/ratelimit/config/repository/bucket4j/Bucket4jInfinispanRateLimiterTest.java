@@ -1,7 +1,6 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.BaseRateLimiterTest;
-import io.github.bucket4j.grid.GridBucketState;
 import org.infinispan.AdvancedCache;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.functional.FunctionalMap;
@@ -19,9 +18,9 @@ public class Bucket4jInfinispanRateLimiterTest extends BaseRateLimiterTest {
         MockitoAnnotations.initMocks(this);
         DefaultCacheManager cacheManager = new DefaultCacheManager();
         cacheManager.defineConfiguration("rateLimit", new ConfigurationBuilder().build());
-        AdvancedCache<String, GridBucketState> cache = cacheManager.<String, GridBucketState>getCache("rateLimit").getAdvancedCache();
-        FunctionalMapImpl<String, GridBucketState> functionalMap = FunctionalMapImpl.create(cache);
-        FunctionalMap.ReadWriteMap<String, GridBucketState> readWriteMap = ReadWriteMapImpl.create(functionalMap);
+        AdvancedCache<String, byte[]> cache = cacheManager.<String, byte[]>getCache("rateLimit").getAdvancedCache();
+        FunctionalMapImpl<String, byte[]> functionalMap = FunctionalMapImpl.create(cache);
+        FunctionalMap.ReadWriteMap<String, byte[]> readWriteMap = ReadWriteMapImpl.create(functionalMap);
         target = new Bucket4jInfinispanRateLimiter(readWriteMap);
     }
 

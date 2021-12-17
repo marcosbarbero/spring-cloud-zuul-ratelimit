@@ -16,10 +16,8 @@
 
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.bucket4j;
 
-import io.github.bucket4j.grid.GridBucketState;
-import io.github.bucket4j.grid.ProxyManager;
-import io.github.bucket4j.grid.infinispan.Infinispan;
-import io.github.bucket4j.grid.infinispan.InfinispanBucketBuilder;
+import io.github.bucket4j.distributed.proxy.ProxyManager;
+import io.github.bucket4j.grid.infinispan.InfinispanProxyManager;
 import org.infinispan.functional.FunctionalMap.ReadWriteMap;
 
 /**
@@ -28,18 +26,17 @@ import org.infinispan.functional.FunctionalMap.ReadWriteMap;
  * @author Liel Chayoun
  * @since 2018-04-06
  */
-public class Bucket4jInfinispanRateLimiter extends AbstractBucket4jRateLimiter<InfinispanBucketBuilder, Infinispan> {
+public class Bucket4jInfinispanRateLimiter extends AbstractBucket4jRateLimiter {
 
-    private final ReadWriteMap<String, GridBucketState> readWriteMap;
+    private final ReadWriteMap<String, byte[]> readWriteMap;
 
-    public Bucket4jInfinispanRateLimiter(final ReadWriteMap<String, GridBucketState> readWriteMap) {
-        super(io.github.bucket4j.grid.infinispan.Infinispan.class);
+    public Bucket4jInfinispanRateLimiter(final ReadWriteMap<String, byte[]> readWriteMap) {
         this.readWriteMap = readWriteMap;
         super.init();
     }
 
     @Override
-    protected ProxyManager<String> getProxyManager(io.github.bucket4j.grid.infinispan.Infinispan extension) {
-        return extension.proxyManagerForMap(readWriteMap);
+    protected ProxyManager<String> getProxyManager() {
+        return new InfinispanProxyManager<>(readWriteMap);
     }
 }

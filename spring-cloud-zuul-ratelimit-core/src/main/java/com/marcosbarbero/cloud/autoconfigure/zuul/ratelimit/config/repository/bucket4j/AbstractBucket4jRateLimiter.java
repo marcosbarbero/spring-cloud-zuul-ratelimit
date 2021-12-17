@@ -20,14 +20,13 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.Rate;
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.repository.AbstractCacheRateLimiter;
-import io.github.bucket4j.AbstractBucketBuilder;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Bucket4j;
 import io.github.bucket4j.BucketConfiguration;
 import io.github.bucket4j.ConsumptionProbe;
-import io.github.bucket4j.Extension;
-import io.github.bucket4j.grid.ProxyManager;
+import io.github.bucket4j.distributed.proxy.ProxyManager;
+
 import java.time.Duration;
 import java.util.function.Supplier;
 
@@ -37,31 +36,22 @@ import java.util.function.Supplier;
  * @author Liel Chayoun
  * @since 2018-04-06
  */
-abstract class AbstractBucket4jRateLimiter<T extends AbstractBucketBuilder<T>, E extends Extension<T>> extends AbstractCacheRateLimiter {
+abstract class AbstractBucket4jRateLimiter extends AbstractCacheRateLimiter {
 
-    private final Class<E> extension;
     private ProxyManager<String> buckets;
 
-    AbstractBucket4jRateLimiter(final Class<E> extension) {
-        this.extension = extension;
-    }
-
     void init() {
-        buckets = getProxyManager(getExtension());
+        buckets = getProxyManager();
     }
 
-    private E getExtension() {
-        return Bucket4j.extension(extension);
-    }
-
-    protected abstract ProxyManager<String> getProxyManager(E extension);
+    protected abstract ProxyManager<String> getProxyManager();
 
     private Bucket getQuotaBucket(String key, Long quota, Duration refreshInterval) {
-        return buckets.getProxy(key + QUOTA_SUFFIX, getBucketConfiguration(quota, refreshInterval));
+        return buckets.builder().build(key + QUOTA_SUFFIX, getBucketConfiguration(quota, refreshInterval));
     }
 
     private Bucket getLimitBucket(String key, Long limit, Duration refreshInterval) {
-        return buckets.getProxy(key, getBucketConfiguration(limit, refreshInterval));
+        return buckets.builder().build(key, getBucketConfiguration(limit, refreshInterval));
     }
 
     private Supplier<BucketConfiguration> getBucketConfiguration(Long capacity, Duration period) {

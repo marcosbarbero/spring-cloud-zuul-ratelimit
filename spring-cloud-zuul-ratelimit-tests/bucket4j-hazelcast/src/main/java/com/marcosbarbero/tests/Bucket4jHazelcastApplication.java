@@ -2,7 +2,6 @@ package com.marcosbarbero.tests;
 
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.map.IMap;
-import io.github.bucket4j.grid.GridBucketState;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.cloud.client.SpringCloudApplication;
@@ -27,7 +26,7 @@ public class Bucket4jHazelcastApplication {
 
     @Bean
     @Qualifier("RateLimit")
-    public IMap<String, GridBucketState> map() {
+    public IMap<String, byte[]> map() {
         return Hazelcast.newHazelcastInstance().getMap("rateLimit");
     }
 
