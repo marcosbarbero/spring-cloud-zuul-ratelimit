@@ -337,7 +337,7 @@ This section details how to add custom implementations
 === Key Generator
 
 If the application needs to control the key strategy beyond the options offered by the type property then it can
-be done just by creating a custom link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/RateLimitKeyGenerator.java[`RateLimitKeyGenerator`]
+be done just by creating a custom link:./spring-cloud-zuul-ratelimit-core/src/main/java/com/marcosbarbero/cloud/autoconfigure/zuul/ratelimit/config/RateLimitKeyGenerator.java[`RateLimitKeyGenerator`] beanfootnote:[By declaring a new `RateLimitKeyGenerator`, you replace the `DefaultRateLimitKeyGenerator`.]
 implementation adding further qualifiers or something entirely different:
 
 [source, java]
