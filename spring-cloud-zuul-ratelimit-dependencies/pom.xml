@@ -15,7 +15,7 @@
     <description>Spring Cloud Zuul Rate Limit Dependencies</description>
 
     <properties>
-        <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
+        <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
     </properties>
 
     <licenses>
