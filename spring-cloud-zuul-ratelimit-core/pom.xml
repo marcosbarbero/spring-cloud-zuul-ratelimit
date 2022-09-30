@@ -24,7 +24,7 @@
         <bucket4j.version>6.3.0</bucket4j.version>
         <hazelcast.version>5.1</hazelcast.version>
         <ignite.version>2.11.0</ignite.version>
-        <infinispan.version>13.0.2.Final</infinispan.version>
+        <infinispan.version>14.0.0.Final</infinispan.version>
     </properties>
 
     <dependencies>
