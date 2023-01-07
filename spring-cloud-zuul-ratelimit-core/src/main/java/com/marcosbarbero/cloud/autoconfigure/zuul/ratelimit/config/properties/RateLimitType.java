@@ -17,11 +17,16 @@
 package com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.properties;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.config.RateLimitUtils;
+
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.util.SubnetUtils;
 import org.springframework.cloud.netflix.zuul.filters.Route;
+import org.springframework.security.core.parameters.P;
 import org.springframework.util.AntPathMatcher;
 
 public enum RateLimitType {
@@ -162,10 +167,41 @@ public enum RateLimitType {
         public boolean isValid(String matcher) {
             return StringUtils.isNotEmpty(matcher);
         }
+    },
+
+    /**
+     * Rate limit policy considering on the value of specific http header
+     * e.g token[]
+     */
+    HTTP_HEADER_VALUE {
+        @Override
+        public boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
+            final String valueRegx = "\\[\\w+\\]";
+            Pattern pattern = Pattern.compile(valueRegx);
+            Matcher valueMatcher = pattern.matcher(matcher);
+            if (valueMatcher.find()) {
+                String matcherValue = valueMatcher.group().replaceAll("[\\[\\]]", "");
+                String matcherHeader = matcher.replaceAll(valueRegx, "");
+                if (StringUtils.isNotBlank(matcherHeader)) {
+                    String headerValue = request.getHeader(matcherHeader);
+                    if (StringUtils.isNotBlank(headerValue) && headerValue.equals(matcherValue)) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        @Override
+        public String key(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils, String matcher) {
+            return matcher;
+        }
+
     };
 
     public abstract boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils,
-        String matcher);
+                                  String matcher);
 
     public abstract String key(HttpServletRequest request, Route route,
                                RateLimitUtils rateLimitUtils, String matcher);

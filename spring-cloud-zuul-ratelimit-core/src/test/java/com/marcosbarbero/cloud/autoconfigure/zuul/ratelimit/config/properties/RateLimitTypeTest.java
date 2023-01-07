@@ -5,9 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import com.marcosbarbero.cloud.autoconfigure.zuul.ratelimit.support.DefaultRateLimitUtils;
+
 import java.util.Collections;
 import java.util.concurrent.ThreadLocalRandom;
 import javax.servlet.http.HttpServletRequest;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -181,5 +183,34 @@ public class RateLimitTypeTest {
 
         String key = RateLimitType.HTTP_HEADER.key(httpServletRequest, route, rateLimitUtils, "customHeader");
         assertThat(key).isEqualTo("customValue");
+    }
+
+    @Test
+    public void applyHeaderValue() {
+        when(httpServletRequest.getHeader("token")).thenReturn("myToken");
+
+        boolean apply = RateLimitType.HTTP_HEADER_VALUE.apply(httpServletRequest, route, rateLimitUtils, "token[myToken]");
+
+        assertThat(apply).isTrue();
+    }
+
+    @Test
+    public void applyHeaderValueNoMatch() {
+        when(httpServletRequest.getHeader("token")).thenReturn("otherToken");
+        when(httpServletRequest.getHeader("otherHeader")).thenReturn(null);
+
+        boolean apply = RateLimitType.HTTP_HEADER_VALUE.apply(httpServletRequest, route, rateLimitUtils, "token[myToken]");
+        assertThat(apply).isFalse();
+
+        boolean emptyApply = RateLimitType.HTTP_HEADER_VALUE.apply(httpServletRequest, route, rateLimitUtils, "otherHeader[fake]");
+        assertThat(emptyApply).isFalse();
+    }
+
+    @Test
+    public void keyHeaderValue() {
+        when(httpServletRequest.getHeader("token")).thenReturn("myToken");
+
+        String key = RateLimitType.HTTP_HEADER_VALUE.key(httpServletRequest, route, rateLimitUtils, "token[myToken]");
+        assertThat(key).isEqualTo("token[myToken]");
     }
 }
