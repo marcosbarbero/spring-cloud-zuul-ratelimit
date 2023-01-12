@@ -198,6 +198,10 @@ public enum RateLimitType {
             return matcher;
         }
 
+        @Override
+        public boolean isValid(String matcher) {
+            return StringUtils.isNotEmpty(matcher);
+        }
     };
 
     public abstract boolean apply(HttpServletRequest request, Route route, RateLimitUtils rateLimitUtils,
